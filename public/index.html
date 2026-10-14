@@ -8,7 +8,8 @@
     <title>Mythos.Guide — Discover the gods</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23a4402d'/%3E%3Cpath d='M12 25L32 13l20 12H12m4 6h32M20 31v17m12-17v17m12-17v17M13 52h38' fill='none' stroke='%23f6f2e9' stroke-width='4'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="/styles.css" />
-    <script src="/app.js" defer></script>
+    <link rel="stylesheet" href="/quiz.css" />
+    <script src="/app.js" type="module"></script>
   </head>
   <body>
     <a class="skip-link" href="#search-input">Skip to search</a>
@@ -18,15 +19,17 @@
           <svg class="brand-mark" aria-hidden="true" viewBox="0 0 44 44" fill="none"><path d="M5 16 22 6l17 10H5Zm3 5h28M11 22v14m11-14v14m11-14v14M6 40h32M9 36h26" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" /></svg>
           <span>Mythos<span class="brand-dot">.</span>Guide</span>
         </a>
-        <div class="header-note"><span class="tiny-star" aria-hidden="true">✦</span> A little curiosity. An ancient world.</div>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="#search">Search</a><a href="#gods">Gods</a><a href="#worlds">Their world</a><a href="#stories">Stories</a><a href="#play">Play <span aria-hidden="true">↗</span></a>
+        </nav>
       </header>
 
       <main>
-        <section class="hero" aria-labelledby="hero-title">
+        <section id="search" class="hero" aria-labelledby="hero-title">
           <div class="hero-copy">
             <div class="eyebrow"><span class="eyebrow-line"></span> GREEK &amp; ROMAN MYTHOLOGY</div>
             <h1 id="hero-title">Every god<br />has a <em>story.</em></h1>
-            <p class="hero-description">Meet the names behind the myths. Search for a god or goddess and discover their place in the ancient world.</p>
+            <p class="hero-description">Meet the names behind the myths. Find a god, wander through their world, and discover the stories that still spark our curiosity.</p>
 
             <div class="search-area">
               <form id="search-form" class="search-form" role="search" novalidate>
@@ -96,9 +99,56 @@
           <noscript><p class="noscript-message">Please enable JavaScript in your browser to use the search.</p></noscript>
           <p class="collection-note">A growing sample collection of mythological figures. Names and traditions can vary across ancient sources.</p>
         </section>
+
+        <section id="gods" class="collection-section content-section" aria-labelledby="gods-title">
+          <div class="section-intro">
+            <div><p class="section-kicker"><span>01</span> THE PANTHEON</p><h2 id="gods-title">Meet the immortals.</h2></div>
+            <p>Gods of the sea. Guardians of the hearth. Get to know the figures behind the names.</p>
+          </div>
+          <div class="collection-toolbar">
+            <div class="filter-group" role="group" aria-label="Filter gods by tradition">
+              <button type="button" data-tradition="all" aria-pressed="true">All gods</button>
+              <button type="button" data-tradition="Greek" aria-pressed="false">Greek</button>
+              <button type="button" data-tradition="Roman" aria-pressed="false">Roman</button>
+            </div>
+            <p id="browse-status" class="small-status" role="status" aria-live="polite">Opening the collection…</p>
+          </div>
+          <div id="browse-results" class="god-grid" aria-busy="true"></div>
+          <div class="show-more-wrap"><button id="browse-more" class="outline-button" type="button" hidden>Show more gods <span aria-hidden="true">↓</span></button></div>
+        </section>
+
+        <section id="worlds" class="world-section content-section" aria-labelledby="worlds-title">
+          <div class="section-intro">
+            <div><p class="section-kicker"><span>02</span> PLACES &amp; EVERYDAY LIFE</p><h2 id="worlds-title">Step into their world.</h2></div>
+            <p>Imagine the places and rituals in these traditions, from a mountain palace to a Roman home.</p>
+          </div>
+          <div id="world-tabs" class="world-tabs" role="tablist" aria-label="Explore a mythological world"></div>
+          <div id="world-panel" class="world-panel" role="tabpanel" tabindex="0"></div>
+        </section>
+
+        <section id="stories" class="stories-section content-section" aria-labelledby="stories-title">
+          <div class="section-intro">
+            <div><p class="section-kicker"><span>03</span> TALES THAT TRAVEL THROUGH TIME</p><h2 id="stories-title">Pull up a seat.</h2></div>
+            <p>Small stories with big questions. Read about wisdom, courage, choices, and the changing seasons.</p>
+          </div>
+          <div id="story-grid" class="story-grid"></div>
+          <p class="collection-note story-note">Original educational sample retellings, inspired by Greek and Roman mythology. Myths vary by source, place, and time; these stories are not quotations from ancient texts.</p>
+        </section>
+
+        <section id="play" class="play-section content-section" aria-labelledby="play-title">
+          <div class="section-intro">
+            <div><p class="section-kicker"><span>04</span> A LITTLE CHALLENGE</p><h2 id="play-title">Put your curiosity to the test.</h2></div>
+            <p>Meet a few familiar faces, try a short quiz, and learn something with every answer.</p>
+          </div>
+          <div id="quiz-root"></div>
+        </section>
       </main>
 
       <footer class="site-footer"><span class="footer-brand">Mythos.Guide</span><span>For the endlessly curious.</span><span class="footer-edition">GREEK &amp; ROMAN MYTHOLOGY <span aria-hidden="true">✦</span></span></footer>
     </div>
+    <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="dialog-title">
+      <button id="dialog-close" class="dialog-close" type="button" aria-label="Close detail window" autofocus>Close <span aria-hidden="true">×</span></button>
+      <div id="dialog-content"></div>
+    </dialog>
   </body>
 </html>

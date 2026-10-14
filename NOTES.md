@@ -33,4 +33,4 @@ Nowhere. The web app runs only on this computer at **http://localhost:3000**. No
 
 Try the search and choose the next improvement. Expand and review the sample descriptions before treating the collection as a research reference. Publish only when explicitly requested; the secret would then go in Vercel environment variables.
 
-Browsing, games, stories, and experiences of the gods' lives are future work.
+Browsing the 60 gods by tradition, exploring four realms, reading six sample stories, and a five-question replayable quiz are complete. All 24 automated checks passed before this save point.

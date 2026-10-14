@@ -43,6 +43,9 @@ test('the app serves its page and public assets locally', async () => {
     ['/', 'text/html'],
     ['/styles.css', 'text/css'],
     ['/app.js', 'text/javascript'],
+    ['/learn-content.js', 'text/javascript'],
+    ['/quiz.js', 'text/javascript'],
+    ['/quiz.css', 'text/css'],
   ]) {
     const response = await fetch(`${address}${path}`);
     assert.equal(response.status, 200, path);
@@ -132,6 +135,30 @@ test('the Vercel request format rejects arrays and objects as god names', async 
     assert.equal(res.statusCode, 400);
     assert.deepEqual(responseBody, {
       error: "Enter one god's name using 1 to 80 characters.",
+    });
+  }
+});
+
+test('browse rejects conflicting, repeated, and invalid options before accessing a database', async () => {
+  for (const query of [
+    '?mode=search',
+    '?mode=',
+    '?mode=Browse',
+    '?mode=browse&mode=browse',
+    '?mode=browse&q=Zeus',
+    '?mode=browse&q=',
+    '?mode=browse&tradition=greek',
+    '?mode=browse&tradition=',
+    '?mode=browse&tradition=Egyptian',
+    '?mode=browse&tradition=Greek&tradition=Roman',
+    '?tradition=all&q=Zeus',
+    '?mode%5B%5D=browse&q=Zeus',
+    '?mode=browse&tradition%5B%24ne%5D=',
+  ]) {
+    const response = await fetch(`${address}/api/gods${query}`);
+    assert.equal(response.status, 400, query);
+    assert.deepEqual(await response.json(), {
+      error: "Choose all, Greek, or Roman in the gods browser, or search for one god's name.",
     });
   }
 });

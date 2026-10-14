@@ -11,6 +11,9 @@ const assets = new Map([
   ['/index.html', ['index.html', 'text/html; charset=utf-8']],
   ['/styles.css', ['styles.css', 'text/css; charset=utf-8']],
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
+  ['/learn-content.js', ['learn-content.js', 'text/javascript; charset=utf-8']],
+  ['/quiz.js', ['quiz.js', 'text/javascript; charset=utf-8']],
+  ['/quiz.css', ['quiz.css', 'text/css; charset=utf-8']],
 ]);
 
 export function createAppServer() {

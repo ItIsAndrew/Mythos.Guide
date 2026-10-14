@@ -2,12 +2,15 @@ import { getDatabase } from "./_lib/mongodb.js";
 import { normalizeSearch, sampleGods } from "./_lib/sample-gods.js";
 
 const COLLECTION = "mythos_guide_sample_gods";
+const SAMPLE_IDS = sampleGods.map(({ id }) => id);
+const SEARCH_ERROR = "Enter one god's name using 1 to 80 characters.";
+const BROWSE_ERROR = "Choose all, Greek, or Roman in the gods browser, or search for one god's name.";
 const seedStateKey = Symbol.for("mythos-guide.sample-seed");
 const seedState = globalThis[seedStateKey] ??= { promise: null };
 
-async function ensureSampleArchive(collection) {
-  if (!seedState.promise) {
-    seedState.promise = (async () => {
+async function ensureSampleArchive(collection, archiveState) {
+  if (!archiveState.promise) {
+    archiveState.promise = (async () => {
       await collection.createIndex({ id: 1 }, { unique: true, name: "sample_god_id" });
       await collection.bulkWrite(
         sampleGods.map((record) => ({
@@ -20,28 +23,51 @@ async function ensureSampleArchive(collection) {
         { ordered: false },
       );
     })().catch(() => {
-      seedState.promise = null;
+      archiveState.promise = null;
       throw new Error("The sample archive could not be prepared.");
     });
   }
-  await seedState.promise;
+  await archiveState.promise;
 }
 
-function readQuery(req) {
+function readRequest(req) {
   const url = new URL(req.url || "/api/gods", "http://localhost");
   // URLSearchParams otherwise silently replaces broken percent encodings.
   decodeURIComponent(url.search.replace(/\+/g, " "));
-  const urlQueries = url.searchParams.getAll("q");
-  if (urlQueries.length > 1) return null;
+  const keys = [...url.searchParams.keys(), ...Object.keys(req.query || {})];
+  // Both the local server and Vercel reject bracket-style array/object inputs.
+  if (keys.some((key) => /^(mode|tradition)\[/.test(key))) return { error: BROWSE_ERROR };
+  if (keys.some((key) => /^q\[/.test(key))) return { error: SEARCH_ERROR };
 
-  const queryValue = req.query && Object.hasOwn(req.query, "q")
-    ? req.query.q
-    : urlQueries[0];
+  function parameter(name) {
+    const values = url.searchParams.getAll(name);
+    const fromRequest = req.query && Object.hasOwn(req.query, name);
+    const value = fromRequest ? req.query[name] : values[0];
+    return {
+      present: Boolean(fromRequest || values.length),
+      value,
+      invalid: values.length > 1 || (value !== undefined && typeof value !== "string"),
+    };
+  }
 
-  if (typeof queryValue !== "string" || queryValue.length > 80) return null;
-  const query = queryValue.trim();
-  if (!query || !normalizeSearch(query)) return null;
-  return query;
+  const mode = parameter("mode");
+  const tradition = parameter("tradition");
+  const q = parameter("q");
+  if (mode.invalid || tradition.invalid) return { error: BROWSE_ERROR };
+
+  if (mode.present) {
+    if (mode.value !== "browse" || q.present || q.invalid) return { error: BROWSE_ERROR };
+    if (tradition.present && !["all", "Greek", "Roman"].includes(tradition.value)) {
+      return { error: BROWSE_ERROR };
+    }
+    return { mode: "browse", tradition: tradition.present ? tradition.value : "all" };
+  }
+  if (tradition.present) return { error: BROWSE_ERROR };
+
+  if (q.invalid || typeof q.value !== "string" || q.value.length > 80) return { error: SEARCH_ERROR };
+  const query = q.value.trim();
+  if (!query || !normalizeSearch(query)) return { error: SEARCH_ERROR };
+  return { mode: "search", query };
 }
 
 function escapeRegex(value) {
@@ -75,64 +101,102 @@ function respond(res, status, body) {
   res.end(JSON.stringify(body));
 }
 
-export default async function handler(req, res) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
-    respond(res, 405, { error: "Please use the search box to look up a god." });
-    return;
-  }
+// The provider is injectable for tests; normal requests always use the shared
+// server-only MongoDB client from getDatabase.
+export function createGodsHandler(databaseProvider = getDatabase, archiveState = { promise: null }) {
+  return async function handler(req, res) {
+    if (req.method !== "GET") {
+      res.setHeader("Allow", "GET");
+      respond(res, 405, { error: "Please use the search box to look up a god." });
+      return;
+    }
 
-  let query;
-  try {
-    query = readQuery(req);
-  } catch {
-    query = null;
-  }
+    let request;
+    try {
+      request = readRequest(req);
+    } catch {
+      request = { error: SEARCH_ERROR };
+    }
 
-  if (query === null) {
-    respond(res, 400, { error: "Enter one god's name using 1 to 80 characters." });
-    return;
-  }
+    if (request.error) {
+      respond(res, 400, { error: request.error });
+      return;
+    }
 
-  try {
-    const database = await getDatabase();
-    const collection = database.collection(COLLECTION);
-    await ensureSampleArchive(collection);
+    try {
+      const database = await databaseProvider();
+      const collection = database.collection(COLLECTION);
+      await ensureSampleArchive(collection, archiveState);
 
-    const normalized = normalizeSearch(query);
-    const records = await collection.find({
-      sampleArchive: "mythos-guide-v1",
-      searchNames: { $regex: escapeRegex(normalized) },
-    }, {
-      projection: {
-        _id: 0,
-        id: 1,
-        name: 1,
-        tradition: 1,
-        description: 1,
-        domain: 1,
-        symbols: 1,
-        equivalent: 1,
-        searchNames: 1,
-      },
-      maxTimeMS: 3_000,
-    }).limit(100).toArray();
+      if (request.mode === "browse") {
+        const filter = {
+          sampleArchive: "mythos-guide-v1",
+          id: { $in: SAMPLE_IDS },
+        };
+        if (request.tradition !== "all") filter.tradition = request.tradition;
+        const records = await collection.find(filter, {
+          projection: {
+            _id: 0,
+            id: 1,
+            name: 1,
+            tradition: 1,
+            description: 1,
+            domain: 1,
+            symbols: 1,
+            equivalent: 1,
+          },
+          maxTimeMS: 3_000,
+        }).limit(sampleGods.length).toArray();
+        records.sort((a, b) => (
+          a.name.localeCompare(b.name, "en")
+          || a.tradition.localeCompare(b.tradition, "en")
+        ));
+        respond(res, 200, {
+          mode: "browse",
+          total: records.length,
+          results: records.map(publicRecord),
+        });
+        return;
+      }
 
-    records.sort((a, b) => (
-      matchRank(a, normalized) - matchRank(b, normalized)
-      || a.name.localeCompare(b.name, "en")
-      || a.tradition.localeCompare(b.tradition, "en")
-    ));
+      const { query } = request;
+      const normalized = normalizeSearch(query);
+      const records = await collection.find({
+        sampleArchive: "mythos-guide-v1",
+        searchNames: { $regex: escapeRegex(normalized) },
+      }, {
+        projection: {
+          _id: 0,
+          id: 1,
+          name: 1,
+          tradition: 1,
+          description: 1,
+          domain: 1,
+          symbols: 1,
+          equivalent: 1,
+          searchNames: 1,
+        },
+        maxTimeMS: 3_000,
+      }).limit(100).toArray();
 
-    respond(res, 200, {
-      query,
-      results: records.slice(0, 8).map(publicRecord),
-    });
-  } catch {
-    // Return only a fixed, friendly message. Raw database errors can reveal
-    // connection details, so they must never be sent to the browser or logs.
-    respond(res, 503, {
-      error: "The mythology archive is taking a break. Please try your search again in a moment.",
-    });
-  }
+      records.sort((a, b) => (
+        matchRank(a, normalized) - matchRank(b, normalized)
+        || a.name.localeCompare(b.name, "en")
+        || a.tradition.localeCompare(b.tradition, "en")
+      ));
+
+      respond(res, 200, {
+        query,
+        results: records.slice(0, 8).map(publicRecord),
+      });
+    } catch {
+      // Return only a fixed, friendly message. Raw database errors can reveal
+      // connection details, so they must never be sent to the browser or logs.
+      respond(res, 503, {
+        error: "The mythology archive is taking a break. Please try your search again in a moment.",
+      });
+    }
+  };
 }
+
+export default createGodsHandler(getDatabase, seedState);
