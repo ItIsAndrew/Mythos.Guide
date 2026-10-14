@@ -210,6 +210,7 @@ function openGod(god, opener) {
 const browseResults = document.querySelector('#browse-results');
 const browseStatus = document.querySelector('#browse-status');
 const browseMore = document.querySelector('#browse-more');
+const browseLess = document.querySelector('#browse-less');
 const traditionButtons = Array.from(document.querySelectorAll('[data-tradition]'));
 const browsePageSize = 12;
 let browseGods = [];
@@ -239,6 +240,7 @@ function renderBrowse() {
   const traditionLabel = currentTradition === 'all' ? '' : `${currentTradition} `;
   browseStatus.textContent = `${shown} of ${browseGods.length} ${traditionLabel}gods in the collection`;
   browseMore.hidden = shown >= browseGods.length;
+  browseLess.hidden = shown <= browsePageSize;
   if (!browseMore.hidden) browseMore.firstChild.textContent = `Show ${Math.min(browsePageSize, browseGods.length - shown)} more gods `;
 }
 
@@ -251,6 +253,7 @@ async function loadBrowse(tradition = currentTradition) {
   browseResults.setAttribute('aria-busy', 'true');
   browseStatus.textContent = 'Opening the collection…';
   browseMore.hidden = true;
+  browseLess.hidden = true;
   const loading = element('div', 'loading-state browse-feedback');
   const spinner = element('span', 'loading-spinner');
   spinner.setAttribute('aria-hidden', 'true');
@@ -295,6 +298,11 @@ browseMore.addEventListener('click', () => {
   visibleGods += browsePageSize;
   renderBrowse();
   browseResults.children[firstNewIndex]?.focus({ preventScroll: true });
+});
+browseLess.addEventListener('click', () => {
+  visibleGods = browsePageSize;
+  renderBrowse();
+  browseMore.focus();
 });
 
 const worldTabs = document.querySelector('#world-tabs');
