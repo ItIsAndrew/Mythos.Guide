@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#f6f2e9" />
+    <title>Owner tools — Mythos.Guide</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/accounts.css" />
+    <script src="/owner.js" type="module"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#owner-main">Skip to owner tools</a>
+    <div class="owner-shell">
+      <header class="owner-header"><a class="brand" href="/">Mythos<span class="brand-dot">.</span>Guide</a><a href="/">Back to the guide</a></header>
+      <main id="owner-main">
+        <div class="owner-intro"><p class="section-kicker">PRIVATE OWNER TOOLS</p><h1>Care for the archive.</h1><p>Invite friends with made-up nicknames, moderate posts, and pause posting whenever you need to.</p></div>
+        <p id="owner-status" class="account-status" role="status" aria-live="polite" aria-atomic="true">Checking your owner session…</p>
+        <form id="owner-login" class="account-card account-form" hidden>
+          <div class="account-field"><label for="owner-passcode">Owner passcode</label><input id="owner-passcode" type="password" maxlength="256" autocomplete="current-password" aria-describedby="owner-login-hint" required /><p id="owner-login-hint" class="account-hint">Open the local owner launcher, then paste your private passcode here.</p></div>
+          <button class="account-primary" type="submit">Open owner tools</button>
+        </form>
+        <div id="owner-content" hidden>
+          <div class="account-toolbar"><p class="owner-login-note">Only your owner session can open these controls.</p><div class="account-actions"><button id="owner-refresh" class="account-secondary" type="button">Refresh posts</button><button id="owner-logout" class="account-secondary" type="button">Log out</button></div></div>
+          <div class="owner-tools">
+            <section class="account-card" aria-labelledby="posting-heading"><h2 id="posting-heading">Allow posting</h2><label class="posting-switch" for="owner-posting"><input id="owner-posting" type="checkbox" role="switch" /><span id="owner-posting-label">Posting on</span></label><p id="owner-posting-hint">Members can save and edit their own posts. They can always read and delete their saved posts.</p></section>
+            <section class="account-card" aria-labelledby="invite-heading"><h2 id="invite-heading">Invite a friend</h2><p>Create a code for one new account. It expires after 24 hours. Give it privately to the person you invite.</p><button id="owner-invite" class="account-primary" type="button">Create invitation</button><div id="owner-invite-result" class="invite-result" hidden><p id="owner-invite-code-label" class="account-hint">One-use invitation code</p><div id="owner-invite-code" class="invite-code" tabindex="0" aria-labelledby="owner-invite-code-label"></div><p id="owner-invite-expiry" class="account-hint"></p><button id="owner-copy-invite" class="account-secondary" type="button">Copy code</button></div></section>
+          </div>
+          <h2 id="owner-posts-heading" class="owner-list-heading">All member posts</h2>
+          <p class="account-hint">Members see only their own posts. You can read and delete any post here.</p>
+          <div id="owner-post-list" class="post-list" aria-busy="false" aria-labelledby="owner-posts-heading"></div>
+          <div class="show-more-wrap"><button id="owner-older" class="account-secondary" type="button" hidden>Load older posts</button></div>
+        </div>
+        <noscript><p class="noscript-message">Please enable JavaScript to use the owner tools.</p></noscript>
+      </main>
+      <footer class="owner-footer">Keep the owner passcode and invitations private. Use made-up sample content on this local app.</footer>
+    </div>
+  </body>
+</html>

@@ -9,7 +9,9 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23a4402d'/%3E%3Cpath d='M12 25L32 13l20 12H12m4 6h32M20 31v17m12-17v17m12-17v17M13 52h38' fill='none' stroke='%23f6f2e9' stroke-width='4'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/quiz.css" />
+    <link rel="stylesheet" href="/accounts.css" />
     <script src="/app.js" type="module"></script>
+    <script src="/accounts.js" type="module"></script>
   </head>
   <body>
     <a class="skip-link" href="#search-input">Skip to search</a>
@@ -20,7 +22,7 @@
           <span>Mythos<span class="brand-dot">.</span>Guide</span>
         </a>
         <nav class="site-nav" aria-label="Main navigation">
-          <a href="#search">Search</a><a href="#gods">Gods</a><a href="#worlds">Their world</a><a href="#stories">Stories</a><a href="#play">Play <span aria-hidden="true">↗</span></a>
+          <a href="#search">Search</a><a href="#gods">Gods</a><a href="#worlds">Their world</a><a href="#stories">Stories</a><a href="#play">Play <span aria-hidden="true">↗</span></a><a href="#account">My posts</a>
         </nav>
       </header>
 
@@ -141,6 +143,38 @@
             <p>Try five questions and learn something with every answer.</p>
           </div>
           <div id="quiz-root"></div>
+        </section>
+
+        <section id="account" class="account-section content-section" aria-labelledby="account-title">
+          <div class="section-intro">
+            <div><p class="section-kicker"><span>05</span> YOUR OWN LITTLE ARCHIVE</p><h2 id="account-title">A place for your discoveries.</h2></div>
+            <p>Keep short notes about the myths. Other members cannot see your posts. The owner can read and delete posts to keep this space safe.</p>
+          </div>
+          <p class="account-rules">Use a made-up nickname. No real names or contact information: no emails, phone numbers, addresses, or social handles in nicknames or posts.</p>
+          <p id="account-status" class="account-status" role="status" aria-live="polite" aria-atomic="true">Checking your account…</p>
+          <div id="account-entry" class="account-card" hidden>
+            <div class="account-tabs" role="group" aria-label="Choose an account action">
+              <button id="account-login-tab" type="button" aria-pressed="true">Log in</button>
+              <button id="account-register-tab" type="button" aria-pressed="false">Join with an invitation</button>
+            </div>
+            <form id="account-form" class="account-form">
+              <div class="account-field"><label for="account-nickname">Made-up nickname</label><input id="account-nickname" name="nickname" type="text" minlength="3" maxlength="24" pattern="[A-Za-z][A-Za-z-]{2,23}" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="nickname-hint" required /><p id="nickname-hint" class="account-hint">3–24 letters or dashes. Try an invented alias such as Moon-Quill. No real names.</p></div>
+              <div class="account-field"><label for="account-password">Password</label><input id="account-password" name="password" type="password" minlength="10" maxlength="72" autocomplete="current-password" aria-describedby="password-hint" required /><p id="password-hint" class="account-hint">10 characters or more, up to 72 bytes. Keep it somewhere safe; there is no email recovery.</p></div>
+              <div id="account-invite-field" class="account-field" hidden><label for="account-invite">Invitation code</label><input id="account-invite" name="inviteCode" type="text" maxlength="128" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="invite-hint" disabled /><p id="invite-hint" class="account-hint">Ask the owner for a private, one-use invitation.</p></div>
+              <button id="account-submit" class="account-primary" type="submit">Log in</button>
+            </form>
+          </div>
+          <div id="account-member" hidden>
+            <div class="account-toolbar"><h3 id="account-welcome"></h3><div class="account-actions"><button id="account-refresh" class="account-secondary" type="button">Refresh posts</button><button id="account-logout" class="account-secondary" type="button">Log out</button></div></div>
+            <p id="posting-status" class="posting-status" role="status"></p>
+            <form id="post-form" class="account-card account-form">
+              <div class="account-field"><label for="post-text">A note about mythology</label><textarea id="post-text" name="text" rows="4" maxlength="500" aria-describedby="post-hint post-count" required></textarea><div class="account-field-footer"><p id="post-hint" class="account-hint">Up to 500 characters. Keep real names and all contact information out of your post.</p><span id="post-count" class="account-count">0 / 500</span></div></div>
+              <button id="post-submit" class="account-primary" type="submit">Save my post</button>
+            </form>
+            <div id="post-list" class="post-list" aria-busy="false"></div>
+            <details id="account-delete-details" class="account-delete"><summary>Delete my account</summary><p>This permanently deletes your account and all your posts. You cannot undo it.</p><form id="account-delete-form" class="account-form"><div class="account-field"><label for="account-delete-password">Confirm with your password</label><input id="account-delete-password" type="password" minlength="10" maxlength="72" autocomplete="current-password" required /></div><button class="account-danger" type="submit">Delete account and all my posts</button></form></details>
+          </div>
+          <noscript><p class="noscript-message">Please enable JavaScript to use your account and posts.</p></noscript>
         </section>
       </main>
 

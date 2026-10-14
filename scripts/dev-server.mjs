@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import godsHandler from '../api/gods.js';
+import accountHandler from '../api/account.js';
+import postsHandler from '../api/posts.js';
+import adminHandler from '../api/admin.js';
 
 const publicRoot = new URL('../public/', import.meta.url);
 const assets = new Map([
@@ -14,13 +17,25 @@ const assets = new Map([
   ['/learn-content.js', ['learn-content.js', 'text/javascript; charset=utf-8']],
   ['/quiz.js', ['quiz.js', 'text/javascript; charset=utf-8']],
   ['/quiz.css', ['quiz.css', 'text/css; charset=utf-8']],
+  ['/accounts.js', ['accounts.js', 'text/javascript; charset=utf-8']],
+  ['/accounts.css', ['accounts.css', 'text/css; charset=utf-8']],
+  ['/owner.html', ['owner.html', 'text/html; charset=utf-8']],
+  ['/owner.js', ['owner.js', 'text/javascript; charset=utf-8']],
 ]);
+const handlers = new Map([
+  ['/api/gods', godsHandler], ['/api/account', accountHandler],
+  ['/api/posts', postsHandler], ['/api/admin', adminHandler],
+]);
+const contentPolicy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
 
 export function createAppServer() {
   return createServer(async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'same-origin');
     res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Content-Security-Policy', contentPolicy);
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
     let url;
     try {
@@ -30,7 +45,8 @@ export function createAppServer() {
       return;
     }
 
-    if (url.pathname === '/api/gods') {
+    const handler = handlers.get(url.pathname);
+    if (handler) {
       res.status = (code) => { res.statusCode = code; return res; };
       res.json = (value) => {
         res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -38,7 +54,7 @@ export function createAppServer() {
         return res;
       };
       try {
-        await godsHandler(req, res);
+        await handler(req, res);
       } catch {
         if (!res.headersSent) {
           res.status(500).json({ error: 'The archive is taking a short break. Please try again.' });

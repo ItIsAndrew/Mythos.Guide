@@ -46,6 +46,10 @@ test('the app serves its page and public assets locally', async () => {
     ['/learn-content.js', 'text/javascript'],
     ['/quiz.js', 'text/javascript'],
     ['/quiz.css', 'text/css'],
+    ['/accounts.css', 'text/css'],
+    ['/accounts.js', 'text/javascript'],
+    ['/owner.html', 'text/html'],
+    ['/owner.js', 'text/javascript'],
   ]) {
     const response = await fetch(`${address}${path}`);
     assert.equal(response.status, 200, path);
@@ -65,6 +69,10 @@ test('private files, server source, and traversal requests are never served', as
     '/AGENTS.md',
     '/api/_lib/mongodb.js',
     '/scripts/dev-server.mjs',
+    '/scripts/open-owner.mjs',
+    '/scripts/check-safety.mjs',
+    '/api/_lib/accounts.js',
+    '/api/_lib/validation.js',
     '/../.env.local',
     '/%2e%2e/.env.local',
     '/%2e%2e%2f.env.local',
@@ -74,6 +82,20 @@ test('private files, server source, and traversal requests are never served', as
     assert.equal(response.status, 404, path);
     assert.equal(response.body, 'Page not found.', path);
   }
+});
+
+test('pages restrict active content, framing, and private response caching', async () => {
+  for (const path of ['/', '/owner.html']) {
+    const response = await fetch(`${address}${path}`);
+    assert.equal(response.headers.get('cache-control'), 'no-store');
+    assert.equal(response.headers.get('x-frame-options'), 'DENY');
+    const policy = response.headers.get('content-security-policy');
+    assert.match(policy, /script-src 'self'/);
+    assert.match(policy, /frame-ancestors 'none'/);
+    assert.doesNotMatch(policy, /unsafe-inline|unsafe-eval/);
+  }
+  const page = await (await fetch(address)).text();
+  assert.doesNotMatch(page, /href=["'][^"']*owner\.html/);
 });
 
 test('HEAD returns page headers without sending page contents', async () => {
