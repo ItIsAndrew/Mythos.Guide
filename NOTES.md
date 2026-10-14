@@ -20,7 +20,7 @@ Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
 - Read six original short retellings with museum reference links.
 - Play five-question quiz rounds from 16 questions, with explanations, scores, and replay.
 - Only `/api` server code uses MongoDB, through one reused client and `client.db()` without a database name. Sample inserts preserve existing records; private environment files stay out of Git.
-- Automated checks cover search, browsing, the local server, and the quiz. Desktop and phone browser checks have also covered the main features.
+- All 42 automated tests passed after the archive expansion. Live browser and database checks confirmed Aether, Euterpe, alternate spellings, and all 129 browse entries.
 - Invite-only accounts ask for an invented nickname and password, with no real names or contact fields. Passwords use bcrypt (cost 12); member sessions last seven days and owner sessions one hour. Sessions are private cookies; logout revokes them.
 - **My posts** saves up to 100 private mythology notes per account. Members can create, edit, delete, or permanently delete their account and posts with their password. Only the owner can moderate everyone’s posts.
 - Hidden owner controls create one-use invitations (24 hours), delete any member post with pagination, and turn posting on/off. Off blocks new posts and edits; reading and deletion still work.
@@ -29,7 +29,7 @@ Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
 
 ## How to try it
 
-Use **Search**, **Gods**, **Their world**, **Stories**, and **Play** in the navigation. Search for Zeus or Neptune, open a god card, switch worlds, read a story, then complete a quiz and choose **Play again**.
+Use **Search**, **Gods**, **Their world**, **Stories**, and **Play** in the navigation. Search for Aether or Euterpe, open a god card, switch worlds, read a story, then complete a quiz and choose **Play again**.
 
 To try accounts: open owner controls, create an invitation, then choose **My posts → Join with an invitation**. Choose a made-up nickname such as **Moon-Quill**, a password of at least 10 characters (maximum 72 UTF-8 bytes), and the invitation. Save **Athena is associated with wisdom.**, edit it, and delete it. Use another browser profile or a private window for a second account. There is no email/password recovery; remember the nickname and password. Friends need a reachable app later; this local-only version has no public invitation link.
 

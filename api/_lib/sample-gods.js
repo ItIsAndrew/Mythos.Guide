@@ -1,3 +1,5 @@
+import { additionalGods } from "./additional-gods.js";
+
 export function normalizeSearch(value) {
   return value
     .normalize("NFKD")
@@ -83,4 +85,5 @@ export const sampleGods = [
   god("roman-bellona", "Bellona", "Roman", "Bellona is a Roman goddess of war. She is often imagined with weapons and a fierce presence, expressing the force and urgency of battle.", "War", ["Sword", "Helmet", "Whip"], "Enyo (Greek association)", ["Duellona"]),
   god("roman-faunus", "Faunus", "Roman", "Faunus is a Roman god of the countryside, flocks, and woodland places. He is also connected with prophecy and is sometimes identified with the Greek Pan.", "Countryside, flocks, and woodland prophecy", ["Goat", "Shepherd's staff"], "Pan (Greek association)", ["Faun", "Lupercus"]),
   god("roman-tellus", "Tellus", "Roman", "Tellus is the Roman personification of the earth. Also called Terra, she is associated with fertile land, growing life, and the earth that supports the community.", "Earth and fertility", ["Earth", "Fruit", "Cornucopia"], "Gaia (Greek)", ["Terra", "Terra Mater", "Tellus Mater"]),
+  ...additionalGods.map((entry) => god(...entry)),
 ];

@@ -163,6 +163,7 @@ export function createGodsHandler(databaseProvider = getDatabase, archiveState =
       const normalized = normalizeSearch(query);
       const records = await collection.find({
         sampleArchive: "mythos-guide-v1",
+        id: { $in: SAMPLE_IDS },
         searchNames: { $regex: escapeRegex(normalized) },
       }, {
         projection: {
@@ -177,7 +178,7 @@ export function createGodsHandler(databaseProvider = getDatabase, archiveState =
           searchNames: 1,
         },
         maxTimeMS: 3_000,
-      }).limit(100).toArray();
+      }).limit(sampleGods.length).toArray();
 
       records.sort((a, b) => (
         matchRank(a, normalized) - matchRank(b, normalized)

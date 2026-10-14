@@ -56,7 +56,7 @@ test('browse returns the complete alphabetical sample archive with public descri
   assert.equal(response.headers['cache-control'], 'no-store');
   assert.equal(response.headers['x-content-type-options'], 'nosniff');
   assert.equal(response.body.mode, 'browse');
-  assert.equal(response.body.total, 60);
+  assert.equal(response.body.total, 129);
   const expected = sampleGods.toSorted((a, b) => (
     a.name.localeCompare(b.name, 'en') || a.tradition.localeCompare(b.tradition, 'en')
   ));
@@ -65,7 +65,7 @@ test('browse returns the complete alphabetical sample archive with public descri
     assert.deepEqual(Object.keys(record).sort(), publicKeys);
     assert.equal(record.description, sampleGods.find(({ id }) => id === record.id).description);
   }
-  assert.equal(calls.finds[0].limit, 60);
+  assert.equal(calls.finds[0].limit, sampleGods.length);
   assert.equal(calls.finds[0].options.maxTimeMS, 3_000);
   assert.equal(calls.finds[0].options.projection._id, 0);
   assert.deepEqual(calls.finds[0].filter.id.$in, sampleGods.map(({ id }) => id));
@@ -96,7 +96,7 @@ test('seeding uses insert-only upserts and preserves existing sample records', a
   assert.deepEqual(calls.indexes[0], [{ id: 1 }, { unique: true, name: 'sample_god_id' }]);
   assert.equal(calls.writes.length, 1);
   const [operations, options] = calls.writes[0];
-  assert.equal(operations.length, 60);
+  assert.equal(operations.length, sampleGods.length);
   assert.deepEqual(options, { ordered: false });
   for (const [index, operation] of operations.entries()) {
     assert.deepEqual(operation, {
@@ -118,19 +118,41 @@ test('search retains aliases, accents, exact-name ranking, ambiguity, limits, an
     ['ATHÉNA', 'greek-athena'],
     ['Pallas-Athena', 'greek-athena'],
     ['Ζεύς', 'greek-zeus'],
+    ['Aether', 'greek-aether'],
+    ['Aither', 'greek-aether'],
+    ['Euterpe', 'greek-euterpe'],
+    ['Euterpê', 'greek-euterpe'],
+    ['Calliope', 'greek-calliope'],
+    ['Clio', 'greek-clio'],
+    ['Erato', 'greek-erato'],
+    ['Melpomene', 'greek-melpomene'],
+    ['Polyhymnia', 'greek-polyhymnia'],
+    ['Terpsichore', 'greek-terpsichore'],
+    ['Thalia', 'greek-thalia-muse'],
+    ['Urania', 'greek-urania'],
+    ['Chronos', 'greek-chronos'],
+    ['Cronus', 'greek-cronus'],
+    ['Rhea', 'greek-rhea'],
+    ['Themis', 'greek-themis'],
+    ['Amphitrite', 'greek-amphitrite'],
+    ['Triton', 'greek-triton'],
+    ['Flora', 'roman-flora'],
+    ['Terminus', 'roman-terminus'],
+    ['Somnus', 'roman-somnus'],
   ]) {
     const { status, body } = await invoke(handler, `/api/gods?q=${encodeURIComponent(query)}`);
     assert.equal(status, 200);
     assert.equal(body.query, query.trim());
     assert.equal(body.results[0].id, expectedId);
     assert.equal(calls.finds.at(-1).filter.searchNames.$regex, normalizeSearch(query));
-    assert.equal(calls.finds.at(-1).limit, 100);
+    assert.equal(calls.finds.at(-1).limit, sampleGods.length);
+    assert.deepEqual(calls.finds.at(-1).filter.id.$in, sampleGods.map(({ id }) => id));
   }
   const apollo = await invoke(handler, '/api/gods?q=Apollo');
   assert.deepEqual(apollo.body.results.map(({ id }) => id), ['greek-apollo', 'roman-apollo']);
   const broad = await invoke(handler, '/api/gods?q=a');
   assert.equal(broad.body.results.length, 8);
-  assert.equal(broad.body.results[0].name, 'Aphrodite');
+  assert.equal(broad.body.results[0].name, 'Aether');
   for (const record of broad.body.results) assert.deepEqual(Object.keys(record).sort(), publicKeys);
   assert.deepEqual((await invoke(handler, '/api/gods?q=not-a-god-123')).body, {
     query: 'not-a-god-123', results: [],
@@ -196,7 +218,7 @@ test('failed archive preparation can be retried without caching a rejected promi
   assert.deepEqual(first.body, unavailable);
   const second = await invoke(handler, '/api/gods?mode=browse');
   assert.equal(second.status, 200);
-  assert.equal(second.body.total, 60);
+  assert.equal(second.body.total, sampleGods.length);
   assert.equal(attempts, 2);
 });
 
