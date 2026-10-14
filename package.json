@@ -1,0 +1,17 @@
+{
+  "name": "mythos-guide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A local Greek and Roman mythology god search.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node --env-file=.env.local scripts/dev-server.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "mongodb": "^7.0.0"
+  }
+}

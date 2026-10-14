@@ -14,7 +14,7 @@
 - Keep the real database URL only in `.env.local` as `MONGODB_URI`, and later in Vercel environment variables if deployment is requested. Never put it in code, fallbacks, logs, chat, or commits, and never ask the user to paste it into chat.
 - Use the database already specified in the URL: call `client.db()` with no name. Do not use `MONGODB_DB` or a hardcoded database name.
 - Keep `.env*` first in `.gitignore`.
-- For the one-time initial URL entry step, set `.env.local` to exactly `MONGODB_URI=PASTE_YOUR_DATABASE_LINK_HERE`, open it in a local text editor, and stop until the user says "Done". Then check the connection without exposing the URL. Do not repeat the reset after the user has saved their URL.
+- The one-time URL entry and private connection check are complete. Keep the user's saved `.env.local`; do not reset it to the placeholder.
 - Keep version 1 on the user's computer. Use only made-up sample data, no real people. Do not publish or deploy it.
 - Run the app locally, open it in the user's browser, and give simple steps for checking the search. The user should not need to read code or debug.
 - Maintain a short `NOTES.md` with how to run, publication status, completed work, and next steps. Update it after each big change.
