@@ -56,9 +56,9 @@ test('browse returns the complete alphabetical sample archive with public descri
   assert.equal(response.headers['cache-control'], 'no-store');
   assert.equal(response.headers['x-content-type-options'], 'nosniff');
   assert.equal(response.body.mode, 'browse');
-  assert.equal(response.body.total, 129);
+  assert.equal(response.body.total, 141);
   const expected = sampleGods.toSorted((a, b) => (
-    a.name.localeCompare(b.name, 'en') || a.tradition.localeCompare(b.tradition, 'en')
+    a.name.localeCompare(b.name, 'en') || a.tradition.localeCompare(b.tradition, 'en') || a.id.localeCompare(b.id, 'en')
   ));
   assert.deepEqual(response.body.results.map(({ id }) => id), expected.map(({ id }) => id));
   for (const record of response.body.results) {
@@ -128,7 +128,18 @@ test('search retains aliases, accents, exact-name ranking, ambiguity, limits, an
     ['Melpomene', 'greek-melpomene'],
     ['Polyhymnia', 'greek-polyhymnia'],
     ['Terpsichore', 'greek-terpsichore'],
-    ['Thalia', 'greek-thalia-muse'],
+    ['Thalia', 'greek-thalia-grace'],
+    ['Thalia the Grace', 'greek-thalia-grace'],
+    ['Aglaia', 'greek-aglaia'],
+    ['Euphrosyne', 'greek-euphrosyne'],
+    ['Eirene', 'greek-eirene'],
+    ['Dike', 'greek-dike'],
+    ['Eunomia', 'greek-eunomia'],
+    ['Alecto', 'greek-alecto'],
+    ['Megaera', 'greek-megaera'],
+    ['Tisiphone', 'greek-tisiphone'],
+    ['Heracles', 'greek-heracles'],
+    ['Aesculapius', 'roman-aesculapius'],
     ['Urania', 'greek-urania'],
     ['Chronos', 'greek-chronos'],
     ['Cronus', 'greek-cronus'],
@@ -150,9 +161,11 @@ test('search retains aliases, accents, exact-name ranking, ambiguity, limits, an
   }
   const apollo = await invoke(handler, '/api/gods?q=Apollo');
   assert.deepEqual(apollo.body.results.map(({ id }) => id), ['greek-apollo', 'roman-apollo']);
+  const thalia = await invoke(handler, '/api/gods?q=Thalia');
+  assert.deepEqual(thalia.body.results.map(({ id }) => id), ['greek-thalia-grace', 'greek-thalia-muse']);
   const broad = await invoke(handler, '/api/gods?q=a');
   assert.equal(broad.body.results.length, 8);
-  assert.equal(broad.body.results[0].name, 'Aether');
+  assert.equal(broad.body.results[0].name, 'Aesculapius');
   for (const record of broad.body.results) assert.deepEqual(Object.keys(record).sort(), publicKeys);
   assert.deepEqual((await invoke(handler, '/api/gods?q=not-a-god-123')).body, {
     query: 'not-a-god-123', results: [],

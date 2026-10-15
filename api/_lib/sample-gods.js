@@ -1,4 +1,5 @@
 import { additionalGods } from "./additional-gods.js";
+import { majorGods } from "./major-gods.js";
 
 export function normalizeSearch(value) {
   return value
@@ -86,4 +87,5 @@ export const sampleGods = [
   god("roman-faunus", "Faunus", "Roman", "Faunus is a Roman god of the countryside, flocks, and woodland places. He is also connected with prophecy and is sometimes identified with the Greek Pan.", "Countryside, flocks, and woodland prophecy", ["Goat", "Shepherd's staff"], "Pan (Greek association)", ["Faun", "Lupercus"]),
   god("roman-tellus", "Tellus", "Roman", "Tellus is the Roman personification of the earth. Also called Terra, she is associated with fertile land, growing life, and the earth that supports the community.", "Earth and fertility", ["Earth", "Fruit", "Cornucopia"], "Gaia (Greek)", ["Terra", "Terra Mater", "Tellus Mater"]),
   ...additionalGods.map((entry) => god(...entry)),
+  ...majorGods.map((entry) => god(...entry)),
 ];

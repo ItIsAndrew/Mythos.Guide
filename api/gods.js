@@ -150,6 +150,7 @@ export function createGodsHandler(databaseProvider = getDatabase, archiveState =
         records.sort((a, b) => (
           a.name.localeCompare(b.name, "en")
           || a.tradition.localeCompare(b.tradition, "en")
+          || a.id.localeCompare(b.id, "en")
         ));
         respond(res, 200, {
           mode: "browse",
@@ -184,6 +185,7 @@ export function createGodsHandler(databaseProvider = getDatabase, archiveState =
         matchRank(a, normalized) - matchRank(b, normalized)
         || a.name.localeCompare(b.name, "en")
         || a.tradition.localeCompare(b.tradition, "en")
+        || a.id.localeCompare(b.id, "en")
       ));
 
       respond(res, 200, {
