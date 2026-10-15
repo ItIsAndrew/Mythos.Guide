@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createQuizSession, questionBank } from '../public/quiz.js';
+import { createQuizSession, questionBank, quizDifficulties } from '../public/quiz.js';
 import { stories, worlds } from '../public/learn-content.js';
 import { normalizeSearch, sampleGods } from '../api/_lib/sample-gods.js';
 
@@ -92,6 +92,43 @@ test('replay resets score, selections, progress, and completion without changing
   assert.equal(JSON.stringify(questionBank), original);
 });
 
+test('difficulty choice limits each round to its question pool and survives replay', () => {
+  assert.deepEqual(quizDifficulties, ['easy', 'medium', 'hard']);
+  const session = createQuizSession({ random: () => 0.5 });
+  for (const difficulty of quizDifficulties) {
+    session.selectDifficulty(difficulty);
+    assert.equal(session.getState().difficulty, difficulty);
+    session.start();
+    const seen = new Set();
+    for (let index = 0; index < 5; index += 1) {
+      const current = session.getState().currentQuestion;
+      assert.equal(current.difficulty, difficulty);
+      seen.add(current.id);
+      chooseAnswer(session, true);
+      session.next();
+    }
+    assert.equal(seen.size, 5);
+    assert.equal(session.getState().status, 'complete');
+    assert.equal(session.restart().difficulty, difficulty);
+    assert.equal(session.getState().currentQuestion.difficulty, difficulty);
+    // Finish the replay before choosing a new difficulty.
+    for (let index = 0; index < 5; index += 1) {
+      chooseAnswer(session, true);
+      session.next();
+    }
+  }
+});
+
+test('difficulty cannot change during a round or to an unavailable pool', () => {
+  const session = createQuizSession();
+  assert.throws(() => session.selectDifficulty('unknown'), RangeError);
+  session.start();
+  assert.equal(session.selectDifficulty('hard').difficulty, 'easy');
+  assert.equal(session.getState().status, 'question');
+  assert.throws(() => createQuizSession({ difficulty: 'unknown' }), RangeError);
+  assert.throws(() => createQuizSession({ difficulty: 'hard', roundSize: 9 }), RangeError);
+});
+
 test('the quiz rejects invalid round sizes and every answer exists exactly once', () => {
   for (const roundSize of [0, -1, 1.5, questionBank.length + 1]) {
     assert.throws(() => createQuizSession({ roundSize }), RangeError);
@@ -99,6 +136,7 @@ test('the quiz rejects invalid round sizes and every answer exists exactly once'
   assert.ok(questionBank.length >= 12);
   assert.equal(new Set(questionBank.map((item) => item.id)).size, questionBank.length);
   for (const item of questionBank) {
+    assert.ok(quizDifficulties.includes(item.difficulty));
     assert.equal(item.choices.length, 4);
     assert.equal(new Set(item.choices).size, 4);
     assert.equal(item.choices.filter((choice) => choice === item.answer).length, 1);

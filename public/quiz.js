@@ -1,24 +1,34 @@
-const question = (id, prompt, choices, answer, explanation) => Object.freeze({
-  id, prompt, choices: Object.freeze(choices), answer, explanation,
+const question = (id, prompt, choices, answer, explanation, difficulty = 'easy') => Object.freeze({
+  id, prompt, choices: Object.freeze(choices), answer, explanation, difficulty,
 });
+
+export const quizDifficulties = Object.freeze(['easy', 'medium', 'hard']);
 
 export const questionBank = Object.freeze([
   question('zeus', 'Which Greek god is associated with thunder?', ['Zeus', 'Hermes', 'Hades', 'Pan'], 'Zeus', 'Zeus rules the Olympian gods and is associated with the sky and thunder.'),
   question('athena', 'Which goddess is linked with wisdom and an owl?', ['Athena', 'Aphrodite', 'Demeter', 'Selene'], 'Athena', 'Athena is associated with wisdom, strategy, and skilled crafts. The owl is one of her symbols.'),
   question('poseidon', 'Who carries a trident in Greek mythology?', ['Poseidon', 'Apollo', 'Ares', 'Hephaestus'], 'Poseidon', 'Poseidon is a Greek god of the sea, earthquakes, and horses; the trident is his familiar symbol.'),
-  question('demeter', 'Which Greek goddess cares for grain and the harvest?', ['Demeter', 'Artemis', 'Hera', 'Iris'], 'Demeter', 'Demeter is associated with agriculture and harvests. Her daughter is Persephone.'),
+  question('demeter', 'Which Greek goddess cares for grain and the harvest?', ['Demeter', 'Artemis', 'Hera', 'Iris'], 'Demeter', 'Demeter is associated with agriculture and harvests. Her daughter is Persephone.', 'medium'),
   question('hermes', 'Which Greek god is a messenger and protector of travelers?', ['Hermes', 'Cronus', 'Helios', 'Hypnos'], 'Hermes', 'Hermes carries messages and crosses boundaries. His symbols include winged sandals.'),
-  question('hades', 'Who rules the Greek underworld?', ['Hades', 'Thanatos', 'Ares', 'Eros'], 'Hades', 'Hades rules the underworld. Thanatos personifies death, so the two have different roles.'),
-  question('artemis', 'Which Greek goddess is associated with the hunt and wild animals?', ['Artemis', 'Hestia', 'Nike', 'Tyche'], 'Artemis', 'Artemis is associated with hunting, the wilderness, and the protection of the young.'),
+  question('hades', 'Who rules the Greek underworld?', ['Hades', 'Thanatos', 'Ares', 'Eros'], 'Hades', 'Hades rules the underworld. Thanatos personifies death, so the two have different roles.', 'medium'),
+  question('artemis', 'Which Greek goddess is associated with the hunt and wild animals?', ['Artemis', 'Hestia', 'Nike', 'Tyche'], 'Artemis', 'Artemis is associated with hunting, the wilderness, and the protection of the young.', 'medium'),
   question('apollo', 'Which instrument is a familiar symbol of Apollo?', ['Lyre', 'Trident', 'Hammer', 'Rudder'], 'Lyre', 'Apollo is linked with music, prophecy, healing, and archery. The lyre is one of his symbols.'),
   question('jupiter', 'Which Roman god is closely identified with Zeus?', ['Jupiter', 'Neptune', 'Saturn', 'Mercury'], 'Jupiter', 'Jupiter is a leading Roman god of sky, thunder, and public authority.'),
-  question('minerva', 'Which Roman goddess is closely identified with Athena?', ['Minerva', 'Venus', 'Juno', 'Ceres'], 'Minerva', 'Minerva is a Roman goddess of wisdom, crafts, and the arts. Roman and Greek traditions overlap but are not identical.'),
+  question('minerva', 'Which Roman goddess is closely identified with Athena?', ['Minerva', 'Venus', 'Juno', 'Ceres'], 'Minerva', 'Minerva is a Roman goddess of wisdom, crafts, and the arts. Roman and Greek traditions overlap but are not identical.', 'medium'),
   question('neptune', 'Which Roman god is associated with the sea?', ['Neptune', 'Vulcan', 'Mars', 'Janus'], 'Neptune', 'Neptune is associated with water, the sea, and horses, and is closely identified with Poseidon.'),
-  question('vesta', 'Which Roman goddess is linked with the hearth and its fire?', ['Vesta', 'Luna', 'Aurora', 'Fortuna'], 'Vesta', 'Vesta is the Roman goddess of the hearth. Her fire represents the shared life of home and community.'),
-  question('janus', 'Which Roman god is linked with beginnings and doorways?', ['Janus', 'Bacchus', 'Cupid', 'Sol'], 'Janus', 'Janus is associated with beginnings and transitions. His two faces look in different directions.'),
+  question('vesta', 'Which Roman goddess is linked with the hearth and its fire?', ['Vesta', 'Luna', 'Aurora', 'Fortuna'], 'Vesta', 'Vesta is the Roman goddess of the hearth. Her fire represents the shared life of home and community.', 'medium'),
+  question('janus', 'Which Roman god is linked with beginnings and doorways?', ['Janus', 'Bacchus', 'Cupid', 'Sol'], 'Janus', 'Janus is associated with beginnings and transitions. His two faces look in different directions.', 'medium'),
   question('venus', 'Which Roman goddess is linked with love and beauty?', ['Venus', 'Diana', 'Ops', 'Bellona'], 'Venus', 'Venus is a Roman goddess of love, beauty, and desire, closely identified with Aphrodite.'),
-  question('vulcan', 'Which Roman god is associated with fire and metalworking?', ['Vulcan', 'Pluto', 'Faunus', 'Mercury'], 'Vulcan', 'Vulcan is associated with fire and the work of a divine smith. His familiar symbols include a hammer and anvil.'),
-  question('mercury', 'Which Roman god is linked with trade, travel, and messages?', ['Mercury', 'Saturn', 'Mars', 'Neptune'], 'Mercury', 'Mercury is the swift messenger linked with travel and trade, closely identified with Hermes.'),
+  question('vulcan', 'Which Roman god is associated with fire and metalworking?', ['Vulcan', 'Pluto', 'Faunus', 'Mercury'], 'Vulcan', 'Vulcan is associated with fire and the work of a divine smith. His familiar symbols include a hammer and anvil.', 'medium'),
+  question('mercury', 'Which Roman god is linked with trade, travel, and messages?', ['Mercury', 'Saturn', 'Mars', 'Neptune'], 'Mercury', 'Mercury is the swift messenger linked with travel and trade, closely identified with Hermes.', 'medium'),
+  question('hebe', 'Which Greek goddess represents youth and serves drink to the gods?', ['Hebe', 'Hestia', 'Themis', 'Rhea'], 'Hebe', 'Hebe is the goddess of youth. Some stories show her serving as cupbearer to the Olympian gods.', 'hard'),
+  question('eileithyia', 'Which goddess is linked with childbirth in Greek mythology?', ['Eileithyia', 'Eris', 'Eos', 'Eirene'], 'Eileithyia', 'Eileithyia is associated with childbirth and is commonly named as a daughter of Zeus and Hera.', 'hard'),
+  question('eris', 'Which divine figure personifies strife and discord?', ['Eris', 'Iris', 'Nike', 'Tyche'], 'Eris', 'Eris gives strife a divine form and appears in stories of quarrels among gods and mortals.', 'hard'),
+  question('morpheus', 'Which dream spirit takes human form in the dreams of kings?', ['Morpheus', 'Hypnos', 'Thanatos', 'Helios'], 'Morpheus', 'In Ovid’s account, Morpheus is one of the dream spirits and appears in human guise.', 'hard'),
+  question('harmonia', 'Which goddess is associated with harmony and concord?', ['Harmonia', 'Nemesis', 'Enyo', 'Ananke'], 'Harmonia', 'Harmonia gives harmony a divine form; ancient accounts connect her with Ares and Aphrodite.', 'hard'),
+  question('plutus', 'Which Greek god personifies wealth?', ['Plutus', 'Pontus', 'Proteus', 'Pan'], 'Plutus', 'Plutus personifies wealth and appears in stories about how prosperity reaches people.', 'hard'),
+  question('nereus', 'Which sea god is sometimes called the Old Man of the Sea?', ['Nereus', 'Triton', 'Oceanus', 'Poseidon'], 'Nereus', 'Nereus is an early sea god and father of the Nereids, a group of sea nymphs.', 'hard'),
+  question('mnemosyne', 'Which Titaness personifies memory and is mother of the Muses?', ['Mnemosyne', 'Metis', 'Theia', 'Phoebe'], 'Mnemosyne', 'Mnemosyne personifies memory and is named as the mother of the nine Muses.', 'hard'),
 ]);
 
 function shuffled(items, random) {
@@ -31,7 +41,7 @@ function shuffled(items, random) {
 }
 
 // The session owns scoring and progression; it can be tested without a browser.
-export function createQuizSession({ questions = questionBank, roundSize = 5, random = Math.random } = {}) {
+export function createQuizSession({ questions = questionBank, roundSize = 5, random = Math.random, difficulty = 'easy' } = {}) {
   if (!Number.isInteger(roundSize) || roundSize < 1 || roundSize > questions.length) {
     throw new RangeError('Choose a round size within the question bank.');
   }
@@ -40,17 +50,39 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
   let index = 0;
   let score = 0;
   let selectedIndex = null;
+  let selectedDifficulty = difficulty;
+
+  function poolFor(value) {
+    if (!quizDifficulties.includes(value)) throw new RangeError('Choose easy, medium, or hard.');
+    const pool = questions.filter((item) => item.difficulty === value);
+    if (pool.length < roundSize) throw new RangeError('Not enough questions for this difficulty.');
+    return pool;
+  }
+
+  poolFor(selectedDifficulty);
 
   const getState = () => ({
-    status, index, score, total: roundSize, selectedIndex,
+    status, index, score, total: roundSize, selectedIndex, difficulty: selectedDifficulty,
     currentQuestion: round[index] ? { ...round[index], choices: [...round[index].choices] } : null,
   });
 
   function start() {
-    round = shuffled(questions, random).slice(0, roundSize).map((item) => ({
+    round = shuffled(poolFor(selectedDifficulty), random).slice(0, roundSize).map((item) => ({
       ...item, choices: shuffled(item.choices, random),
     }));
     status = 'question';
+    index = 0;
+    score = 0;
+    selectedIndex = null;
+    return getState();
+  }
+
+  function selectDifficulty(value) {
+    if (status === 'question') return getState();
+    poolFor(value);
+    selectedDifficulty = value;
+    status = 'ready';
+    round = [];
     index = 0;
     score = 0;
     selectedIndex = null;
@@ -77,7 +109,7 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
     return getState();
   }
 
-  return { getState, start, answer, next, restart: start };
+  return { getState, start, answer, next, restart: start, selectDifficulty };
 }
 
 let mountNumber = 0;
@@ -111,11 +143,29 @@ export function mountQuiz(root) {
       panel.append(element('p', 'quiz-eyebrow', 'A little challenge'));
       const title = element('h3', 'quiz-heading', 'How well do you know the gods?');
       title.id = headingId;
-      panel.append(title, element('p', 'quiz-description', 'Five questions, one answer each. Learn something with every choice, and play again for a fresh mix. There is no timer.'));
+      panel.append(title, element('p', 'quiz-description', 'Choose a difficulty, then answer five questions. Each answer has an explanation, and there is no timer.'));
+      const difficultyChoices = element('fieldset', 'quiz-difficulty');
+      difficultyChoices.append(element('legend', '', 'Choose difficulty'));
+      for (const [value, label, hint] of [
+        ['easy', 'Easy', 'Familiar gods'],
+        ['medium', 'Medium', 'More names and symbols'],
+        ['hard', 'Hard', 'Lesser-known figures'],
+      ]) {
+        const option = element('label', 'quiz-difficulty-option');
+        const input = element('input');
+        input.type = 'radio';
+        input.name = `quiz-difficulty-${mountNumber}`;
+        input.value = value;
+        input.checked = state.difficulty === value;
+        input.addEventListener('change', () => session.selectDifficulty(value));
+        option.append(input, element('span', 'quiz-difficulty-name', label), element('span', 'quiz-difficulty-hint', hint));
+        difficultyChoices.append(option);
+      }
+      panel.append(difficultyChoices);
       panel.append(button('Start quiz', () => { session.start(); render('heading'); }));
       panel.append(element('p', 'quiz-small-note', 'Play just for fun. Your answers stay in this page.'));
     } else if (state.status === 'complete') {
-      panel.append(element('p', 'quiz-eyebrow', 'Round complete'));
+      panel.append(element('p', 'quiz-eyebrow', `${state.difficulty} round complete`));
       const title = element('h3', 'quiz-heading', `You scored ${state.score} out of ${state.total}`);
       title.id = headingId;
       title.tabIndex = -1;
@@ -124,11 +174,12 @@ export function mountQuiz(root) {
         : 'Every answer is a chance to learn. Explore the gods, then try a new round whenever you like.';
       panel.append(title, element('p', 'quiz-description', message));
       panel.append(button('Play again', () => { session.restart(); render('heading'); }));
+      panel.append(button('Change difficulty', () => { session.selectDifficulty(state.difficulty); render('difficulty'); }, 'quiz-change-button'));
     } else {
       const current = state.currentQuestion;
       const answered = state.selectedIndex !== null;
       const progress = element('div', 'quiz-progress');
-      progress.append(element('p', 'quiz-eyebrow', `Question ${state.index + 1} of ${state.total}`));
+      progress.append(element('p', 'quiz-eyebrow', `${state.difficulty} · Question ${state.index + 1} of ${state.total}`));
       progress.append(element('p', 'quiz-score', `Score: ${state.score} / ${state.total}`));
       panel.append(progress);
       const meter = element('progress', 'quiz-meter');
@@ -183,6 +234,7 @@ export function mountQuiz(root) {
     root.replaceChildren(panel);
     if (focusTarget === 'heading') panel.querySelector('.quiz-heading')?.focus({ preventScroll: true });
     if (focusTarget === 'feedback') panel.querySelector('.quiz-feedback')?.focus({ preventScroll: true });
+    if (focusTarget === 'difficulty') panel.querySelector('.quiz-difficulty input:checked')?.focus({ preventScroll: true });
   }
 
   render();

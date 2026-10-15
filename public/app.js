@@ -88,8 +88,8 @@ async function search() {
 
   if (!query) {
     input.setAttribute('aria-invalid', 'true');
-    status.textContent = 'Enter a god’s name to start your discovery.';
-    showFeedback('A name opens a world.', 'Try Zeus, Athena, or Neptune in the search box above.');
+    status.textContent = 'Enter a mythological name to start your discovery.';
+    showFeedback('A name opens a world.', 'Try Zeus, Athena, or Morpheus in the search box above.');
     results.setAttribute('aria-busy', 'false');
     button.removeAttribute('aria-busy');
     buttonLabel.textContent = 'Search';
@@ -116,7 +116,7 @@ async function search() {
 
     if (data.results.length === 0) {
       status.textContent = `No matches for “${query}”.`;
-      showFeedback('A little mystery remains.', 'That name isn’t in our sample collection yet. Check the spelling, try part of the name, or search for Zeus, Athena, or Neptune.');
+      showFeedback('A little mystery remains.', 'That name isn’t in our sample collection yet. Check the spelling, try part of the name, or search for Zeus, Athena, or Morpheus.');
     } else {
       renderResults(data.results);
       status.textContent = `${data.results.length} ${data.results.length === 1 ? 'discovery' : 'discoveries'} for “${query}”.`;
