@@ -1,5 +1,6 @@
 import { worlds, stories } from './learn-content.js';
 import { mountQuiz } from './quiz.js';
+import { familyFactsFor } from './family-facts.js';
 
 const form = document.querySelector('#search-form');
 const input = document.querySelector('#search-input');
@@ -54,6 +55,13 @@ function renderResults(gods) {
       element('span', '', `${readable(god.tradition)} mythology`),
     );
     main.append(heading, element('h3', '', readable(god.name)), element('p', 'result-description', readable(god.description)));
+    if (familyFactsFor(god.id)) {
+      const more = element('button', 'fact-open-button', 'Family & more facts');
+      more.type = 'button';
+      more.setAttribute('aria-label', `Family and more facts about ${readable(god.name)}`);
+      more.addEventListener('click', () => openGod(god, more));
+      main.append(more);
+    }
     const details = element('dl', 'result-details');
     const otherTradition = god.tradition === 'Greek' ? 'Roman' : 'Greek';
     for (const [label, value] of [
@@ -203,7 +211,31 @@ function openGod(god, opener) {
     item.append(element('dt', 'detail-label', label), element('dd', '', readable(value)));
     facts.append(item);
   }
-  content.append(facts, element('p', 'collection-note', 'Myths have many versions. This is an educational sample description, not a single definitive account.'));
+  content.append(facts);
+  const family = familyFactsFor(god.id);
+  if (family) {
+    const section = element('section', 'family-section');
+    section.append(element('h3', '', 'Family & more facts'));
+    const relationships = element('dl', 'family-relationships');
+    for (const [label, value] of [
+      ['Parents', family.parents], ['Partner', family.partner],
+      ['Children', family.children], ['Siblings', family.sibling],
+    ]) {
+      if (!value) continue;
+      const item = element('div', 'family-relationship');
+      item.append(element('dt', '', label), element('dd', '', value));
+      relationships.append(item);
+    }
+    section.append(relationships);
+    if (family.note) section.append(element('p', 'family-note', family.note));
+    const sourceLink = element('a', 'family-source', 'Read the source ↗');
+    sourceLink.href = family.source;
+    sourceLink.target = '_blank';
+    sourceLink.rel = 'noopener noreferrer';
+    section.append(sourceLink);
+    content.append(section);
+  }
+  content.append(element('p', 'collection-note', 'Myths have many versions. This is an educational sample description, not a single definitive account.'));
   openDialog(content, opener);
 }
 
@@ -227,7 +259,7 @@ function renderBrowse() {
     const top = element('span', 'god-card-top');
     top.append(element('span', 'god-tradition', readable(god.tradition)), element('span', 'god-index', String(index + 1).padStart(2, '0')));
     card.append(top, element('span', 'god-card-title', readable(god.name)), element('span', 'god-card-domain', readable(god.domain)), element('span', 'god-card-description', readable(god.description)));
-    const action = element('span', 'card-action', 'Meet this god');
+    const action = element('span', 'card-action', familyFactsFor(god.id) ? 'Family & more facts' : 'Meet this god');
     const arrow = element('span', '', '↗');
     arrow.setAttribute('aria-hidden', 'true');
     action.append(arrow);

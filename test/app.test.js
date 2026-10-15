@@ -47,6 +47,8 @@ test('the app serves its page and public assets locally', async () => {
     ['/quiz.js', 'text/javascript'],
     ['/quiz.css', 'text/css'],
     ['/accounts.css', 'text/css'],
+    ['/family-facts.css', 'text/css'],
+    ['/family-facts.js', 'text/javascript'],
     ['/accounts.js', 'text/javascript'],
     ['/owner.html', 'text/html'],
     ['/owner.js', 'text/javascript'],

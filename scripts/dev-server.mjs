@@ -19,6 +19,8 @@ const assets = new Map([
   ['/quiz.css', ['quiz.css', 'text/css; charset=utf-8']],
   ['/accounts.js', ['accounts.js', 'text/javascript; charset=utf-8']],
   ['/accounts.css', ['accounts.css', 'text/css; charset=utf-8']],
+  ['/family-facts.js', ['family-facts.js', 'text/javascript; charset=utf-8']],
+  ['/family-facts.css', ['family-facts.css', 'text/css; charset=utf-8']],
   ['/owner.html', ['owner.html', 'text/html; charset=utf-8']],
   ['/owner.js', ['owner.js', 'text/javascript; charset=utf-8']],
 ]);

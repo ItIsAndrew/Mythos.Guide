@@ -16,6 +16,7 @@ Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
 
 - Search 129 sample Greek and Roman divine figures, including Aether, Euterpe, the nine Muses, early gods, Titans, sea gods, and alternate spellings.
 - Browse the collection, filter Greek/Roman, show more gods, and open their details.
+- Search results now have a **Family & more facts** button where sourced family details are available. The expanded god view shows parents, partners, children, siblings, a short fact, and a source link as applicable; myths may differ by account.
 - Explore four worlds: Olympus, the sea, the underworld, and a Roman hearth.
 - Read six original short retellings with museum reference links.
 - Play five-question quiz rounds from 16 questions, with explanations, scores, and replay.
@@ -30,6 +31,8 @@ Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
 ## How to try it
 
 Use **Search**, **Gods**, **Their world**, **Stories**, and **Play** in the navigation. Search for Aether or Euterpe, open a god card, switch worlds, read a story, then complete a quiz and choose **Play again**.
+
+For family facts, search **Zeus** or **Athena** and choose **Family & more facts** below the main description. In **Gods**, opening a figure with family facts shows the same extra section.
 
 To try accounts: open owner controls, create an invitation, then choose **My posts → Join with an invitation**. Choose a made-up nickname such as **Moon-Quill**, a password of at least 10 characters (maximum 72 UTF-8 bytes), and the invitation. Save **Athena is associated with wisdom.**, edit it, and delete it. Use another browser profile or a private window for a second account. There is no email/password recovery; remember the nickname and password. Friends need a reachable app later; this local-only version has no public invitation link.
 

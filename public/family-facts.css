@@ -1,0 +1,62 @@
+.fact-open-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 18px;
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: var(--rust);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.fact-open-button:hover { color: var(--ink); }
+.fact-open-button:focus-visible,
+.family-source:focus-visible { outline: 2px solid var(--rust); outline-offset: 3px; }
+
+.family-section {
+  border-top: 1px solid var(--line);
+  padding-top: 25px;
+  margin-top: 4px;
+}
+
+.family-section h3 {
+  margin: 0 0 18px;
+  font-family: var(--serif);
+  font-size: 27px;
+  font-weight: 400;
+}
+
+.family-relationships {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 25px;
+  margin: 0;
+}
+
+.family-relationship dt {
+  margin-bottom: 5px;
+  color: #747663;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+.family-relationship dd,
+.family-note {
+  margin: 0;
+  color: #606456;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.family-note { margin-top: 20px; }
+.family-source { display: inline-block; margin-top: 18px; color: var(--rust); font-size: 13px; }
+
+@media (max-width: 520px) {
+  .family-relationships { grid-template-columns: 1fr; gap: 17px; }
+}
