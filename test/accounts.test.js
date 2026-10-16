@@ -7,7 +7,7 @@ import { createPostsHandler } from '../api/posts.js';
 import { createAdminHandler } from '../api/admin.js';
 import { COLLECTIONS, hashToken } from '../api/_lib/accounts.js';
 import {
-  validateNickname, validatePassword, validatePostText,
+  validateNickname, validatePassword, validatePostText, validateSignupNickname,
 } from '../api/_lib/validation.js';
 import { memoryDatabase } from './helpers/memory-database.js';
 
@@ -107,6 +107,11 @@ async function writePost(f, cookie, text = 'Athena represents wisdom in Greek my
 
 test('nickname and password validation accepts only bounded nickname-only credentials', () => {
   assert.equal(validateNickname('Comet-Fox'), 'Comet-Fox');
+  assert.equal(validateSignupNickname('CometFox'), 'CometFox');
+  assert.equal(validateSignupNickname('Moon-Quill'), 'Moon-Quill');
+  for (const nickname of ['Sarah', 'sarah', 'SARAH']) {
+    assert.throws(() => validateSignupNickname(nickname), { status: 400 });
+  }
   for (const nickname of [null, '', 'A', 'a'.repeat(25), 'Fox99', '@Comet', 'Fox--Comet', 'Real Name', 'fox@example.com', { $ne: '' }]) {
     assert.throws(() => validateNickname(nickname), { status: 400 });
   }
@@ -126,6 +131,8 @@ test('posts reject contact details, obfuscation, controls, and oversized content
     'My number is 555-123-4567', '٥٥٥ ١٢٣ ٤٥٦٧', 'My address: 123 Sample Street',
     'Send to PO Box 432', '@cometfox', 'Instagram: cometfox', 'https://example.com',
     'my real name is Sample Person', 'Athena\u200bis wise',
+    'I go to Cedar Valley Middle School.', 'I attend Cedar Valley Academy.',
+    'My teacher is in the morning class.',
   ]) assert.throws(() => validatePostText(text), { status: 400 }, text);
 });
 
@@ -310,7 +317,7 @@ test('duplicate nicknames roll back invite consumption and registration commits 
   const inviteCode = await invitation(f, ownerCookie);
   clearCooldowns(f);
   const duplicate = await invoke(f.account, {
-    method: 'POST', body: { action: 'register', nickname: 'COMETFOX', password: PASSWORD, inviteCode },
+    method: 'POST', body: { action: 'register', nickname: 'CometFOX', password: PASSWORD, inviteCode },
   });
   assert.equal(duplicate.status, 409);
   const retained = await f.database.collection(COLLECTIONS.invites).findOne({ _id: hashToken(inviteCode) });

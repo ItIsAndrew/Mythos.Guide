@@ -72,6 +72,7 @@ try {
   const invitationB = await expect(owner, '/api/admin', 'POST', { action: 'invite' }, 201);
   await expect(first, '/api/account', 'POST', { action: 'register', nickname: nicknameA, password, inviteCode: invitationA.data.inviteCode }, 201);
   created.add(first);
+  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'Sarah', password, inviteCode: invitationB.data.inviteCode }, 400);
   await expect(second, '/api/account', 'POST', { action: 'register', nickname: nicknameB, password, inviteCode: invitationB.data.inviteCode }, 201);
   created.add(second);
   await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: `StarFox-${suffix}`, password, inviteCode: invitationA.data.inviteCode }, 400);
@@ -98,7 +99,7 @@ try {
   for (const text of [
     'x'.repeat(501), 'Contact fictional@example.invalid', 'fictional [at] example [dot] invalid',
     'Call 202-555-0199', 'Find me at 123 Fictional Street', 'Follow @fictional_owl',
-    'https://example.invalid/fictional',
+    'https://example.invalid/fictional', 'I go to Cedar Valley Middle School.',
   ]) await expect(first, '/api/posts', 'POST', { text }, 400);
   const before = await expect(first, '/api/posts', 'GET', undefined, 200);
   check(before.data.posts.length === 1, 'Blocked contact information was saved.');

@@ -14,6 +14,16 @@ export function validateNickname(value) {
   return value;
 }
 
+// New accounts need an invented-looking two-part alias. Keep the general
+// validator for existing accounts so this change does not lock anyone out.
+export function validateSignupNickname(value) {
+  validateNickname(value);
+  if (!/(?:[a-z][A-Z]|-)/.test(value)) {
+    throw new HttpError(400, "Choose an invented two-part nickname such as Moon-Quill or CometFox. No real names.");
+  }
+  return value;
+}
+
 export function validatePassword(value) {
   if (typeof value !== "string" || value.length < 10 || Buffer.byteLength(value, "utf8") > 72
       || value.includes("\0")) {
@@ -38,6 +48,8 @@ export function containsContactInformation(value) {
   if (/(?:^|\s)(?:\p{N}{1,6}[a-z]?|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:[\p{L}\p{N}.'-]+\s+){0,6}(?:street|st\.?|avenue|ave\.?|road|rd\.?|lane|ln\.?|drive|dr\.?|boulevard|blvd\.?|court|ct\.?|way|place|pl\.?|terrace|ter\.?|circle|close|crescent|parkway|highway|hwy\.?)(?:\b|$)/iu.test(text)) return true;
   if (/(?:^|\s)\p{N}{1,6}[a-z]?\s+(?:rue|rua|calle|strasse|straße|via|piazza)\b|\b(?:rue|rua|calle|strasse|straße|via|piazza)\s+(?:[\p{L}.'-]+\s+){0,5}\p{N}{1,6}|\b(?:apt\.?|apartment|suite|unit)\s*#?\s*\p{N}+/iu.test(text)) return true;
   if (/\b(?:p\.?\s*o\.?\s*box|postal\s+address|home\s+address|my\s+address|i\s+live\s+(?:at|on))\b/iu.test(text)) return true;
+  if (/\b(?:school|academy|college|university|campus|homeroom|classroom|school\s*district)\b/iu.test(text)) return true;
+  if (/\b(?:my\s+(?:teacher|principal|class)|i\s+(?:go|attend|study)\s+(?:at|to))\b/iu.test(text)) return true;
   // Personal introductions are outside the mythology notebook's purpose.
   if (/\b(?:my\s+(?:real\s+)?name\s+is|real\s+name\s*[:=]|full\s+name\s*[:=])\b/iu.test(text)) return true;
   return false;
@@ -46,7 +58,7 @@ export function containsContactInformation(value) {
 export function validatePostText(value) {
   if (typeof value !== "string" || value.length > 500 || !value.trim()
       || containsContactInformation(value)) {
-    throw new HttpError(400, "Write 1 to 500 characters about mythology. No real names, emails, phone numbers, addresses, social handles, or links.");
+    throw new HttpError(400, "Write 1 to 500 characters about mythology. No real names, schools, emails, phone numbers, addresses, social handles, or links.");
   }
   return value.trim();
 }

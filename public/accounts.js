@@ -64,8 +64,8 @@ function safeMessage(error, kind) {
   }
   if (error.status === 403 && kind === 'post') return 'Posting is currently off. You can still read or delete your posts.';
   if (error.status === 400 || error.status === 422) {
-    if (kind === 'register') return 'Check your made-up nickname, password, and invitation. Use no real names or contact information.';
-    if (kind === 'post') return 'Use 1–500 characters about mythology. Remove real names, emails, phone numbers, addresses, and social handles.';
+    if (kind === 'register') return 'Check your two-part made-up nickname, password, and invitation. Use no real names or contact information.';
+    if (kind === 'post') return 'Use 1–500 characters about mythology. Remove real names, schools, emails, phone numbers, addresses, and social handles.';
     return 'Please check the fields and try again.';
   }
   if (error.status === 409 && kind === 'register') return 'Please choose another made-up nickname or check your invitation.';

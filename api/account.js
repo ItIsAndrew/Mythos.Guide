@@ -4,7 +4,7 @@ import {
   COLLECTIONS, apiHandler, clearUserCookie, createSession, currentUser, endSession,
   hashToken, newId, postingEnabled, rateIdentity, rateLimit, respond, token, transaction,
 } from "./_lib/accounts.js";
-import { HttpError, schema, validateInviteCode, validateNickname, validatePassword } from "./_lib/validation.js";
+import { HttpError, schema, validateInviteCode, validateNickname, validatePassword, validateSignupNickname } from "./_lib/validation.js";
 
 let dummyHash;
 async function comparePassword(password, user) {
@@ -48,7 +48,7 @@ export function createAccountHandler(databaseProvider = getDatabase, state) {
     }
     if (!["login", "register"].includes(body.action)) throw new HttpError(400, "Choose login, sign up, or logout.");
     schema(body, body.action === "register" ? ["action", "nickname", "password", "inviteCode"] : ["action", "nickname", "password"]);
-    const nickname = validateNickname(body.nickname);
+    const nickname = body.action === "register" ? validateSignupNickname(body.nickname) : validateNickname(body.nickname);
     const password = validatePassword(body.password);
     const nicknameKey = nickname.toLowerCase();
     await rateLimit(db, "account-auth-ip", identity, 30, 15 * 60_000);

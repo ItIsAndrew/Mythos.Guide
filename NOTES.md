@@ -27,7 +27,7 @@ Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
 - Invite-only accounts ask for an invented nickname and password, with no real names or contact fields. Passwords use bcrypt (cost 12); member sessions last seven days and owner sessions one hour. Sessions are private cookies; logout revokes them.
 - **My posts** saves up to 100 private mythology notes per account. Members can create, edit, delete, or permanently delete their account and posts with their password. Only the owner can moderate everyone’s posts.
 - Hidden owner controls create one-use invitations (24 hours), delete any member post with pagination, and turn posting on/off. Off blocks new posts and edits; reading and deletion still work.
-- MongoDB-backed rate limits persist across server instances. Post changes have a three-second cooldown. Text is limited to 500 characters; recognizable emails, phone numbers, addresses, social handles, links, and personal introductions are blocked before saving and redacted before display. Filters cannot recognize every disguise or infer whether an arbitrary word is a real name; owner moderation remains necessary.
+- MongoDB-backed rate limits persist across server instances. Post changes have a three-second cooldown. New accounts need a two-part invented nickname; existing accounts keep their login format. Text is limited to 500 characters; recognizable school details, emails, phone numbers, addresses, social handles, links, and personal introductions are blocked before saving and redacted before display. Filters cannot recognize every disguise or infer whether arbitrary words are real names; owner moderation remains necessary.
 - Tabs hide private screens when backgrounded and verify the current account on return. Account changes notify other tabs without passing tokens or identity.
 
 ## How to try it
@@ -38,7 +38,7 @@ Try **Morpheus** in Search to find a lesser-known figure. In **Play**, choose a 
 
 For family facts, search **Zeus** or **Athena** and choose **Family & more facts** below the main description. In **Gods**, opening a figure with family facts shows the same extra section.
 
-To try accounts: open owner controls, create an invitation, then choose **My posts → Join with an invitation**. Choose a made-up nickname such as **Moon-Quill**, a password of at least 10 characters (maximum 72 UTF-8 bytes), and the invitation. Save **Athena is associated with wisdom.**, edit it, and delete it. Use another browser profile or a private window for a second account. There is no email/password recovery; remember the nickname and password. Friends need a reachable app later; this local-only version has no public invitation link.
+To try accounts: open owner controls, create an invitation, then choose **My posts → Join with an invitation**. Choose a two-part made-up nickname such as **Moon-Quill**, a password of at least 10 characters (maximum 72 UTF-8 bytes), and the invitation. Save **Athena is associated with wisdom.**, edit it, and delete it. Use another browser profile or a private window for a second account. There is no email/password recovery; remember the nickname and password. Friends need a reachable app later; this local-only version has no public invitation link.
 
 ## Safety rules before any publication or republication
 
