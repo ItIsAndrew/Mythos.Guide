@@ -17,6 +17,7 @@ Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
 - Search 141 sample Greek and Roman divine figures, including lesser-known figures such as Hebe, Morpheus, Nereus, the Muses, Furies, Graces, and Horae. Alternate spellings work too.
 - The archive covers all 48 named Greek figures in [Theoi's major-pantheon overview](https://www.theoi.com/Pantheon.html) and all 12 Roman [Dei Consentes](https://penelope.uchicago.edu/encyclopaedia_romana/romanforum/deorumconsentium.html). This defined 60-name reference set exceeds the 75% goal for major gods; ancient traditions have many more local and minor deities, so there is no fixed total for *all* gods.
 - Browse the collection, filter Greek/Roman, show more or fewer gods, and open their details.
+- Phone layouts have readable text, tap areas of at least 44 pixels, a full-width search button, and wrapping for long notes and codes. Checked small phones (320–430 pixels), landscape phones, tablets, and desktop with no sideways scrolling. Search, stories, god details, quizzes, and account forms were checked in the browser; signed-in and owner layouts used invented in-memory samples.
 - Search results now have a **Family & more facts** button where sourced family details are available. The expanded god view shows parents, partners, children, siblings, a short fact, and a source link as applicable; myths may differ by account.
 - Explore four worlds: Olympus, the sea, the underworld, and a Roman hearth.
 - Read six original short retellings with museum reference links.
