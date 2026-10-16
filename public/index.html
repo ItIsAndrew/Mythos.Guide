@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/quiz.css" />
     <link rel="stylesheet" href="/accounts.css" />
     <link rel="stylesheet" href="/family-facts.css" />
+    <link rel="stylesheet" href="/explore.css" />
     <script src="/app.js" type="module"></script>
     <script src="/accounts.js" type="module"></script>
   </head>
@@ -23,14 +24,14 @@
           <span>Mythos<span class="brand-dot">.</span>Guide</span>
         </a>
         <nav class="site-nav" aria-label="Main navigation">
-          <a href="#search">Search</a><a href="#gods">Gods</a><a href="#worlds">Their world</a><a href="#stories">Stories</a><a href="#play">Play <span aria-hidden="true">↗</span></a><a href="#account">My posts</a>
+          <a href="#search">Search</a><a href="#gods">Gods</a><a href="#basics">Basics</a><a href="#worlds">Their world</a><a href="#stories">Stories</a><a href="#play">Play <span aria-hidden="true">↗</span></a><a href="#account">My posts</a>
         </nav>
         <nav class="phone-nav" aria-label="Phone navigation">
           <a href="#start-here">Start here</a>
           <details class="phone-menu">
             <summary>Explore <span aria-hidden="true">▾</span></summary>
             <div class="phone-menu-links">
-              <a href="#search">Search</a><a href="#gods">Gods</a><a href="#worlds">Their world</a><a href="#stories">Stories</a><a href="#play">Quiz</a><a href="#account">My posts</a>
+              <a href="#search">Search</a><a href="#gods">Gods</a><a href="#basics">Basics</a><a href="#worlds">Their world</a><a href="#stories">Stories</a><a href="#play">Quiz</a><a href="#account">My posts</a>
             </div>
           </details>
         </nav>
@@ -45,6 +46,7 @@
             <li><a class="beginner-link" href="#stories"><span class="beginner-number" aria-hidden="true">2</span><span><strong>Read a story</strong><span class="beginner-description">Pick a short story and meet the gods in action.</span></span><span class="beginner-arrow" aria-hidden="true">→</span></a></li>
             <li><a class="beginner-link" href="#play"><span class="beginner-number" aria-hidden="true">3</span><span><strong>Try an easy quiz</strong><span class="beginner-description">Choose Easy and learn from every answer.</span></span><span class="beginner-arrow" aria-hidden="true">→</span></a></li>
           </ol>
+          <a class="beginner-basics" href="#basics">Learn the Greek and Roman names and mythology words <span aria-hidden="true">→</span></a>
         </section>
 
         <section id="search" class="hero" aria-labelledby="hero-title">
@@ -63,6 +65,10 @@
                 </div>
               </form>
               <div id="search-hint" class="search-examples"><span>Try a name</span><button type="button" data-search="Zeus">Zeus</button><button type="button" data-search="Athena">Athena</button><button type="button" data-search="Morpheus">Morpheus</button></div>
+              <div class="random-discovery">
+                <button id="random-god" class="random-button" type="button">Meet a random god <span aria-hidden="true">↗</span></button>
+                <p id="random-status" role="status" aria-live="polite">No name in mind? Let curiosity choose.</p>
+              </div>
             </div>
           </div>
 
@@ -135,12 +141,19 @@
             </div>
             <p id="browse-status" class="small-status" role="status" aria-live="polite">Opening the collection…</p>
           </div>
+          <div class="topic-filter"><label for="god-topic">Explore by topic</label><select id="god-topic" class="topic-control" disabled><option value="all">All topics</option></select></div>
           <div id="browse-results" class="god-grid" aria-busy="true"></div>
           <div class="show-more-wrap">
             <button id="browse-more" class="outline-button" type="button" hidden>Show more gods <span aria-hidden="true">↓</span></button>
             <button id="browse-less" class="outline-button browse-less-button" type="button" hidden>Show fewer gods <span aria-hidden="true">↑</span></button>
           </div>
           <div class="beginner-next"><a href="#start-here">Start here</a><a href="#stories">Next: Read a story <span aria-hidden="true">→</span></a></div>
+        </section>
+
+        <section id="basics" class="content-section" aria-labelledby="basics-title">
+          <div class="section-intro"><div><p class="section-kicker">A little help along the way</p><h2 id="basics-title">Names and words, made simple</h2></div><p>Compare familiar Greek and Roman names, or look up a mythology word.</p></div>
+          <div id="name-comparison"></div>
+          <div id="myth-glossary"></div>
         </section>
 
         <section id="worlds" class="world-section content-section" aria-labelledby="worlds-title">

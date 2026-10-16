@@ -1,6 +1,8 @@
 import { worlds, stories } from './learn-content.js';
 import { mountQuiz } from './quiz.js';
 import { familyFactsFor } from './family-facts.js';
+import { topics, filterGodsByTopic, chooseRandomGod, suggestionsFor } from './discovery-content.js';
+import { mountLearningTools } from './learning-tools.js';
 
 const form = document.querySelector('#search-form');
 const input = document.querySelector('#search-input');
@@ -62,6 +64,7 @@ function renderResults(gods) {
       more.addEventListener('click', () => openGod(god, more));
       main.append(more);
     }
+    main.append(createExploreNext(god));
     const details = element('dl', 'result-details');
     const otherTradition = god.tradition === 'Greek' ? 'Roman' : 'Greek';
     for (const [label, value] of [
@@ -171,10 +174,12 @@ dialog.addEventListener('click', (event) => {
 });
 
 function openDialog(content, opener) {
+  const alreadyOpen = dialog.open;
   dialogOpener = opener || document.activeElement;
   dialogContent.replaceChildren(content);
   document.body.classList.add('dialog-open');
-  dialog.showModal();
+  if (!alreadyOpen) dialog.showModal();
+  else document.querySelector('#dialog-close').focus({ preventScroll: true });
   dialog.scrollTop = 0;
 }
 
@@ -193,6 +198,50 @@ function relatedNames(names, label = 'Explore these gods') {
   names.forEach((name) => buttons.append(createSearchButton(name)));
   related.append(buttons);
   return related;
+}
+
+function createExploreNext(god) {
+  const next = suggestionsFor(god, worlds, stories);
+  const section = element('details', 'explore-next');
+  section.append(element('summary', '', 'What can I explore next?'));
+  section.append(element('p', '', next.stories.length || next.worlds.length
+    ? 'You might enjoy these stories and places. They connect with this god’s themes or tradition.'
+    : 'Keep learning with a short story from the collection.'));
+  const actions = element('div', 'explore-next-actions');
+  next.stories.forEach((story) => {
+    const read = element('button', 'name-link', `Read ${story.title}`);
+    read.type = 'button';
+    read.addEventListener('click', () => openStory(story, dialog.open ? dialogOpener : read));
+    actions.append(read);
+  });
+  next.worlds.forEach((world) => {
+    const visit = element('button', 'name-link', `Visit ${world.name}`);
+    visit.type = 'button';
+    visit.addEventListener('click', () => {
+      const index = worlds.findIndex((item) => item.id === world.id);
+      const tab = worldTabs.children[index];
+      if (dialog.open) {
+        dialogOpener = tab;
+        dialog.close();
+      }
+      selectWorld(index, true);
+      document.querySelector('#worlds').scrollIntoView({ block: 'start', behavior: 'auto' });
+    });
+    actions.append(visit);
+  });
+  if (!actions.childElementCount) {
+    const browseStories = element('a', 'name-link', 'Browse the stories');
+    browseStories.href = '#stories';
+    browseStories.addEventListener('click', () => {
+      if (dialog.open) {
+        dialogOpener = document.querySelector('#story-grid button') || dialogOpener;
+        dialog.close();
+      }
+    });
+    actions.append(browseStories);
+  }
+  section.append(actions);
+  return section;
 }
 
 function openGod(god, opener) {
@@ -235,24 +284,79 @@ function openGod(god, opener) {
     section.append(sourceLink);
     content.append(section);
   }
-  content.append(element('p', 'collection-note', 'Myths have many versions. This is an educational sample description, not a single definitive account.'));
+  content.append(createExploreNext(god));
+  const another = element('button', 'random-button', 'Meet another random god');
+  another.type = 'button';
+  another.addEventListener('click', () => discoverRandom(god.id, dialogOpener));
+  content.append(another, element('p', 'collection-note', 'Myths have many versions. This is an educational sample description, not a single definitive account.'));
   openDialog(content, opener);
 }
+
+// Cache public records for this page visit; MongoDB remains behind /api/gods.
+let archivePromise;
+function getArchive() {
+  if (!archivePromise) {
+    archivePromise = fetch('/api/gods?mode=browse&tradition=all', { headers: { Accept: 'application/json' } })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok || !Array.isArray(data.results)) throw new Error('Collection unavailable');
+        return data.results;
+      }).catch((error) => {
+        archivePromise = null;
+        throw error;
+      });
+  }
+  return archivePromise;
+}
+
+const randomButton = document.querySelector('#random-god');
+const randomStatus = document.querySelector('#random-status');
+let previousRandomId;
+let randomBusy = false;
+async function discoverRandom(excludeId = previousRandomId, opener = randomButton) {
+  if (randomBusy) return;
+  randomBusy = true;
+  randomButton.disabled = true;
+  randomButton.setAttribute('aria-busy', 'true');
+  randomStatus.textContent = 'Choosing a god from the collection…';
+  try {
+    const god = chooseRandomGod(await getArchive(), excludeId);
+    if (!god) throw new Error('Collection empty');
+    previousRandomId = god.id;
+    randomStatus.textContent = `Meet ${god.name} from ${god.tradition} mythology.`;
+    openGod(god, opener);
+  } catch {
+    randomStatus.textContent = 'The collection couldn’t be loaded. Please try the random button again.';
+  } finally {
+    randomBusy = false;
+    randomButton.disabled = false;
+    randomButton.removeAttribute('aria-busy');
+  }
+}
+randomButton.addEventListener('click', () => discoverRandom());
 
 const browseResults = document.querySelector('#browse-results');
 const browseStatus = document.querySelector('#browse-status');
 const browseMore = document.querySelector('#browse-more');
 const browseLess = document.querySelector('#browse-less');
+const topicSelect = document.querySelector('#god-topic');
+topics.forEach((topic) => {
+  const option = element('option', '', topic.label);
+  option.value = topic.id;
+  if (topic.id === 'all') topicSelect.replaceChildren(option);
+  else topicSelect.append(option);
+});
 const traditionButtons = Array.from(document.querySelectorAll('[data-tradition]'));
 const browsePageSize = 12;
 let browseGods = [];
 let visibleGods = browsePageSize;
 let currentTradition = 'all';
-let browseRequest;
+let currentTopic = 'all';
 let browseNumber = 0;
 
 function renderBrowse() {
-  const cards = browseGods.slice(0, visibleGods).map((god, index) => {
+  const matchingGods = filterGodsByTopic(browseGods, currentTopic);
+  const cards = matchingGods.slice(0, visibleGods).map((god, index) => {
     const card = element('button', 'god-card');
     card.type = 'button';
     card.setAttribute('aria-label', `Read about ${readable(god.name)}, ${readable(god.tradition)} mythology`);
@@ -268,20 +372,33 @@ function renderBrowse() {
     return card;
   });
   browseResults.replaceChildren(...cards);
-  const shown = Math.min(visibleGods, browseGods.length);
+  const shown = Math.min(visibleGods, matchingGods.length);
   const traditionLabel = currentTradition === 'all' ? '' : `${currentTradition} `;
-  browseStatus.textContent = `${shown} of ${browseGods.length} ${traditionLabel}gods in the collection`;
-  browseMore.hidden = shown >= browseGods.length;
+  const topicLabel = currentTopic === 'all' ? 'in the collection' : `· ${topics.find((topic) => topic.id === currentTopic).label}`;
+  browseStatus.textContent = `${shown} of ${matchingGods.length} ${traditionLabel}gods ${topicLabel}`;
+  browseMore.hidden = shown >= matchingGods.length;
   browseLess.hidden = shown <= browsePageSize;
-  if (!browseMore.hidden) browseMore.firstChild.textContent = `Show ${Math.min(browsePageSize, browseGods.length - shown)} more gods `;
+  if (!browseMore.hidden) browseMore.firstChild.textContent = `Show ${Math.min(browsePageSize, matchingGods.length - shown)} more gods `;
+  if (!matchingGods.length) {
+    const empty = element('div', 'feedback-state browse-feedback');
+    empty.append(element('h3', '', 'Try another part of the collection.'), element('p', '', 'No gods match this combination of tradition and topic.'));
+    const reset = element('button', 'outline-button', 'Clear filters');
+    reset.type = 'button';
+    reset.addEventListener('click', () => {
+      currentTopic = 'all';
+      topicSelect.value = 'all';
+      loadBrowse('all');
+    });
+    empty.append(reset);
+    browseResults.replaceChildren(empty);
+  }
 }
 
 async function loadBrowse(tradition = currentTradition) {
-  browseRequest?.abort();
   const requestNumber = ++browseNumber;
   currentTradition = tradition;
   traditionButtons.forEach((filter) => filter.setAttribute('aria-pressed', String(filter.dataset.tradition === tradition)));
-  browseRequest = new AbortController();
+  topicSelect.disabled = true;
   browseResults.setAttribute('aria-busy', 'true');
   browseStatus.textContent = 'Opening the collection…';
   browseMore.hidden = true;
@@ -292,14 +409,9 @@ async function loadBrowse(tradition = currentTradition) {
   loading.append(spinner, element('span', '', 'Gathering the gods and goddesses…'));
   browseResults.replaceChildren(loading);
   try {
-    const response = await fetch(`/api/gods?mode=browse&tradition=${encodeURIComponent(tradition)}`, {
-      signal: browseRequest.signal,
-      headers: { Accept: 'application/json' },
-    });
-    const data = await response.json();
+    const records = await getArchive();
     if (requestNumber !== browseNumber) return;
-    if (!response.ok || !Array.isArray(data.results)) throw new Error('Collection unavailable');
-    browseGods = data.results;
+    browseGods = records.filter((god) => tradition === 'all' || god.tradition === tradition);
     visibleGods = browsePageSize;
     if (browseGods.length) {
       renderBrowse();
@@ -320,13 +432,21 @@ async function loadBrowse(tradition = currentTradition) {
     feedback.append(retry);
     browseResults.replaceChildren(feedback);
   } finally {
-    if (requestNumber === browseNumber) browseResults.setAttribute('aria-busy', 'false');
+    if (requestNumber === browseNumber) {
+      browseResults.setAttribute('aria-busy', 'false');
+      topicSelect.disabled = !browseGods.length;
+    }
   }
 }
 
 traditionButtons.forEach((filter) => filter.addEventListener('click', () => loadBrowse(filter.dataset.tradition)));
+topicSelect.addEventListener('change', () => {
+  currentTopic = topicSelect.value;
+  visibleGods = browsePageSize;
+  renderBrowse();
+});
 browseMore.addEventListener('click', () => {
-  const firstNewIndex = Math.min(visibleGods, browseGods.length);
+  const firstNewIndex = Math.min(visibleGods, filterGodsByTopic(browseGods, currentTopic).length);
   visibleGods += browsePageSize;
   renderBrowse();
   browseResults.children[firstNewIndex]?.focus({ preventScroll: true });
@@ -437,6 +557,7 @@ stories.forEach((story, index) => {
 });
 
 mountQuiz(document.querySelector('#quiz-root'));
+mountLearningTools({ comparisonRoot: document.querySelector('#name-comparison'), glossaryRoot: document.querySelector('#myth-glossary') });
 
 document.querySelectorAll('.phone-nav a').forEach((link) => {
   link.addEventListener('click', () => {

@@ -21,6 +21,9 @@ const assets = new Map([
   ['/accounts.css', ['accounts.css', 'text/css; charset=utf-8']],
   ['/family-facts.js', ['family-facts.js', 'text/javascript; charset=utf-8']],
   ['/family-facts.css', ['family-facts.css', 'text/css; charset=utf-8']],
+  ['/discovery-content.js', ['discovery-content.js', 'text/javascript; charset=utf-8']],
+  ['/learning-tools.js', ['learning-tools.js', 'text/javascript; charset=utf-8']],
+  ['/explore.css', ['explore.css', 'text/css; charset=utf-8']],
   ['/owner.html', ['owner.html', 'text/html; charset=utf-8']],
   ['/owner.js', ['owner.js', 'text/javascript; charset=utf-8']],
 ]);

@@ -1,0 +1,146 @@
+// These topic groups help readers explore; they are not ancient categories or
+// a complete account of any god's roles. A figure can belong to several topics.
+export const topics = [
+  { id: 'all', label: 'All topics' },
+  { id: 'sea', label: 'Sea & water' },
+  { id: 'sky', label: 'Sky & stars' },
+  { id: 'arts', label: 'Arts & wisdom' },
+  { id: 'nature', label: 'Nature & growth' },
+  { id: 'underworld', label: 'The underworld' },
+];
+
+const topicRules = {
+  sea: /\b(sea|water|waters|waves|ocean|oceans|river|rivers|harbors|harbours)\b/i,
+  sky: /\b(sky|sun|moon|stars|starry|dawn|daylight|night|wind|winds|thunder|rainbows|astronomy|upper air)\b/i,
+  arts: /\b(arts|wisdom|crafts|metalworking|invention|music|poetry|dance|song|hymns|tragedy|comedy|theater|theatre|history|learning|memory|astronomy)\b/i,
+  nature: /\b(nature|earth|agriculture|harvest|grain|growth|growing|flowers|flourishing|spring|fruit|orchards|woods|fields|wilderness|wild places|shepherds|flocks|hunting|forests|plants|trees)\b/i,
+  underworld: /\b(underworld|death|dead|underground|afterlife)\b/i,
+};
+
+// These links are established roles that the brief domain field may omit.
+// https://www.metmuseum.org/essays/greek-gods-and-religious-practices
+// https://www.theoi.com/Pantheon.html
+const topicIds = {
+  underworld: new Set(['greek-hermes', 'roman-mercury', 'greek-hecate', 'roman-trivia']),
+};
+
+export function filterGodsByTopic(gods, topicId) {
+  const records = Array.isArray(gods) ? gods : [];
+  const rule = Object.hasOwn(topicRules, topicId) ? topicRules[topicId] : null;
+  if (!rule) return records.slice();
+  return records.filter((god) => (
+    god && (rule.test(String(god.domain || '')) || topicIds[topicId]?.has(god.id))
+  ));
+}
+
+export function chooseRandomGod(gods, previousId, random = Math.random) {
+  const records = Array.isArray(gods) ? gods.filter(Boolean) : [];
+  if (!records.length) return null;
+  const alternatives = records.filter((god) => god.id !== previousId);
+  const choices = alternatives.length ? alternatives : records;
+  const draw = Number(random());
+  const fraction = Number.isFinite(draw) ? Math.min(Math.max(draw, 0), 1) : 0;
+  return choices[Math.min(Math.floor(fraction * choices.length), choices.length - 1)];
+}
+
+// Common identifications, not a claim that Greek and Roman religious traditions
+// were identical. Names and short role summaries were checked against:
+// https://www.metmuseum.org/zh/-/media/files/learn/for-educators/publications-for-educators/roman.pdf
+// https://www.theoi.com/Pantheon.html (including Hestia / Vesta).
+export const comparisons = [
+  { greek: 'Zeus', roman: 'Jupiter', domain: 'Sky and thunder' },
+  { greek: 'Hera', roman: 'Juno', domain: 'Marriage and queenship' },
+  { greek: 'Poseidon', roman: 'Neptune', domain: 'The sea' },
+  { greek: 'Demeter', roman: 'Ceres', domain: 'Grain and harvest' },
+  { greek: 'Athena', roman: 'Minerva', domain: 'Wisdom and crafts' },
+  { greek: 'Apollo', roman: 'Apollo', domain: 'Music, healing, and prophecy' },
+  { greek: 'Artemis', roman: 'Diana', domain: 'Hunting and wild places' },
+  { greek: 'Ares', roman: 'Mars', domain: 'War' },
+  { greek: 'Aphrodite', roman: 'Venus', domain: 'Love and beauty' },
+  { greek: 'Hephaestus', roman: 'Vulcan', domain: 'Fire and metalworking' },
+  { greek: 'Hermes', roman: 'Mercury', domain: 'Messages, travel, and trade' },
+  { greek: 'Hestia', roman: 'Vesta', domain: 'The hearth and home' },
+];
+
+// Original beginner definitions, checked against museum education material and
+// the ancient-text references collected by Theoi:
+// https://www.metmuseum.org/essays/greek-gods-and-religious-practices
+// https://www.theoi.com/Titan/Titanes.html
+// https://www.theoi.com/Nymphe/Nymphai.html
+// https://delphi.culture.gr/archaelogical-site/site-history/mythological-versions-of-the-foundation-of-the-oracle/
+export const glossary = [
+  { term: 'Myth', definition: 'A traditional story about gods, heroes, or the world. Myths can have many different versions.' },
+  { term: 'Deity', definition: 'Another word for a god or goddess.' },
+  { term: 'Pantheon', definition: 'The gods and goddesses of a particular tradition, considered together.' },
+  { term: 'Olympian', definition: 'A god associated with Mount Olympus, the home of the leading Greek gods in myths.' },
+  { term: 'Titan', definition: 'One of an older family of Greek gods. The Titans include Cronus and Rhea; some of their descendants are also called Titans.' },
+  { term: 'Underworld', definition: 'The realm of the dead in Greek and Roman myths. Hades rules it in Greek tradition.' },
+  { term: 'Oracle', definition: 'A message believed to come from a god, or the person or sacred place through which it was given.' },
+  { term: 'Nymph', definition: 'A female divine spirit connected with nature, such as a spring, tree, mountain, or the sea.' },
+];
+
+function normalize(value) {
+  return String(value || '').normalize('NFKD').replace(/\p{M}/gu, '')
+    .toLocaleLowerCase('en').replace(/[^\p{L}\p{N}]/gu, '');
+}
+
+function godNames(god) {
+  const names = [god.name, god.id, ...(Array.isArray(god.aliases) ? god.aliases : []),
+    ...(Array.isArray(god.searchNames) ? god.searchNames : [])];
+  const normalized = new Set(names.filter(Boolean).map(normalize));
+
+  // Two collection entries are named Thalia. An unqualified name alone cannot
+  // establish which one a story means; keep qualified names and IDs instead.
+  if (/^greek-thalia-(muse|grace)$/.test(god.id || '')) {
+    normalized.delete('thalia');
+    normalized.delete('thaleia');
+    normalized.add(normalize(`Thalia the ${god.id.endsWith('muse') ? 'Muse' : 'Grace'}`));
+  }
+  return normalized;
+}
+
+function directMatches(records, key, names) {
+  return records.filter((record) => Array.isArray(record?.[key])
+    && record[key].some((name) => names.has(normalize(name))));
+}
+
+function relatedMatches(records, key, names, counterpart) {
+  // A story naming Mercury should appear before a story naming Hermes when
+  // reading about Mercury. Both can be useful, but they are different links.
+  return [...new Set([
+    ...directMatches(records, key, names),
+    ...directMatches(records, key, counterpart),
+  ])];
+}
+
+function existingById(records, ids) {
+  return ids.map((id) => records.find((record) => record?.id === id)).filter(Boolean);
+}
+
+// Always return objects from the supplied content. Direct name matches take
+// priority. The fallback offers a related topic, not a claim that this god
+// appears in that story or lives in that place.
+export function suggestionsFor(god, worlds, stories) {
+  if (!god) return { stories: [], worlds: [] };
+  const worldRecords = Array.isArray(worlds) ? worlds : [];
+  const storyRecords = Array.isArray(stories) ? stories : [];
+  const names = godNames(god);
+  const counterpart = new Set(god.equivalent
+    ? [normalize(String(god.equivalent).replace(/\s*\([^)]*\)\s*$/, ''))] : []);
+  const directStories = relatedMatches(storyRecords, 'relatedGods', names, counterpart);
+  const directWorlds = relatedMatches(worldRecords, 'gods', names, counterpart);
+  const topic = topics.find(({ id }) => id !== 'all' && filterGodsByTopic([god], id).length)?.id;
+  const fallbackStoryIds = {
+    sea: ['athenas-gift'],
+    arts: ['hermes-and-the-lyre'],
+    nature: ['persephones-return'],
+    underworld: ['persephones-return', 'orpheus-looks-back'],
+  };
+  const fallbackWorldIds = { sea: ['sea'], sky: ['olympus'], underworld: ['underworld'] };
+  return {
+    stories: (directStories.length ? directStories
+      : existingById(storyRecords, fallbackStoryIds[topic] || [])).slice(0, 2),
+    worlds: (directWorlds.length ? directWorlds
+      : existingById(worldRecords, fallbackWorldIds[topic] || [])).slice(0, 1),
+  };
+}
