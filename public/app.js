@@ -437,4 +437,10 @@ stories.forEach((story, index) => {
 });
 
 mountQuiz(document.querySelector('#quiz-root'));
+
+document.querySelectorAll('.phone-nav a').forEach((link) => {
+  link.addEventListener('click', () => {
+    document.querySelector('.phone-menu').open = false;
+  });
+});
 loadBrowse();

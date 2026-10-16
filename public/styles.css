@@ -89,3 +89,39 @@ button, a { touch-action: manipulation; }
   .world-tabs { grid-template-columns: minmax(0, 1fr); }
   .initial-state { flex-direction: column; }
 }
+
+/* A short first-visit path uses the existing collection, stories, and quiz. */
+.phone-nav, .beginner-next { display: none; }
+.beginner-start { padding: 34px 0 38px; border-bottom: 1px solid var(--line); scroll-margin-top: 24px; }
+.beginner-start h2 { font: 400 32px/1.2 var(--serif); letter-spacing: -.7px; margin: 0 0 12px; }
+.beginner-copy { max-width: 700px; margin: 0 0 24px; color: var(--muted); font-size: 16px; line-height: 1.7; }
+.beginner-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; list-style: none; padding: 0; margin: 0; }
+.beginner-steps li { min-width: 0; }
+.beginner-link { display: grid; grid-template-columns: 28px minmax(0, 1fr) 18px; align-items: start; gap: 12px; min-height: 116px; padding: 20px; border: 1px solid var(--line); border-radius: 3px; background: var(--white); text-decoration: none; }
+.beginner-link:hover { border-color: var(--rust); background: #f1ede3; }
+.beginner-number { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid #cbbda8; border-radius: 50%; color: var(--rust); font-size: 14px; }
+.beginner-link strong { display: block; font-size: 17px; line-height: 1.5; }
+.beginner-description { display: block; margin-top: 5px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.beginner-arrow { color: var(--rust); line-height: 28px; }
+
+@media (max-width: 900px) {
+  .site-nav { display: none; }
+  .phone-nav { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; }
+  .phone-nav > a, .phone-menu summary { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 10px; border: 1px solid var(--line); border-radius: 3px; background: #ede8dd; color: var(--ink); font-size: 16px; line-height: 1.5; text-decoration: none; cursor: pointer; }
+  .phone-nav > a { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .phone-menu summary { list-style: none; }
+  .phone-menu summary::-webkit-details-marker { display: none; }
+  .phone-menu summary:focus-visible { outline: 3px solid #c66c45; outline-offset: 5px; }
+  .phone-menu[open] summary > span { transform: rotate(180deg); }
+  .phone-menu-links { position: absolute; z-index: 5; top: calc(100% + 8px); inset-inline: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 10px; border: 1px solid var(--line); border-radius: 3px; background: var(--white); box-shadow: 0 8px 20px #44361f14; }
+  .phone-menu-links a { display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px; border-radius: 3px; font-size: 16px; line-height: 1.5; text-decoration: none; }
+  .phone-menu-links a:hover { background: #ede8dd; }
+  .beginner-start { padding: 26px 0 30px; scroll-margin-top: 16px; }
+  .beginner-start h2 { font-size: 29px; }
+  .beginner-copy { margin-bottom: 20px; }
+  .beginner-steps { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .beginner-link { min-height: 0; padding: 16px; gap: 10px; }
+  .beginner-link strong { font-size: 16px; }
+  .beginner-next { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .beginner-next a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--rust); font-size: 15px; line-height: 1.5; text-underline-offset: 4px; }
+}

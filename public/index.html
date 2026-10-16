@@ -25,9 +25,28 @@
         <nav class="site-nav" aria-label="Main navigation">
           <a href="#search">Search</a><a href="#gods">Gods</a><a href="#worlds">Their world</a><a href="#stories">Stories</a><a href="#play">Play <span aria-hidden="true">↗</span></a><a href="#account">My posts</a>
         </nav>
+        <nav class="phone-nav" aria-label="Phone navigation">
+          <a href="#start-here">Start here</a>
+          <details class="phone-menu">
+            <summary>Explore <span aria-hidden="true">▾</span></summary>
+            <div class="phone-menu-links">
+              <a href="#search">Search</a><a href="#gods">Gods</a><a href="#worlds">Their world</a><a href="#stories">Stories</a><a href="#play">Quiz</a><a href="#account">My posts</a>
+            </div>
+          </details>
+        </nav>
       </header>
 
       <main>
+        <section id="start-here" class="beginner-start" aria-labelledby="start-title">
+          <h2 id="start-title">New to mythology? Start here.</h2>
+          <p class="beginner-copy">Greek and Roman myths tell stories about gods, heroes, and the world around them. You don’t need to know any names to begin. Follow these three steps.</p>
+          <ol class="beginner-steps" role="list">
+            <li><a class="beginner-link" href="#gods"><span class="beginner-number" aria-hidden="true">1</span><span><strong>Meet the gods</strong><span class="beginner-description">Browse the cards. Tap a name to learn who they are.</span></span><span class="beginner-arrow" aria-hidden="true">→</span></a></li>
+            <li><a class="beginner-link" href="#stories"><span class="beginner-number" aria-hidden="true">2</span><span><strong>Read a story</strong><span class="beginner-description">Pick a short story and meet the gods in action.</span></span><span class="beginner-arrow" aria-hidden="true">→</span></a></li>
+            <li><a class="beginner-link" href="#play"><span class="beginner-number" aria-hidden="true">3</span><span><strong>Try an easy quiz</strong><span class="beginner-description">Choose Easy and learn from every answer.</span></span><span class="beginner-arrow" aria-hidden="true">→</span></a></li>
+          </ol>
+        </section>
+
         <section id="search" class="hero" aria-labelledby="hero-title">
           <div class="hero-copy">
             <div class="eyebrow"><span class="eyebrow-line"></span> GREEK &amp; ROMAN MYTHOLOGY</div>
@@ -121,6 +140,7 @@
             <button id="browse-more" class="outline-button" type="button" hidden>Show more gods <span aria-hidden="true">↓</span></button>
             <button id="browse-less" class="outline-button browse-less-button" type="button" hidden>Show fewer gods <span aria-hidden="true">↑</span></button>
           </div>
+          <div class="beginner-next"><a href="#start-here">Start here</a><a href="#stories">Next: Read a story <span aria-hidden="true">→</span></a></div>
         </section>
 
         <section id="worlds" class="world-section content-section" aria-labelledby="worlds-title">
@@ -139,6 +159,7 @@
           </div>
           <div id="story-grid" class="story-grid"></div>
           <p class="collection-note story-note">Original educational sample retellings, inspired by Greek and Roman mythology. Myths vary by source, place, and time; these stories are not quotations from ancient texts.</p>
+          <div class="beginner-next"><a href="#start-here">Start here</a><a href="#play">Next: Try an easy quiz <span aria-hidden="true">→</span></a></div>
         </section>
 
         <section id="play" class="play-section content-section" aria-labelledby="play-title">
