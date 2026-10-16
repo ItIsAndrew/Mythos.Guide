@@ -29,6 +29,68 @@ export const questionBank = Object.freeze([
   question('plutus', 'Which Greek god personifies wealth?', ['Plutus', 'Pontus', 'Proteus', 'Pan'], 'Plutus', 'Plutus personifies wealth and appears in stories about how prosperity reaches people.', 'hard'),
   question('nereus', 'Which sea god is sometimes called the Old Man of the Sea?', ['Nereus', 'Triton', 'Oceanus', 'Poseidon'], 'Nereus', 'Nereus is an early sea god and father of the Nereids, a group of sea nymphs.', 'hard'),
   question('mnemosyne', 'Which Titaness personifies memory and is mother of the Muses?', ['Mnemosyne', 'Metis', 'Theia', 'Phoebe'], 'Mnemosyne', 'Mnemosyne personifies memory and is named as the mother of the nine Muses.', 'hard'),
+
+  // More familiar Greek figures: The Met, Greek Gods and Religious Practices;
+  // Homeric Hymn 5.18–32 for Hestia (classical quotations collected by Theoi).
+  // https://www.metmuseum.org/essays/greek-gods-and-religious-practices
+  // https://www.theoi.com/Ouranios/Hestia.html
+  question('hera', 'Which Greek goddess is queen of the Olympian gods?', ['Hera', 'Demeter', 'Hestia', 'Artemis'], 'Hera', 'Hera is queen of the Olympian gods and is closely linked with marriage.'),
+  question('aphrodite', 'Which Greek goddess is associated with love and beauty?', ['Aphrodite', 'Athena', 'Hera', 'Demeter'], 'Aphrodite', 'Aphrodite is the Greek goddess of love and beauty. Venus is her familiar Roman counterpart.'),
+  question('ares', 'Which Greek god is especially associated with war and battle?', ['Ares', 'Apollo', 'Hermes', 'Dionysus'], 'Ares', 'Ares is a Greek god of war, especially the violence and fighting of battle.'),
+  question('hestia', 'Which Greek goddess is linked with the hearth at the center of a home?', ['Hestia', 'Artemis', 'Aphrodite', 'Iris'], 'Hestia', 'Hestia is the Greek goddess of the hearth. Her sacred fire belongs to homes and communities.'),
+
+  // Roman figures: museum objects identify Diana and Juno's attributes;
+  // Ovid, Fasti 3.171–172 and 3.713–790 describes Mars and Bacchus.
+  // https://www.metmuseum.org/art/collection/search/436499
+  // https://www.metmuseum.org/art/collection/search/207645
+  // https://www.theoi.com/Text/OvidFasti3.html
+  question('diana', 'Which Roman goddess is known for hunting with a bow?', ['Diana', 'Ceres', 'Juno', 'Vesta'], 'Diana', 'Diana is a Roman goddess of the hunt. Artists often show her carrying a bow and arrows.'),
+  question('mars', 'Which Roman god is especially associated with war?', ['Mars', 'Mercury', 'Bacchus', 'Neptune'], 'Mars', 'Mars is a Roman god of war. Roman tradition also connects him with the protection of the community.'),
+  question('juno', 'Which bird is a familiar symbol of the Roman goddess Juno?', ['Peacock', 'Owl', 'Eagle', 'Dove'], 'Peacock', 'The peacock is a familiar symbol of Juno, the Roman goddess of marriage and wife of Jupiter.'),
+  question('bacchus', 'Which Roman god is closely linked with wine and the grapevine?', ['Bacchus', 'Vulcan', 'Saturn', 'Janus'], 'Bacchus', 'Bacchus is associated with wine and the grapevine. Roman writers closely identify him with Dionysus.'),
+
+  // Greek roles and stories: The Met overview; Homeric Hymn to Demeter;
+  // Ovid, Metamorphoses 11.585–632 for Iris (classical quotations on Theoi).
+  // https://www.metmuseum.org/essays/greek-gods-and-religious-practices
+  // https://www.theoi.com/Khthonios/Persephone.html
+  // https://www.theoi.com/Pontios/Iris.html
+  question('dionysus', 'Which Greek god is closely connected with theater festivals?', ['Dionysus', 'Ares', 'Poseidon', 'Hephaestus'], 'Dionysus', 'Dionysus is linked with wine and theater. Greek festivals in his honor included dramatic performances.', 'medium'),
+  question('hephaestus', 'Which Greek god is the divine metalworker and smith?', ['Hephaestus', 'Hermes', 'Hades', 'Helios'], 'Hephaestus', 'Hephaestus is the Greek god of metalworking. Myths describe him making remarkable objects for the gods.', 'medium'),
+  question('persephone', 'Which fruit does Persephone eat in the underworld story?', ['Pomegranate', 'Apple', 'Fig', 'Grape'], 'Pomegranate', 'Persephone eats pomegranate seeds in the underworld. This binds her to spend part of each year there.', 'medium'),
+  question('iris', 'Which Greek messenger goddess is associated with the rainbow?', ['Iris', 'Nike', 'Hebe', 'Selene'], 'Iris', 'Iris is a divine messenger associated with the rainbow. Ancient poems describe her colorful path across the sky.', 'medium'),
+
+  // Roman roles: Ovid, Fasti 4.393–620; Metamorphoses 1.452–473;
+  // Ovid and Virgil quotations for Aurora and Luna collected by Theoi.
+  // https://www.theoi.com/Text/OvidFasti4.html
+  // https://www.theoi.com/Text/OvidMetamorphoses1.html
+  // https://www.theoi.com/Titan/Eos.html
+  // https://www.theoi.com/Titan/Selene.html
+  question('ceres', 'Which Roman goddess is especially linked with grain and farming?', ['Ceres', 'Juno', 'Venus', 'Diana'], 'Ceres', 'Ceres is associated with grain and agriculture. Ovid describes her helping people grow crops for food.', 'medium'),
+  question('aurora', 'Which Roman goddess personifies the dawn?', ['Aurora', 'Luna', 'Nox', 'Fortuna'], 'Aurora', 'Aurora personifies the dawn. Roman poets describe her bringing the first light and driving away the night.', 'medium'),
+  question('luna', 'What does the Roman goddess Luna personify?', ['The Moon', 'The dawn', 'The sea', 'The harvest'], 'The Moon', 'Luna personifies the Moon. Roman poets describe her traveling across the night sky in a chariot.', 'medium'),
+  question('cupid', 'Which Roman god uses arrows that can inspire love?', ['Cupid', 'Mars', 'Mercury', 'Vulcan'], 'Cupid', 'Cupid is a Roman god of love. In Ovid’s stories, his arrows can change the feelings of gods and mortals.', 'medium'),
+
+  // Muses, Fates and Titans: ancient art and classical texts collected by Theoi.
+  // Atlas bears the sky in Hesiod, Theogony 517–520, rather than the Earth.
+  // https://www.theoi.com/Ouranios/MousaEuterpe.html
+  // https://www.theoi.com/Ouranios/MousaKalliope.html
+  // https://www.theoi.com/Daimon/Moirai.html
+  // https://www.theoi.com/Titan/TitanAtlas.html
+  question('euterpe', 'Which Muse is often shown with a double flute?', ['Euterpe', 'Clio', 'Urania', 'Thalia'], 'Euterpe', 'Euterpe is one of the nine Muses. Her familiar double flute, also called double pipes, connects her with music.', 'hard'),
+  question('calliope', 'Which Muse is traditionally associated with epic poetry?', ['Calliope', 'Terpsichore', 'Melpomene', 'Erato'], 'Calliope', 'Calliope is traditionally the Muse of epic poetry, the long poems that tell stories of heroes and their deeds.', 'hard'),
+  question('clotho', 'Which of the Greek Fates is known as the Spinner?', ['Clotho', 'Lachesis', 'Atropos', 'Nemesis'], 'Clotho', 'Clotho is the Spinner among the three Fates. She spins the thread that represents a person’s life.', 'hard'),
+  question('atlas', 'In Hesiod’s account, what does the Titan Atlas hold up?', ['The sky', 'The sea', 'The underworld', 'Mount Olympus'], 'The sky', 'In Hesiod’s account, Atlas supports the sky with his head and hands. This is the burden placed on him.', 'hard'),
+
+  // Roman figures: Ovid, Metamorphoses 14.623–636; Fasti 2.639–684 and 6.89–96;
+  // Cicero, De Natura Deorum 2.26, identifies Portunus as the harbor god.
+  // https://www.theoi.com/Text/OvidMetamorphoses14.html
+  // https://www.theoi.com/Text/OvidFasti2.html
+  // https://www.theoi.com/Text/OvidFasti6.html
+  // https://www.theoi.com/Pontios/Palaimon.html
+  question('pomona', 'Which Roman goddess is especially linked with fruit trees and orchards?', ['Pomona', 'Flora', 'Vesta', 'Bellona'], 'Pomona', 'Pomona is associated with fruit trees and orchards. Ovid describes her skill in caring for fruitful gardens.', 'hard'),
+  question('portunus', 'Which Roman god is especially associated with harbors?', ['Portunus', 'Terminus', 'Vulcan', 'Janus'], 'Portunus', 'Portunus is a Roman god of harbors. Cicero connects his name with the Latin word for a harbor.', 'hard'),
+  question('terminus', 'Which Roman god protects the boundaries marked between pieces of land?', ['Terminus', 'Faunus', 'Bacchus', 'Cupid'], 'Terminus', 'Terminus guards boundaries. Romans honored him at markers separating neighboring fields and properties.', 'hard'),
+  question('concordia', 'Which Roman goddess represents agreement and harmony?', ['Concordia', 'Discordia', 'Bellona', 'Fortuna'], 'Concordia', 'Concordia represents agreement and harmony. Ovid shows her arriving to settle a disagreement between goddesses.', 'hard'),
 ]);
 
 function shuffled(items, random) {

@@ -126,15 +126,20 @@ test('difficulty cannot change during a round or to an unavailable pool', () => 
   assert.equal(session.selectDifficulty('hard').difficulty, 'easy');
   assert.equal(session.getState().status, 'question');
   assert.throws(() => createQuizSession({ difficulty: 'unknown' }), RangeError);
-  assert.throws(() => createQuizSession({ difficulty: 'hard', roundSize: 9 }), RangeError);
+  const hardPoolSize = questionBank.filter((item) => item.difficulty === 'hard').length;
+  assert.throws(() => createQuizSession({ difficulty: 'hard', roundSize: hardPoolSize + 1 }), RangeError);
 });
 
 test('the quiz rejects invalid round sizes and every answer exists exactly once', () => {
   for (const roundSize of [0, -1, 1.5, questionBank.length + 1]) {
     assert.throws(() => createQuizSession({ roundSize }), RangeError);
   }
-  assert.ok(questionBank.length >= 12);
+  assert.ok(questionBank.length >= 48);
   assert.equal(new Set(questionBank.map((item) => item.id)).size, questionBank.length);
+  assert.equal(new Set(questionBank.map((item) => normalizeSearch(item.prompt))).size, questionBank.length);
+  for (const difficulty of quizDifficulties) {
+    assert.ok(questionBank.filter((item) => item.difficulty === difficulty).length >= 16);
+  }
   for (const item of questionBank) {
     assert.ok(quizDifficulties.includes(item.difficulty));
     assert.equal(item.choices.length, 4);
@@ -142,6 +147,34 @@ test('the quiz rejects invalid round sizes and every answer exists exactly once'
     assert.equal(item.choices.filter((choice) => choice === item.answer).length, 1);
     assert.ok(item.explanation.length > 40);
   }
+});
+
+test('every question in the expanded bank scores correct and incorrect answers consistently', () => {
+  const visited = new Set();
+  for (const difficulty of quizDifficulties) {
+    const roundSize = questionBank.filter((item) => item.difficulty === difficulty).length;
+    const session = createQuizSession({ difficulty, roundSize, random: () => 0.37 });
+    for (const correct of [true, false]) {
+      session.start();
+      const roundIds = new Set();
+      for (let index = 0; index < roundSize; index += 1) {
+        const current = session.getState().currentQuestion;
+        assert.equal(current.difficulty, difficulty);
+        roundIds.add(current.id);
+        visited.add(current.id);
+        const state = chooseAnswer(session, correct);
+        assert.equal(state.score, correct ? index + 1 : 0, current.id);
+        assert.equal(state.currentQuestion.explanation, current.explanation);
+        chooseAnswer(session, !correct);
+        assert.equal(session.getState().score, state.score, `${current.id}: answer must stay locked`);
+        session.next();
+      }
+      assert.equal(roundIds.size, roundSize);
+      assert.equal(session.getState().status, 'complete');
+      assert.equal(session.getState().score, correct ? roundSize : 0);
+    }
+  }
+  assert.equal(visited.size, questionBank.length);
 });
 
 test('learning content has unique stories, both traditions, and complete realm details', () => {

@@ -27,9 +27,9 @@ Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
 - Search results now have a **Family & more facts** button where sourced family details are available. The expanded god view shows parents, partners, children, siblings, a short fact, and a source link as applicable; myths may differ by account.
 - Explore four worlds: Olympus, the sea, the underworld, and a Roman hearth.
 - Read six original short retellings with museum reference links.
-- Choose Easy, Medium, or Hard for five-question quiz rounds from 24 questions. Hard features lesser-known figures; each answer has an explanation, with scores and replay.
+- Choose Easy, Medium, or Hard for five-question quiz rounds from 48 questions (16 per difficulty). Each level now has more Greek and Roman questions, including Hera, Diana, Persephone, Aurora, Euterpe, and Pomona. Hard features lesser-known figures; each answer has an explanation, with scores and replay.
 - Only `/api` server code uses MongoDB, through one reused client and `client.db()` without a database name. Sample inserts preserve existing records; private environment files stay out of Git.
-- All 58 automated tests pass, including topic combinations, random selection, related suggestions, name pairings, lesser-known search names, and distinct quiz questions. Live browser checks passed for all five new discovery tools, combined filters, show-more/show-fewer, next-step destinations, keyboard focus, glossary no-match recovery, and layouts from 320 to 1280 pixels without sideways scrolling. Earlier live browser and database checks confirmed Heracles, both figures named Thalia, and all 141 browse entries.
+- All 59 automated tests pass, including topic combinations, random selection, related suggestions, name pairings, lesser-known search names, and distinct quiz questions. Every one of the 48 quiz questions passed correct-answer, incorrect-answer, and answer-locking checks. Live browser checks passed full Easy/Medium/Hard rounds, feedback, scores, replay, difficulty switching, keyboard play, and 320/390-pixel phone and 1280-pixel desktop layouts without sideways scrolling. Earlier browser checks passed all five discovery tools, filters, next-step destinations, keyboard focus, and glossary no-match recovery; live database checks confirmed Heracles, both figures named Thalia, and all 141 browse entries.
 - Invite-only accounts ask for an invented nickname and password, with no real names or contact fields. Passwords use bcrypt (cost 12); member sessions last seven days and owner sessions one hour. Sessions are private cookies; logout revokes them.
 - **My posts** saves up to 100 private mythology notes per account. Members can create, edit, delete, or permanently delete their account and posts with their password. Only the owner can moderate everyone’s posts.
 - Hidden owner controls create one-use invitations (24 hours), delete any member post with pagination, and turn posting on/off. Off blocks new posts and edits; reading and deletion still work.
@@ -41,6 +41,8 @@ Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
 Use **Search**, **Gods**, **Their world**, **Stories**, and **Play** in the navigation. Search for Aether or Euterpe, open a god card, switch worlds, read a story, then complete a quiz and choose **Play again**.
 
 Try **Morpheus** in Search to find a lesser-known figure. In **Play**, choose a difficulty before starting; **Play again** keeps that level, and **Change difficulty** returns to the chooser.
+
+For the expanded trivia game, choose **Play → Easy, Medium, or Hard → Start quiz**. Finish five answers to see your score, then choose **Play again** for another shuffled round or **Change difficulty** to try another level. Questions do not repeat within a round; they can return in later rounds.
 
 For family facts, search **Zeus** or **Athena** and choose **Family & more facts** below the main description. In **Gods**, opening a figure with family facts shows the same extra section.
 
@@ -63,4 +65,4 @@ Do not publish unless explicitly requested. Repeat the checks below after accoun
 
 ## What is next
 
-Try the accounts and owner controls locally. Keep reviewing and expanding the educational sample content. An idea for later is a larger trivia game. Publication remains a separate explicit request and must pass the safety rules above.
+Try the accounts and owner controls locally. Keep reviewing and expanding the educational sample content and trivia questions. Publication remains a separate explicit request and must pass the safety rules above.
