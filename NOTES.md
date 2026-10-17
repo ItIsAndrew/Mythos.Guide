@@ -38,6 +38,8 @@ Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
 
 ## How to try it
 
+The full local app was checked on October 16, 2026: 59 automated tests, all 141 god names, live account/post/owner safety checks, browser workflows, and phone/desktop layouts passed. All disposable test data was removed and the original settings restored. See [TESTING.md](TESTING.md) for the results and one older symbol-data item to review.
+
 Use **Search**, **Gods**, **Their world**, **Stories**, and **Play** in the navigation. Search for Aether or Euterpe, open a god card, switch worlds, read a story, then complete a quiz and choose **Play again**.
 
 Try **Morpheus** in Search to find a lesser-known figure. In **Play**, choose a difficulty before starting; **Play again** keeps that level, and **Change difficulty** returns to the chooser.
