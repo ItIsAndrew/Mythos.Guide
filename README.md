@@ -10,7 +10,7 @@ Use Node.js 22 or newer.
 
 1. Install dependencies with `npm install`.
 2. Copy `database.env.example` to `.env.local`. Enter your MongoDB connection URL privately as `MONGODB_URI`. For account and owner features, also add `ADMIN_PASSCODE` with a long, random private value. Never commit this file or share its contents.
-3. Run `npm run dev` and open **http://localhost:3000**.
+3. Run `npm run dev` and open **http://localhost:3000**. The new landing page leads to the full guide at **http://localhost:3000/guide**.
 
 The existing Mac shortcuts can start the app and open owner controls. Keep the Terminal window open while using the app.
 

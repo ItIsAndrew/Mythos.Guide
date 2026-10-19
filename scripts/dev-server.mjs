@@ -10,8 +10,12 @@ import adminHandler from '../api/admin.js';
 
 const publicRoot = new URL('../public/', import.meta.url);
 const assets = new Map([
-  ['/', ['index.html', 'text/html; charset=utf-8']],
+  ['/', ['landing.html', 'text/html; charset=utf-8']],
+  ['/guide', ['index.html', 'text/html; charset=utf-8']],
   ['/index.html', ['index.html', 'text/html; charset=utf-8']],
+  ['/landing.html', ['landing.html', 'text/html; charset=utf-8']],
+  ['/landing.css', ['landing.css', 'text/css; charset=utf-8']],
+  ['/landing.js', ['landing.js', 'text/javascript; charset=utf-8']],
   ['/styles.css', ['styles.css', 'text/css; charset=utf-8']],
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
   ['/learn-content.js', ['learn-content.js', 'text/javascript; charset=utf-8']],

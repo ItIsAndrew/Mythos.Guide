@@ -2,7 +2,7 @@
 
 ## How to run
 
-Double-click **Start Mythos.Guide.command** in this folder, then use **http://localhost:3000**. Keep the Terminal window open; Control+C stops the app. This Mac uses the Node runtime already bundled with Codex, without an admin password. With Node.js 22+ and dependencies installed, `npm run dev` also works.
+Double-click **Start Mythos.Guide.command** in this folder, then use **http://localhost:3000** for the new landing page. Choose **Enter the guide** to open the full experience at **http://localhost:3000/guide**. Keep the Terminal window open; Control+C stops the app. This Mac uses the Node runtime already bundled with Codex, without an admin password. With Node.js 22+ and dependencies installed, `npm run dev` also works.
 
 Internet is needed for MongoDB. Keep the private URL only in `.env.local` as `MONGODB_URI`.
 
@@ -14,6 +14,7 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 
 ## What is done
 
+- A lighter landing page at `/` introduces Mythos.Guide and leads into the existing full guide at `/guide`. Old links to sections such as `/#account` still open the matching guide section. The design keeps the same paper, ink, and terracotta palette while using a different doorway illustration and simpler first screen.
 - Search 141 sample Greek and Roman divine figures, including lesser-known figures such as Hebe, Morpheus, Nereus, the Muses, Furies, Graces, and Horae. Alternate spellings work too.
 - The archive covers all 48 named Greek figures in [Theoi's major-pantheon overview](https://www.theoi.com/Pantheon.html) and all 12 Roman [Dei Consentes](https://penelope.uchicago.edu/encyclopaedia_romana/romanforum/deorumconsentium.html). This defined 60-name reference set exceeds the 75% goal for major gods; ancient traditions have many more local and minor deities, so there is no fixed total for *all* gods.
 - Browse the collection, filter Greek/Roman, show more or fewer gods, and open their details.
