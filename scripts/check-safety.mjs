@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { setTimeout as pause } from 'node:timers/promises';
+import { nicknameEnds, nicknameStarts } from '../public/nickname-words.js';
 
 // Exercise the local HTTP API only. MongoDB access remains inside /api.
 const base = 'http://localhost:3000';
@@ -7,9 +8,10 @@ const owner = { cookie: '' };
 const first = { cookie: '' };
 const second = { cookie: '' };
 const visitor = { cookie: '' };
-const suffix = Array.from(randomBytes(8), (n) => String.fromCharCode(97 + n % 26)).join('');
-const nicknameA = `MoonMoth-${suffix}`;
-const nicknameB = `CloudOwl-${suffix}`;
+const aliases = nicknameStarts.flatMap((start) => nicknameEnds.map((end) => `${start}-${end}`));
+const firstAlias = randomBytes(2).readUInt16BE() % aliases.length;
+let nicknameA;
+let nicknameB;
 const password = randomBytes(24).toString('base64url');
 const created = new Set();
 let originalPosting;
@@ -55,6 +57,17 @@ async function expect(jar, path, method, body, status) {
   return result;
 }
 
+async function registerMadeUp(jar, inviteCode, exclude = '') {
+  for (let index = 0; index < aliases.length; index += 1) {
+    const nickname = aliases[(firstAlias + index) % aliases.length];
+    if (nickname === exclude) continue;
+    const result = await call(jar, '/api/account', 'POST', { action: 'register', nickname, password, inviteCode });
+    if (result.status === 201) return nickname;
+    check(result.status === 409, 'A made-up test account could not be registered.');
+  }
+  throw new Error('No unused made-up nickname remains for the safety check.');
+}
+
 try {
   check(process.env.ADMIN_PASSCODE?.length >= 16, 'Owner passcode is not configured.');
   await expect(visitor, '/api/posts', 'GET', undefined, 401);
@@ -70,12 +83,13 @@ try {
 
   const invitationA = await expect(owner, '/api/admin', 'POST', { action: 'invite' }, 201);
   const invitationB = await expect(owner, '/api/admin', 'POST', { action: 'invite' }, 201);
-  await expect(first, '/api/account', 'POST', { action: 'register', nickname: nicknameA, password, inviteCode: invitationA.data.inviteCode }, 201);
+  nicknameA = await registerMadeUp(first, invitationA.data.inviteCode);
   created.add(first);
   await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'Sarah', password, inviteCode: invitationB.data.inviteCode }, 400);
-  await expect(second, '/api/account', 'POST', { action: 'register', nickname: nicknameB, password, inviteCode: invitationB.data.inviteCode }, 201);
+  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'SarahJones', password, inviteCode: invitationB.data.inviteCode }, 400);
+  nicknameB = await registerMadeUp(second, invitationB.data.inviteCode, nicknameA);
   created.add(second);
-  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: `StarFox-${suffix}`, password, inviteCode: invitationA.data.inviteCode }, 400);
+  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'Star-Fox', password, inviteCode: invitationA.data.inviteCode }, 400);
   console.log('PASS: invite-only nickname accounts and one-use invitations.');
 
   await expect(first, '/api/posts', 'POST', { text: 'Athena carries a shield in the sample story.' }, 201);
@@ -100,6 +114,7 @@ try {
     'x'.repeat(501), 'Contact fictional@example.invalid', 'fictional [at] example [dot] invalid',
     'Call 202-555-0199', 'Find me at 123 Fictional Street', 'Follow @fictional_owl',
     'https://example.invalid/fictional', 'I go to Cedar Valley Middle School.',
+    'My friend Sarah likes Athena.', 'Sarah is my friend and likes Athena.',
   ]) await expect(first, '/api/posts', 'POST', { text }, 400);
   const before = await expect(first, '/api/posts', 'GET', undefined, 200);
   check(before.data.posts.length === 1, 'Blocked contact information was saved.');

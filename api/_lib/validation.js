@@ -1,3 +1,5 @@
+import { nicknameEnds, nicknameStarts } from "../../public/nickname-words.js";
+
 export class HttpError extends Error {
   constructor(status, message, retryAfter) {
     super(message);
@@ -14,14 +16,17 @@ export function validateNickname(value) {
   return value;
 }
 
-// New accounts need an invented-looking two-part alias. Keep the general
-// validator for existing accounts so this change does not lock anyone out.
+// New accounts choose from impersonal word pairs. Keep the general validator
+// for existing accounts so this change cannot lock anyone out.
 export function validateSignupNickname(value) {
   validateNickname(value);
-  if (!/(?:[a-z][A-Z]|-)/.test(value)) {
-    throw new HttpError(400, "Choose an invented two-part nickname such as Moon-Quill or CometFox. No real names.");
+  const canonical = nicknameStarts.flatMap((start) => nicknameEnds.flatMap((end) => (
+    [`${start}${end}`, `${start}-${end}`]
+  ))).find((name) => name.toLowerCase() === value.toLowerCase());
+  if (!canonical) {
+    throw new HttpError(400, "Choose two made-up nickname words, such as Moon-Quill or CometFox. Use the nickname suggestion on the page.");
   }
-  return value;
+  return canonical;
 }
 
 export function validatePassword(value) {
@@ -50,6 +55,10 @@ export function containsContactInformation(value) {
   if (/\b(?:p\.?\s*o\.?\s*box|postal\s+address|home\s+address|my\s+address|i\s+live\s+(?:at|on))\b/iu.test(text)) return true;
   if (/\b(?:school|academy|college|university|campus|homeroom|classroom|school\s*district)\b/iu.test(text)) return true;
   if (/\b(?:my\s+(?:teacher|principal|class)|i\s+(?:go|attend|study)\s+(?:at|to))\b/iu.test(text)) return true;
+  if (/\b(?:my|our|your)\s+(?:(?:best|close|old|new)\s+)?(?:friend|classmate|neighbor|neighbour|teacher|principal|parent|mother|father|mom|mum|dad|brother|sister|cousin|family|child|kid)\b/iu.test(text)) return true;
+  if (/\b(?:friend|classmate|neighbor|neighbour|teacher|principal|parent|cousin)\s+(?:named|called|is)\b/iu.test(text)) return true;
+  if (/\b(?:is|was)\s+(?:my|our|your)\s+(?:(?:best|close|old|new)\s+)?(?:friend|classmate|neighbor|neighbour|teacher|principal|parent|cousin)\b/iu.test(text)) return true;
+  if (/\b(?:i\s+(?:am|was|know|met|live|work)|i['’]m|myself|about\s+me|we\s+(?:are|live|know)|our\s+(?:home|town|city))\b/iu.test(text)) return true;
   // Personal introductions are outside the mythology notebook's purpose.
   if (/\b(?:my\s+(?:real\s+)?name\s+is|real\s+name\s*[:=]|full\s+name\s*[:=])\b/iu.test(text)) return true;
   return false;

@@ -1,9 +1,12 @@
+import { nicknameEnds, nicknameStarts } from './nickname-words.js';
+
 const root = document.querySelector('#account');
 const entry = document.querySelector('#account-entry');
 const member = document.querySelector('#account-member');
 const status = document.querySelector('#account-status');
 const accountForm = document.querySelector('#account-form');
 const nickname = document.querySelector('#account-nickname');
+const nicknameSuggest = document.querySelector('#nickname-suggest');
 const password = document.querySelector('#account-password');
 const invite = document.querySelector('#account-invite');
 const loginTab = document.querySelector('#account-login-tab');
@@ -64,7 +67,7 @@ function safeMessage(error, kind) {
   }
   if (error.status === 403 && kind === 'post') return 'Posting is currently off. You can still read or delete your posts.';
   if (error.status === 400 || error.status === 422) {
-    if (kind === 'register') return 'Check your two-part made-up nickname, password, and invitation. Use no real names or contact information.';
+    if (kind === 'register') return 'Check the suggested nickname, password, and invitation. Use no real names or contact information.';
     if (kind === 'post') return 'Use 1–500 characters about mythology. Remove real names, schools, emails, phone numbers, addresses, and social handles.';
     return 'Please check the fields and try again.';
   }
@@ -317,6 +320,9 @@ function chooseMode(mode) {
   state.mode = mode;
   loginTab.setAttribute('aria-pressed', String(mode === 'login'));
   registerTab.setAttribute('aria-pressed', String(mode === 'register'));
+  nicknameSuggest.hidden = mode !== 'register';
+  nickname.readOnly = mode === 'register';
+  if (mode === 'register') suggestNickname(false);
   document.querySelector('#account-invite-field').hidden = mode !== 'register';
   invite.disabled = mode !== 'register';
   invite.required = mode === 'register';
@@ -325,6 +331,17 @@ function chooseMode(mode) {
   document.querySelector('#account-submit').textContent = mode === 'register' ? 'Create my account' : 'Log in';
   say(mode === 'register' ? 'Choose a made-up nickname and use the invitation the owner gave you.' : 'Log in to open your own archive.');
   nickname.focus({ preventScroll: true });
+}
+
+function suggestNickname(announce = true) {
+  const start = nicknameStarts[Math.floor(Math.random() * nicknameStarts.length)];
+  let end = nicknameEnds[Math.floor(Math.random() * nicknameEnds.length)];
+  if (`${start}-${end}` === nickname.value) {
+    end = nicknameEnds[(nicknameEnds.indexOf(end) + 1) % nicknameEnds.length];
+  }
+  nickname.value = `${start}-${end}`;
+  nickname.focus({ preventScroll: true });
+  if (announce) say('You can use this made-up nickname, or choose another suggestion.');
 }
 
 function validPassword(value, field) {
@@ -342,6 +359,7 @@ function updateCount() {
 
 loginTab.addEventListener('click', () => chooseMode('login'));
 registerTab.addEventListener('click', () => chooseMode('register'));
+nicknameSuggest.addEventListener('click', () => suggestNickname());
 postText.addEventListener('input', updateCount);
 accountForm.addEventListener('submit', (event) => {
   event.preventDefault();

@@ -1,6 +1,6 @@
 # Mythos.Guide test results
 
-Checked October 16, 2026, on the local app. No functional failures found.
+The full app was checked October 16, 2026. Account privacy checks were repeated October 19, 2026, after the Version 2 changes.
 
 | Area | Result |
 | --- | --- |
@@ -14,6 +14,7 @@ Checked October 16, 2026, on the local app. No functional failures found.
 | Account and owner protection | Live two-user isolation, one-use invitations, validation, cooldowns, owner moderation, posting controls, logout/session revocation, and password-protected account deletion pass. Owner tools stay locked without owner access. |
 | Phone and desktop | No sideways scrolling at widths 320, 390, 430, 768, and 1280 pixels. Visible phone controls have tap areas of at least 44 pixels. Keyboard answer selection, world navigation, dialog closing, and focus return work. |
 | Private files and database setup | Private files/dependencies remain outside Git and the public asset whitelist. MongoDB remains server-only with a reused client and the database from the saved URL. |
+| Version 2 account privacy | All 59 automated tests pass. The server rejects ordinary-name-style signups such as `SarahJones` and personal-reference notes such as “My friend Sarah likes Athena.” The browser generates an approved made-up nickname for new members and lets them request another. The live two-user, owner-delete, posting-off, rate-limit, and cleanup checks pass. |
 
 All disposable accounts and posts were deleted, temporary credential files removed, and the original posting setting restored. The app remains local and is open at **http://localhost:3000**.
 
@@ -22,3 +23,4 @@ All disposable accounts and posts were deleted, temporary credential files remov
 Two previously saved records have symbols that differ from the current seed fixtures: Dike has **Scales**, and Eunomia has **Flowers, Scroll**, while the fixtures have empty symbol lists. Existing records are intentionally preserved by insert-only seeding. Classical passages collected for [Dike](https://www.theoi.com/Ouranios/HoraDike.html) support her balance, and those for [Eunomia](https://www.theoi.com/Ouranios/HoraEunomia.html) give floral associations; the scroll remains unverified in the consulted reference. No existing records were overwritten. This is a content-review item, not a failed search or database operation.
 
 These checks cover the current local app; they do not certify a future deployment or externally hosted reference pages.
+Free-text filters can still miss an unusual or disguised real name. The owner can review and delete any post; the app does not claim perfect name detection.

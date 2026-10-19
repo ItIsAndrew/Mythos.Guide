@@ -109,7 +109,7 @@ test('nickname and password validation accepts only bounded nickname-only creden
   assert.equal(validateNickname('Comet-Fox'), 'Comet-Fox');
   assert.equal(validateSignupNickname('CometFox'), 'CometFox');
   assert.equal(validateSignupNickname('Moon-Quill'), 'Moon-Quill');
-  for (const nickname of ['Sarah', 'sarah', 'SARAH']) {
+  for (const nickname of ['Sarah', 'sarah', 'SARAH', 'SarahJones', 'Sarah-Jones', 'MoonSarah']) {
     assert.throws(() => validateSignupNickname(nickname), { status: 400 });
   }
   for (const nickname of [null, '', 'A', 'a'.repeat(25), 'Fox99', '@Comet', 'Fox--Comet', 'Real Name', 'fox@example.com', { $ne: '' }]) {
@@ -133,6 +133,8 @@ test('posts reject contact details, obfuscation, controls, and oversized content
     'my real name is Sample Person', 'Athena\u200bis wise',
     'I go to Cedar Valley Middle School.', 'I attend Cedar Valley Academy.',
     'My teacher is in the morning class.',
+    'My friend Sarah likes Athena.', 'Sarah is my friend and likes Athena.',
+    'Our classmate Alex likes Zeus.', 'I know someone who likes Hera.',
   ]) assert.throws(() => validatePostText(text), { status: 400 }, text);
 });
 
