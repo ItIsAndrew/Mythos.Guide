@@ -10,7 +10,7 @@ For owner controls, double-click **Open Owner Controls.command** while the app r
 
 ## Where it is published
 
-Nowhere. The app stays on this computer. Nothing is deployed to Vercel or Sites.
+Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/Mythos.Guide). The user authorized this source upload on October 19, 2026. The app still runs on this computer; nothing is deployed to Vercel or Sites. Private environment files and database contents are excluded from the repository.
 
 ## What is done
 
@@ -67,4 +67,4 @@ Do not publish unless explicitly requested. Repeat the checks below after accoun
 
 ## What is next
 
-Try the accounts and owner controls locally. Keep reviewing and expanding the educational sample content and trivia questions. Publication remains a separate explicit request and must pass the safety rules above.
+Try the accounts and owner controls locally. Keep reviewing and expanding the educational sample content and trivia questions. Website deployment remains a separate explicit request and must pass the safety rules above.

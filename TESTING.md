@@ -24,3 +24,7 @@ Two previously saved records have symbols that differ from the current seed fixt
 
 These checks cover the current local app; they do not certify a future deployment or externally hosted reference pages.
 Free-text filters can still miss an unusual or disguised real name. The owner can review and delete any post; the app does not claim perfect name detection.
+
+## GitHub source upload check — October 19, 2026
+
+The current app passes all 59 automated tests and syntax checks for all 31 JavaScript modules. The files and reachable Git history were scanned for the saved database URL, database password, owner passcode, and common credential patterns without displaying their values. No matches were found. Private environment files and generated dependencies are absent from the upload, and `.env*` remains the first ignore rule. GitHub source publication is authorized; website deployment is still separate.

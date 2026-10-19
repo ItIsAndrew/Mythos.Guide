@@ -15,6 +15,6 @@
 - Use the database already specified in the URL: call `client.db()` with no name. Do not use `MONGODB_DB` or a hardcoded database name.
 - Keep `.env*` first in `.gitignore`.
 - The one-time URL entry and private connection check are complete. Keep the user's saved `.env.local`; do not reset it to the placeholder.
-- Keep the app on the user's computer. Use only made-up sample data, no real people. Do not publish or deploy it.
+- GitHub source upload is authorized to https://github.com/ItIsAndrew/Mythos.Guide. Keep secrets and database contents private. Website hosting or deployment still requires a separate explicit request. Use only made-up sample data, no real people.
 - Run the app locally, open it in the user's browser, and give simple steps for trying the features. The user should not need to read code or debug.
 - Maintain a short `NOTES.md` with how to run, publication status, completed work, and next steps. Update it after each big change.
