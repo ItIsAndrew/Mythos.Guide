@@ -54,7 +54,7 @@ For discovery, choose **Meet a random god**, then **Meet another random god** in
 
 In **Basics**, open **Greek and Roman names** and tap a name to search it. Open **Mythology word guide** and type **nature** to find definitions that mention nature; clear the field to see all eight words.
 
-To try accounts: open owner controls, create an invitation, then choose **My posts → Join with an invitation**. The page suggests a made-up nickname; choose **Suggest another nickname** if you prefer. Enter a password of at least 10 characters (maximum 72 UTF-8 bytes) and the invitation. Save **Athena is associated with wisdom.**, edit it, and delete it. Use another browser profile or a private window for a second account. There is no email/password recovery; remember the nickname and password. Friends need a reachable app later; this local-only version has no public invitation link.
+To try accounts: open owner controls, create an invitation, then choose **My posts → Join with an invitation**. The existing MongoDB database is connected; new accounts require a one-use owner invitation. The page suggests a made-up nickname; choose **Suggest another nickname** if you prefer. Enter a password of at least 10 characters (maximum 72 UTF-8 bytes) and the invitation. Switching away to copy an invitation now keeps an unfinished signup in the form. Save **Athena is associated with wisdom.**, edit it, and delete it. Use another browser profile or a private window for a second account. There is no email/password recovery; remember the nickname and password. Friends need a reachable app later; this local-only version has no public invitation link.
 
 ## Safety rules before any publication or republication
 

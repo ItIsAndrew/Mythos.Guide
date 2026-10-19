@@ -251,7 +251,13 @@ async function run(kind, loading, work) {
     await work();
   } catch (error) {
     if (error.stale) return;
-    if (kind === 'session') clearPrivateData();
+    if (kind === 'session') {
+      if (state.user) clearPrivateData();
+      else {
+        state.concealed = false;
+        entry.hidden = false;
+      }
+    }
     if (error.status === 401 && !['login', 'register', 'delete-account'].includes(kind)) clearPrivateData();
     if (error.status === 403 && kind === 'post') {
       applyPosting(false);
@@ -298,9 +304,11 @@ function verifySession() {
       member.hidden = state.concealed;
       say('Your own archive is open.');
     } else {
-      clearPrivateData();
+      // A routine focus check must not erase an unfinished invitation signup.
+      if (previousNickname) clearPrivateData();
+      else entry.hidden = false;
       state.concealed = false;
-      say('Log in or join with a private invitation from the owner.');
+      say('Accounts are ready. To join, ask the owner for a one-use invitation.');
     }
   });
 }
