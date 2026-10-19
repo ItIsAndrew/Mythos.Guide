@@ -40,6 +40,8 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 
 The full local app was checked on October 16, 2026. On October 19, the account privacy changes passed all 59 automated tests, the live account/post/owner safety checks, and a browser signup check. All disposable test data was removed and the original posting setting restored. See [TESTING.md](TESTING.md) for details and one older symbol-data item to review.
 
+A deeper October 19 review found problems outside the existing passing tests: privacy-filter gaps, lost signup drafts on return, phone quiz prompts staying offscreen, and misleading save errors after a refresh failure. Research references and topic coverage also need work. The ranked findings and reproduction methods are in [TESTING.md](TESTING.md#deeper-review--october-19-2026); this review did not change app behavior.
+
 Use **Search**, **Gods**, **Their world**, **Stories**, and **Play** in the navigation. Search for Aether or Euterpe, open a god card, switch worlds, read a story, then complete a quiz and choose **Play again**.
 
 Try **Morpheus** in Search to find a lesser-known figure. In **Play**, choose a difficulty before starting; **Play again** keeps that level, and **Change difficulty** returns to the chooser.
@@ -67,4 +69,4 @@ Do not publish unless explicitly requested. Repeat the checks below after accoun
 
 ## What is next
 
-Try the accounts and owner controls locally. Keep reviewing and expanding the educational sample content and trivia questions. Website deployment remains a separate explicit request and must pass the safety rules above.
+Fix the account/privacy and phone quiz issues in the deeper test review, then improve sources, topic tags, and connected stories. Keep testing with invented local data. Website deployment remains a separate explicit request and must pass the safety rules above.

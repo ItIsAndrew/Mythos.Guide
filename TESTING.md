@@ -28,3 +28,32 @@ Free-text filters can still miss an unusual or disguised real name. The owner ca
 ## GitHub source upload check — October 19, 2026
 
 The current app passes all 59 automated tests and syntax checks for all 31 JavaScript modules. The files and reachable Git history were scanned for the saved database URL, database password, owner passcode, and common credential patterns without displaying their values. No matches were found. Private environment files and generated dependencies are absent from the upload, and `.env*` remains the first ignore rule. GitHub source publication is authorized; website deployment is still separate.
+
+## Deeper review — October 19, 2026
+
+The existing 59 automated tests and the live two-user safety workflow still pass. Additional negative-path checks found the issues below, which the existing suite does not catch. This review records findings; application behavior has not been changed.
+
+### Fix first: account reliability and the phone quiz
+
+1. **Privacy filtering both misses personal introductions and rejects harmless study notes.** An isolated posts-handler test accepts and returns the invented text `Full name: Astra Fictional` with HTTP 201, while rejecting `The Academy of Athens has a statue of Athena.` with HTTP 400. The name-declaration regex has a word-boundary check after punctuation; the school-word rule ignores context. These tests used an in-memory database, not real personal information. Private account isolation still passed. Evidence: `api/_lib/validation.js:56` and `:63`. Add regression cases, correct the punctuation matching, and use narrower rules without claiming perfect name detection.
+2. **Returning to the app erases an unfinished signup.** A DOM/event harness confirms that a window focus/session recheck while logged out clears the password and invitation even when the session has not changed. Someone switching away to copy an invitation can lose their work. Evidence: `public/accounts.js:88`, `:301`, and `:311`. Preserve logged-out form drafts during routine rechecks; continue clearing private member data when sessions change. The event-path reproduction is confirmed; a native app-switch browser reproduction was not completed.
+3. **Phone quiz questions can appear above the screen.** In the browser at 320 × 568, the first question heading was entirely above the viewport; after Next question, the new heading ended about 264 pixels above it. The code focuses headings with `preventScroll: true` after replacing the panel. Evidence: `public/quiz.js:296`. Bring the next prompt or feedback into view and verify at small phone heights. Scoring and answer locking still pass.
+4. **A successful save can be reported as a failure.** A DOM/fetch-stub test confirms that when saving succeeds but the following list refresh fails, the page clears the text box and reports a generic failure. Retrying may create a duplicate of the already-saved note. Evidence: `public/accounts.js:383` and `:246`. Distinguish save success from refresh failure; offer Refresh rather than suggesting another save.
+
+### Improve next: research and discovery
+
+5. **Research references are incomplete.** The 141 main god records have no source fields; only 32 gods have a source through their family-facts section, leaving 109 without a per-god reference link. Roman coverage is 3 of 42, compared with 29 of 99 Greek figures. Quiz explanations have no visible reference links. Evidence: `public/app.js:264` and `public/quiz.js:279`. Add a source and version note to each figure and question.
+6. **Topic filters miss 69 of 141 gods.** Nearly half the collection fits none of the five named topics. Some appropriate matches are missed: Atlas is absent from Sky, Ops from Nature, and Tartarus from Underworld. Filtering uses exact words in the short domain field; it misses related words and roles in descriptions. Evidence: `public/discovery-content.js:12` and `:27`. Use reviewed topic tags and include currently missing subjects such as war, love, and healing.
+7. **Learning paths run out quickly.** Sixty gods receive only the generic stories link, including Ares, Mars, Heracles, and Morpheus. There are six short retellings and four world panels. Expand connected stories and learning paths before treating collection size as content depth.
+
+Other observed limitations: `Thalia the Muse` and `Thalia Muse` return no match, while `Thalia the Grace` works; plain `Thalia` returns both figures. Forgotten passwords have no recovery path. A quiz round cannot change difficulty until completion. The intended post-box focus after login runs while that box is disabled. The curated nickname space is limited and suggestions do not check availability.
+
+### Checks completed
+
+- All 59 automated tests pass. The live safety workflow passes; disposable accounts/posts were removed and the original posting setting restored.
+- Live public API audit: 174 of 175 checks pass. All 141 canonical god names, Greek/Roman totals, supported aliases, ambiguity, no-match, and malformed requests pass; the exploratory failure is the qualified Muse name above.
+- Browser smoke checks pass for common/lesser-known searches, both Thalias, no-match, family details, all six story windows, all four worlds, glossary search/clearing, random picks, quiz scoring, and difficulty return.
+- No sideways scrolling at widths 320, 390, 768, and 1280. The phone quiz scroll-position failure is separate from horizontal layout.
+- Signup interruptions and save/refresh failure were checked with isolated DOM/request harnesses. The privacy examples used the actual handler with an in-memory database. No real credentials or personal data were exposed.
+
+Future regression coverage should exercise browser events and partial network failures, not only successful API/session logic. No website deployment was performed.
