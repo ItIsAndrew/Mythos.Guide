@@ -19,7 +19,7 @@
           <span>Mythos<span class="brand-dot">.</span>Guide</span>
         </a>
         <nav class="landing-nav" aria-label="Main navigation">
-          <a class="nav-text" href="#inside">What’s inside</a>
+          <a class="nav-text" href="/activity#basics">New to mythology?</a>
           <a class="nav-guide" href="/guide">Open the guide <span aria-hidden="true">↗</span></a>
         </nav>
       </header>
@@ -27,16 +27,25 @@
       <main id="main">
         <section class="landing-hero" aria-labelledby="landing-title">
           <div class="hero-copy">
-            <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span> A GREEK &amp; ROMAN MYTHOLOGY GUIDE</p>
+            <p class="eyebrow"><span class="eyebrow-line" aria-hidden="true"></span> Greek &amp; Roman mythology, made simple</p>
             <h1 id="landing-title">The old stories<br />are still <em>alive.</em></h1>
-            <p class="hero-lead">A welcoming place to meet gods and goddesses, wander through their worlds, and find a story that stays with you.</p>
+            <p class="hero-lead">Meet the gods. Follow their stories. Discover a world of wisdom, wonder, and very human mistakes.</p>
+            <form class="landing-search" action="/activity#search" method="get" role="search">
+              <label for="landing-search-input">Who would you like to meet?</label>
+              <div class="landing-search-controls">
+                <input id="landing-search-input" name="q" type="search" placeholder="Try a god’s name…" maxlength="80" required autocomplete="off" />
+                <button type="submit">Find a god <span aria-hidden="true">↗</span></button>
+              </div>
+            </form>
+            <div class="search-examples" aria-label="Names to try"><span>Try</span><a href="/activity?q=Zeus#search">Zeus</a><a href="/activity?q=Venus#search">Venus</a><a href="/activity?q=Euterpe#search">Euterpe</a></div>
             <div class="hero-actions">
-              <a class="primary-link" href="/guide">Enter the guide <span aria-hidden="true">↗</span></a>
-              <a class="quiet-link" href="#inside">See what’s inside <span aria-hidden="true">↓</span></a>
+              <a class="quiet-link" href="/guide">Explore the guide <span aria-hidden="true">↗</span></a>
+              <a class="quiet-link" href="/activity#start-here">Not sure? Start here <span aria-hidden="true">→</span></a>
             </div>
-            <p class="hero-note"><span aria-hidden="true">✦</span> Begin anywhere. No knowledge needed.</p>
+            <p class="hero-note"><span aria-hidden="true">✦</span> No account needed to explore.</p>
           </div>
 
+          <div class="hero-discovery">
           <figure class="hero-figure">
             <svg viewBox="0 0 480 590" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="figure-title figure-description">
               <title id="figure-title">A sun above an ancient doorway</title>
@@ -57,25 +66,34 @@
               <path d="M250 468v58m-27-29h54" stroke="#bdb093" stroke-width="2" />
               <path d="M103 539h294" stroke="#d7cbb6" stroke-width="1" />
             </svg>
-            <figcaption>AN INVITATION TO WANDER <span aria-hidden="true">✦</span> EST. IN CURIOSITY</figcaption>
           </figure>
+          <article class="spotlight-card" aria-labelledby="spotlight-title">
+            <div class="spotlight-label"><span class="spotlight-star" aria-hidden="true">✦</span> A good first god <span class="tradition-tag">Greek</span></div>
+            <div class="spotlight-heading"><h2 id="spotlight-title">Meet Athena.</h2><span class="spotlight-symbol" aria-hidden="true">↗</span></div>
+            <p>Wisdom, crafts, and a gift that became a city’s story. Get to know the goddess behind the owl.</p>
+            <a href="/activity?q=Athena#search">Discover Athena <span aria-hidden="true">→</span></a>
+          </article>
+          </div>
         </section>
+
+        <div class="collection-preview" aria-label="Inside the collection"><span><strong>141</strong> divine figures</span><span><strong>12</strong> short stories</span><span><strong>48</strong> quiz questions</span><span class="preview-source"><span aria-hidden="true">✧</span> Sources to keep exploring</span></div>
 
         <section id="inside" class="inside" aria-labelledby="inside-title">
           <div class="inside-intro">
-            <p class="section-kicker">THREE WAYS TO BEGIN</p>
-            <h2 id="inside-title">Follow your curiosity.</h2>
-            <p>Pick a name, a place, or a question. The guide will take you from there.</p>
+            <p class="section-kicker">Your next chapter</p>
+            <h2 id="inside-title">A little curiosity<br />goes a long way.</h2>
+            <p>You don’t need to know the names. Pick a path, follow a question, and learn at your own pace.</p>
+            <a class="beginner-note" href="/activity#basics">New here? Learn the names &amp; words <span aria-hidden="true">→</span></a>
           </div>
           <div class="inside-links">
-            <a href="/activity#search"><span class="link-number">01</span><span><strong>Meet the gods</strong><small>Find familiar names and lesser-known figures.</small></span><span class="link-arrow" aria-hidden="true">↗</span></a>
-            <a href="/activity#stories"><span class="link-number">02</span><span><strong>Read the myths</strong><small>Enjoy short retellings, one story at a time.</small></span><span class="link-arrow" aria-hidden="true">↗</span></a>
-            <a href="/activity#play"><span class="link-number">03</span><span><strong>Try a quiz</strong><small>Choose a level and learn with every answer.</small></span><span class="link-arrow" aria-hidden="true">↗</span></a>
+            <a href="/activity#search"><span class="link-number">01</span><span><strong>Meet the gods</strong><small>From the familiar to the unexpected. Every name opens a story.</small></span><span class="link-arrow" aria-hidden="true">↗</span></a>
+            <a href="/activity#stories"><span class="link-number">02</span><span><strong>Read the myths</strong><small>Find a theme you love, then settle into a short retelling.</small></span><span class="link-arrow" aria-hidden="true">↗</span></a>
+            <a href="/activity#play"><span class="link-number">03</span><span><strong>Try a quiz</strong><small>Five questions. Learn from each answer, then practice what you missed.</small></span><span class="link-arrow" aria-hidden="true">↗</span></a>
           </div>
         </section>
       </main>
 
-      <footer class="landing-footer"><span>Mythos.Guide</span><span>For the endlessly curious.</span></footer>
+      <footer class="landing-footer"><span>Mythos.Guide</span><span>Many myths. Many versions. Always something to discover.</span></footer>
     </div>
   </body>
 </html>

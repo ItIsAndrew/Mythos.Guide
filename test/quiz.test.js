@@ -243,3 +243,106 @@ test('new retellings add sustained reading and distinct paths beyond the Olympia
   assert.ok(worlds.find((item) => item.id === 'healing-sanctuary').gods.includes('Hygieia'));
   assert.deepEqual(worlds.find((item) => item.id === 'roman-forum').gods, ['Janus', 'Concordia', 'Terminus']);
 });
+
+test('completed rounds retain the chosen answers, explanations, and sources for review', () => {
+  const session = createQuizSession({ random: () => 0.4 });
+  session.start();
+  const expected = [];
+  for (let index = 0; index < 5; index += 1) {
+    const current = session.getState().currentQuestion;
+    const state = chooseAnswer(session, index % 2 === 0);
+    expected.push({ question: current, selectedAnswer: current.choices[state.selectedIndex], correct: index % 2 === 0 });
+    // A second answer must never add a second review entry.
+    chooseAnswer(session, index % 2 !== 0);
+    session.next();
+  }
+  const complete = session.getState();
+  assert.equal(complete.mode, 'round');
+  assert.equal(complete.score, 3);
+  assert.deepEqual(complete.answers, expected);
+  complete.answers[0].question.choices.length = 0;
+  complete.answers[0].question.source.title = 'Changed outside the session';
+  complete.answers[0].selectedAnswer = 'Changed';
+  complete.answers.length = 0;
+  assert.deepEqual(session.getState().answers, expected, 'review snapshots must not mutate session results');
+});
+
+test('practice contains only missed questions and never carries over the old score or answers', () => {
+  const session = createQuizSession({ difficulty: 'hard', random: () => 0.4 });
+  session.start();
+  const firstId = session.getState().currentQuestion.id;
+  assert.equal(session.practiceMissed().currentQuestion.id, firstId, 'practice cannot interrupt an active round');
+  const missedIds = new Set();
+  for (let index = 0; index < 5; index += 1) {
+    if (index > 2) missedIds.add(session.getState().currentQuestion.id);
+    chooseAnswer(session, index <= 2);
+    session.next();
+  }
+  const practice = session.practiceMissed();
+  assert.equal(practice.mode, 'practice');
+  assert.equal(practice.total, 2);
+  assert.equal(practice.score, 0);
+  assert.equal(practice.index, 0);
+  assert.equal(practice.selectedIndex, null);
+  assert.equal(practice.difficulty, 'hard');
+  assert.deepEqual(practice.answers, []);
+  const practicedIds = new Set();
+  for (let index = 0; index < 2; index += 1) {
+    const state = session.getState();
+    practicedIds.add(state.currentQuestion.id);
+    assert.equal(state.currentQuestion.difficulty, 'hard');
+    chooseAnswer(session, index === 0);
+    session.next();
+  }
+  assert.deepEqual(practicedIds, missedIds);
+  assert.equal(session.getState().status, 'complete');
+  assert.equal(session.getState().score, 1);
+  const remainingId = session.getState().answers.find((item) => !item.correct).question.id;
+  const retry = session.practiceMissed();
+  assert.equal(retry.total, 1);
+  assert.equal(retry.currentQuestion.id, remainingId);
+  assert.equal(retry.score, 0);
+  chooseAnswer(session, true);
+  session.next();
+  assert.equal(session.getState().status, 'complete');
+  assert.equal(session.getState().score, 1);
+  const allCorrect = session.getState();
+  assert.deepEqual(session.practiceMissed(), allCorrect, 'a perfect practice round has nothing to retry');
+  const replay = session.restart();
+  assert.equal(replay.mode, 'round');
+  assert.equal(replay.total, 5);
+  assert.equal(replay.score, 0);
+  assert.equal(replay.difficulty, 'hard');
+  assert.deepEqual(replay.answers, []);
+});
+
+test('ending practice or changing difficulty clears the review and restores a five-question round', () => {
+  const session = createQuizSession({ difficulty: 'medium' });
+  assert.equal(session.practiceMissed().status, 'ready');
+  session.start();
+  for (let index = 0; index < 5; index += 1) {
+    chooseAnswer(session, index !== 0);
+    session.next();
+  }
+  session.practiceMissed();
+  chooseAnswer(session, false);
+  const ready = session.quitRound();
+  assert.equal(ready.mode, 'round');
+  assert.equal(ready.total, 5);
+  assert.equal(ready.score, 0);
+  assert.deepEqual(ready.answers, []);
+  assert.equal(ready.difficulty, 'medium');
+  session.selectDifficulty('easy');
+  assert.equal(session.start().currentQuestion.difficulty, 'easy');
+  for (let index = 0; index < 5; index += 1) {
+    chooseAnswer(session, true);
+    session.next();
+  }
+  assert.equal(session.getState().score, 5);
+  assert.equal(session.practiceMissed().status, 'complete');
+  const hard = session.selectDifficulty('hard');
+  assert.equal(hard.mode, 'round');
+  assert.equal(hard.total, 5);
+  assert.equal(hard.score, 0);
+  assert.deepEqual(hard.answers, []);
+});

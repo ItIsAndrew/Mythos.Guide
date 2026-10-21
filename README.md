@@ -4,13 +4,15 @@ A beginner-friendly guide to Greek and Roman mythology. Search 141 divine figure
 
 The guide also includes 12 topic filters, random god discovery, Greek/Roman name comparisons, a short glossary, and self-service nickname accounts for private mythology notes. Each god and quiz answer has a source and a note about differing myth versions. Accounts can be recovered using a private, one-use recovery code.
 
+Search a god directly from the landing page, find stories by theme and tradition, and review or practice missed quiz answers.
+
 ## Run locally
 
 Use Node.js 22 or newer.
 
 1. Install dependencies with `npm install`.
 2. Copy `database.env.example` to `.env.local`. Enter your MongoDB connection URL privately as `MONGODB_URI`. For account and owner features, also add `ADMIN_PASSCODE` with a long, random private value. Never commit this file or share its contents.
-3. Run `npm run dev` and open **http://localhost:3000**. Choose **Enter the guide** for the activity menu at **http://localhost:3000/guide**. Each choice opens a focused activity.
+3. Run `npm run dev` and open **http://localhost:3000**. Choose **Open the guide** for the activity menu at **http://localhost:3000/guide**, or use the landing search. Each menu choice opens a focused activity.
 
 The existing Mac shortcuts can start the app and open owner controls. Keep the Terminal window open while using the app.
 

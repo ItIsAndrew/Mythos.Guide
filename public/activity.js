@@ -22,6 +22,18 @@ function showActivity(name, scroll = true) {
   }
   const visible = new Set(activitySections.get(key));
   for (const [id, node] of activityNodes) node.hidden = !visible.has(id);
+  const skipLink = document.querySelector('.skip-link');
+  const activeSection = activityNodes.get(activitySections.get(key)[0]);
+  if (skipLink && activeSection) {
+    if (key === 'search') {
+      skipLink.href = '#search-input';
+      skipLink.textContent = 'Skip to search';
+    } else {
+      activeSection.tabIndex = -1;
+      skipLink.href = `#${activeSection.id}`;
+      skipLink.textContent = 'Skip to this activity';
+    }
+  }
   for (const link of document.querySelectorAll('.site-nav a, .phone-menu-links a')) {
     if (link.hash) link.setAttribute('aria-current', link.hash.slice(1) === key ? 'page' : 'false');
   }
@@ -35,3 +47,19 @@ window.mythosOpenActivity = (name) => {
 };
 showActivity(window.location.hash.slice(1), false);
 window.addEventListener('hashchange', () => showActivity(window.location.hash.slice(1)));
+
+// Deferred modules attach the real search handler before DOMContentLoaded.
+// Keep shared search links useful without overriding a different activity.
+window.addEventListener('DOMContentLoaded', () => {
+  const section = window.location.hash.slice(1);
+  if (section && !['search', 'search-input'].includes(section)) return;
+  const queries = new URLSearchParams(window.location.search).getAll('q');
+  if (queries.length !== 1) return;
+  const query = queries[0].trim();
+  if (!query || query.length > 80) return;
+  const searchInput = document.querySelector('#search-input');
+  const searchForm = document.querySelector('#search-form');
+  if (!searchInput || !searchForm) return;
+  searchInput.value = query;
+  searchForm.requestSubmit();
+}, { once: true });

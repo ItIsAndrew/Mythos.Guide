@@ -1,5 +1,16 @@
 # Mythos.Guide test results
 
+## Landing, story search, and quiz practice — October 21, 2026
+
+The full current suite passes **100 tests**. The improvements preserve the existing account, API, content, and routing checks. New regressions cover delayed landing-search handoff, multiword/Unicode names, invalid/repeated queries, active-section keyboard skip links, combined story filters, and quiz review/practice state.
+
+- **Landing:** browser Enter submission for **Thalia the Muse** returns the correct figure; **Discover Athena** opens Athena’s result. Queries wait for the search handler, and an explicit Stories link is not overridden by a retained god query.
+- **Stories:** six cards expand to 12 and collapse to six. **kindness** returns the hospitality story and its reader opens. **Athena + Roman** shows helpful no-match guidance; **Clear filters** restores the full collection. Story searches stay in this page and are not saved.
+- **Quiz:** a completed phone round shows the missed question, chosen/correct answers, explanation, and source. A one-question practice round starts at 0/1, can finish at 1/1, and then **Play again** starts a fresh 0/5 round. Automated checks also cover multiple misses, narrowing repeated practice, perfect rounds, difficulty changes, immutable review data, and answer locking.
+- **Accessibility and layout:** keyboard skip from Stories keeps Stories visible and focuses that section. No sideways scrolling on the landing page at 320, 390, 430, 768, or 1280 pixels; visible landing controls have tap areas of at least 44 pixels. Story search/filter controls remain at least 46 pixels tall at checked phone/desktop widths. Quiz prompts and review cards fit a 320 × 568 phone viewport.
+
+The app runs locally. Account/database code and private settings were not changed in this feature update; the earlier live account-safety results below remain historical evidence. No website deployment was performed.
+
 ## Fix verification — October 21, 2026
 
 All seven main findings from the October 19 review, the additional usability issues, and the unverified Eunomia symbol have been addressed. The original findings are preserved below as historical evidence.

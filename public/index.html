@@ -172,8 +172,14 @@
             <div><p class="section-kicker"><span>03</span> Stories</p><h2 id="stories-title">Read the myths</h2></div>
             <p>Short retellings about wisdom, courage, choices, and changing seasons.</p>
           </div>
-          <div id="story-grid" class="story-grid"></div>
+          <form id="story-filters" class="story-filters" role="search" aria-label="Find a story">
+            <div class="story-search-field"><label for="story-search">Find a story</label><input id="story-search" type="search" maxlength="100" placeholder="Try Athena, kindness, or dreams" aria-describedby="story-search-hint" /><p id="story-search-hint">Search a title, god, or theme. Each story takes 1–2 minutes.</p></div>
+            <div class="story-tradition-field"><label for="story-tradition">Tradition</label><select id="story-tradition"><option value="all">Greek &amp; Roman</option><option value="Greek">Greek</option><option value="Roman">Roman</option></select></div>
+            <button id="stories-reset" class="outline-button" type="button" hidden>Clear filters</button>
+          </form>
           <p id="stories-status" class="small-status" role="status" aria-live="polite"></p>
+          <div id="stories-empty" class="stories-empty" hidden><h3>No stories found</h3><p>Try a shorter name or a theme such as love or music. Choose <strong>Clear filters</strong> to see every story.</p></div>
+          <div id="story-grid" class="story-grid"></div>
           <div class="show-more-wrap"><button id="stories-more" class="outline-button" type="button" hidden>Show more stories</button><button id="stories-less" class="outline-button browse-less-button" type="button" hidden>Show fewer stories</button></div>
           <p class="collection-note story-note">Original educational sample retellings, inspired by Greek and Roman mythology. Myths vary by source, place, and time; these stories are not quotations from ancient texts.</p>
           <div class="beginner-next"><a href="/guide">All activities</a><a href="#play">Next: Try an easy quiz <span aria-hidden="true">→</span></a></div>

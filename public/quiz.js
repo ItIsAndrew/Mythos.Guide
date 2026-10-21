@@ -170,6 +170,8 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
   let score = 0;
   let selectedIndex = null;
   let selectedDifficulty = difficulty;
+  let mode = 'round';
+  let answers = [];
 
   function poolFor(value) {
     if (!quizDifficulties.includes(value)) throw new RangeError('Choose easy, medium, or hard.');
@@ -180,20 +182,34 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
 
   poolFor(selectedDifficulty);
 
+  const copyQuestion = (item) => ({ ...item, choices: [...item.choices], source: item.source ? { ...item.source } : undefined });
   const getState = () => ({
-    status, index, score, total: roundSize, selectedIndex, difficulty: selectedDifficulty,
-    currentQuestion: round[index] ? { ...round[index], choices: [...round[index].choices] } : null,
+    status, index, score, total: round.length || roundSize, selectedIndex, difficulty: selectedDifficulty, mode,
+    currentQuestion: round[index] ? copyQuestion(round[index]) : null,
+    answers: answers.map((item) => ({ ...item, question: copyQuestion(item.question) })),
   });
 
-  function start() {
-    round = shuffled(poolFor(selectedDifficulty), random).slice(0, roundSize).map((item) => ({
+  function startRound(items, nextMode, size = items.length) {
+    round = shuffled(items, random).slice(0, size).map((item) => ({
       ...item, choices: shuffled(item.choices, random),
     }));
+    mode = nextMode;
     status = 'question';
     index = 0;
     score = 0;
     selectedIndex = null;
+    answers = [];
     return getState();
+  }
+
+  function start() {
+    return startRound(poolFor(selectedDifficulty), 'round', roundSize);
+  }
+
+  function practiceMissed() {
+    if (status !== 'complete') return getState();
+    const missed = answers.filter((item) => !item.correct).map((item) => item.question);
+    return missed.length ? startRound(missed, 'practice') : getState();
   }
 
   function selectDifficulty(value) {
@@ -205,6 +221,8 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
     index = 0;
     score = 0;
     selectedIndex = null;
+    mode = 'round';
+    answers = [];
     return getState();
   }
 
@@ -214,6 +232,8 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
     index = 0;
     score = 0;
     selectedIndex = null;
+    mode = 'round';
+    answers = [];
     return getState();
   }
 
@@ -222,13 +242,16 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
     if (status !== 'question' || selectedIndex !== null || !Number.isInteger(choiceIndex)
       || choiceIndex < 0 || choiceIndex >= current.choices.length) return getState();
     selectedIndex = choiceIndex;
-    if (current.choices[choiceIndex] === current.answer) score += 1;
+    const selectedAnswer = current.choices[choiceIndex];
+    const correct = selectedAnswer === current.answer;
+    answers.push({ question: current, selectedAnswer, correct });
+    if (correct) score += 1;
     return getState();
   }
 
   function next() {
     if (status !== 'question' || selectedIndex === null) return getState();
-    if (index + 1 === roundSize) {
+    if (index + 1 === round.length) {
       status = 'complete';
     } else {
       index += 1;
@@ -237,7 +260,7 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
     return getState();
   }
 
-  return { getState, start, answer, next, restart: start, selectDifficulty, quitRound };
+  return { getState, start, answer, next, restart: start, selectDifficulty, quitRound, practiceMissed };
 }
 
 let mountNumber = 0;
@@ -261,6 +284,14 @@ export function mountQuiz(root) {
     node.type = 'button';
     node.addEventListener('click', action);
     return node;
+  }
+
+  function sourceFor(item) {
+    const source = element('a', 'quiz-source', `Read the source: ${item.source.title}`);
+    source.href = item.source.url;
+    source.target = '_blank';
+    source.rel = 'noopener noreferrer';
+    return source;
   }
 
   function render(focusTarget = null) {
@@ -294,21 +325,44 @@ export function mountQuiz(root) {
       panel.append(button('Start quiz', () => { confirmQuit = false; session.start(); render('heading'); }));
       panel.append(element('p', 'quiz-small-note', 'Play just for fun. Your answers stay in this page.'));
     } else if (state.status === 'complete') {
-      panel.append(element('p', 'quiz-eyebrow', `${state.difficulty} round complete`));
+      panel.append(element('p', 'quiz-eyebrow', `${state.difficulty} ${state.mode === 'practice' ? 'practice' : 'round'} complete`));
       const title = element('h3', 'quiz-heading', `You scored ${state.score} out of ${state.total}`);
       title.id = headingId;
       title.tabIndex = -1;
-      const message = state.score === state.total
-        ? 'A brilliant round! Try another mix of Greek and Roman questions.'
-        : 'Every answer is a chance to learn. Explore the gods, then try a new round whenever you like.';
+      const missed = state.answers.filter((item) => !item.correct);
+      const message = missed.length === 0
+        ? state.mode === 'practice' ? 'You got every practice answer right. Try a fresh five-question round when you’re ready.' : 'You got every answer right. Try another mix of Greek and Roman questions.'
+        : 'See what you missed below, then practice those questions again. There is no timer.';
       panel.append(title, element('p', 'quiz-description', message));
-      panel.append(button('Play again', () => { confirmQuit = false; session.restart(); render('heading'); }));
-      panel.append(button('Change difficulty', () => { session.selectDifficulty(state.difficulty); render('difficulty'); }, 'quiz-change-button'));
+      const actions = element('div', 'quiz-result-actions');
+      if (missed.length) {
+        actions.append(button('Practice missed answers', () => { confirmQuit = false; session.practiceMissed(); render('heading'); }));
+      }
+      actions.append(button('Play again', () => { confirmQuit = false; session.restart(); render('heading'); }, missed.length ? 'quiz-change-button' : 'quiz-button'));
+      actions.append(button('Change difficulty', () => { session.selectDifficulty(state.difficulty); render('difficulty'); }, 'quiz-change-button'));
+      panel.append(actions);
+      if (missed.length) {
+        const review = element('section', 'quiz-review');
+        const reviewTitle = element('h4', 'quiz-review-heading', `Review ${missed.length} missed ${missed.length === 1 ? 'answer' : 'answers'}`);
+        reviewTitle.id = `${headingId}-review`;
+        review.setAttribute('aria-labelledby', reviewTitle.id);
+        review.append(reviewTitle);
+        for (const item of missed) {
+          const card = element('article', 'quiz-review-card');
+          card.append(element('h5', 'quiz-review-question', item.question.prompt));
+          card.append(element('p', 'quiz-review-choice', `Your answer: ${item.selectedAnswer}`));
+          card.append(element('p', 'quiz-review-correct', `Correct answer: ${item.question.answer}`));
+          card.append(element('p', 'quiz-explanation', item.question.explanation));
+          card.append(sourceFor(item.question), element('p', 'quiz-version-note', item.question.versionNote));
+          review.append(card);
+        }
+        panel.append(review);
+      }
     } else {
       const current = state.currentQuestion;
       const answered = state.selectedIndex !== null;
       const progress = element('div', 'quiz-progress');
-      progress.append(element('p', 'quiz-eyebrow', `${state.difficulty} · Question ${state.index + 1} of ${state.total}`));
+      progress.append(element('p', 'quiz-eyebrow', `${state.difficulty} · ${state.mode === 'practice' ? 'Practice question' : 'Question'} ${state.index + 1} of ${state.total}`));
       progress.append(element('p', 'quiz-score', `Score: ${state.score} / ${state.total}`));
       panel.append(progress);
       const meter = element('progress', 'quiz-meter');
@@ -349,11 +403,7 @@ export function mountQuiz(root) {
         feedback.tabIndex = -1;
         feedback.append(element('p', 'quiz-feedback-title', correct ? 'Correct!' : `The correct answer is ${current.answer}.`));
         feedback.append(element('p', 'quiz-explanation', current.explanation));
-        const source = element('a', 'quiz-source', `Read the source: ${current.source.title}`);
-        source.href = current.source.url;
-        source.target = '_blank';
-        source.rel = 'noopener noreferrer';
-        feedback.append(source, element('p', 'quiz-version-note', current.versionNote));
+        feedback.append(sourceFor(current), element('p', 'quiz-version-note', current.versionNote));
       }
       panel.append(feedback);
       if (answered) {

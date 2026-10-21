@@ -2,7 +2,7 @@
 
 ## How to run
 
-Double-click **Start Mythos.Guide.command** in this folder. Open **http://localhost:3000** and choose **Enter the guide**. The activity menu is at **http://localhost:3000/guide**; each choice opens one focused part of the guide at **http://localhost:3000/activity**. Keep the Terminal window open; Control+C stops the app. The Mac shortcut uses the Node runtime bundled with Codex and needs no admin password. With Node.js 22+ and dependencies installed, `npm run dev` also works.
+Double-click **Start Mythos.Guide.command** in this folder. Open **http://localhost:3000** and choose **Open the guide**, or search for a god directly on the landing page. The activity menu is at **http://localhost:3000/guide**; each choice opens one focused part of the guide at **http://localhost:3000/activity**. Keep the Terminal window open; Control+C stops the app. The Mac shortcut uses the Node runtime bundled with Codex and needs no admin password. With Node.js 22+ and dependencies installed, `npm run dev` also works.
 
 Internet is needed for MongoDB. Keep the saved private settings in `.env.local`; never share or commit that file. Only `/api` accesses MongoDB, using the official driver, one reused client, and `client.db()` with no database name.
 
@@ -15,12 +15,13 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 ## What is done
 
 - A welcoming landing page leads into a compact activity menu. Search, browsing, stories, worlds, basics, quiz, and private notes each open in a focused view. The menu offers a link back to the last opened activity and a different suggested activity. Only the activity name is stored in this browser; nicknames and posts are not used. Old links to guide sections still reach the matching activity.
+- The landing page now has direct god search, example names, an Athena introduction, clear beginner links, and a compact collection preview. Text uses a calmer hierarchy and phone controls have tap areas of at least 44 pixels.
 - Search and browse 141 Greek and Roman divine figures, including Aether, Euterpe, and lesser-known figures. Both Thalias have working qualified Muse/Grace aliases. Show more or fewer cards, filter by tradition, or meet a random god.
 - Every figure has source references, a myth-version note, reviewed topic tags, and a useful next-step topic. There are 12 named topics, including war, love, healing, creation, and dreams. Related stories and worlds are labeled as thematic suggestions where appropriate.
 - Coverage includes all 48 figures in [Theoi’s major-pantheon overview](https://www.theoi.com/Pantheon.html) and all 12 Roman [Dei Consentes](https://penelope.uchicago.edu/encyclopaedia_romana/romanforum/deorumconsentium.html), exceeding the requested 75% of this defined major-god reference set. Ancient mythology has no fixed total for all divine figures.
 - Family facts, 12 Greek/Roman name comparisons, and a 16-word glossary support research. Each word has a myth example and a link to a related figure; a four-clue challenge lets beginners practice.
-- Read 12 original educational retellings, six at a time. Explore six worlds and places, including a healing sanctuary and Roman public life. Stories and worlds include sources and version notes.
-- Play five-question Easy, Medium, or Hard quiz rounds drawn from 48 questions. Answers show an explanation and source. Phone questions and feedback stay in view; players can keep playing or end a round to change difficulty.
+- Read 12 original educational retellings, six at a time. Search stories by title, god, or theme; combine the search with Greek/Roman filters and clear filters if nothing matches. Explore six worlds and places, including a healing sanctuary and Roman public life. Stories and worlds include sources and version notes.
+- Play five-question Easy, Medium, or Hard quiz rounds drawn from 48 questions. Answers show an explanation and source. After a round, review missed answers and practice only those questions with a fresh score. **Play again** starts a full five-question round. Phone questions and feedback stay in view; players can keep playing or end a round to change difficulty.
 - Create an account with an available, approved made-up nickname and a password. Save the private recovery code shown once; it can reset a forgotten password without email. Code replacement and password recovery invalidate old codes and sessions.
 - Save, edit, and delete up to 100 private mythology notes. A successful save remains confirmed when refreshing fails; the page offers Refresh posts. Routine session checks preserve unfinished forms and edits while account changes clear private data.
 - Owner tools moderate posts and pause creation/editing. Password-protected account deletion removes its posts and sessions. Sessions, origin checks, transaction protection, and database-backed rate limits protect account actions.
@@ -36,6 +37,8 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 On October 21, 2026, all **86 automated tests passed** for implementation save point `65a20b8`. Live database checks passed account isolation, validation, moderation, posting controls, recovery, and session revocation. They used disposable collections inside the already configured database; all test collections were removed afterward. Browser checks confirmed save/edit success when the following refresh fails, all three quiz levels, new stories/worlds, and layouts from 320 to 1280 pixels without sideways scrolling. Another chat started further layout work after these checks; its unfinished edits were preserved. See [TESTING.md](TESTING.md) for details and the resolved audit findings.
 
 After the Names & words expansion on October 21, all **100 current automated tests passed** locally. Browser checks confirmed the word challenge, term filtering, and a glossary link opening the matching figure. The other unfinished local edits were not included in this save point.
+
+After the landing, story search, and quiz practice improvements on October 21, the full **100-test suite passed** again. Browser checks confirmed landing search (including multiword names), the Athena link, story search/filter/no-match/reset and paging, missed-answer review/practice/replay, and keyboard skipping to the visible activity. Landing and story layouts fit 320–1280 pixel screens without sideways scrolling. These improvements remain local; no website was deployed.
 
 ## What is next
 

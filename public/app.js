@@ -1,4 +1,5 @@
 import { worlds, stories } from './learn-content.js';
+import { filterStories, storyThemesFor } from './story-discovery.js';
 import { mountQuiz } from './quiz.js';
 import { familyFactsFor } from './family-facts.js';
 import { topics, filterGodsByTopic, chooseRandomGod, suggestionsFor } from './discovery-content.js';
@@ -587,6 +588,10 @@ const storyGrid = document.querySelector('#story-grid');
 const storyMore = document.querySelector('#stories-more');
 const storyLess = document.querySelector('#stories-less');
 const storyStatus = document.querySelector('#stories-status');
+const storySearch = document.querySelector('#story-search');
+const storyTradition = document.querySelector('#story-tradition');
+const storyReset = document.querySelector('#stories-reset');
+const storyEmpty = document.querySelector('#stories-empty');
 const storyPageSize = 6;
 let visibleStories = storyPageSize;
 
@@ -598,6 +603,8 @@ function createStoryCard(story, index) {
   top.append(element('span', 'god-tradition', `${story.tradition} tradition`), number);
   const title = element('h3', '', story.title);
   card.append(top, title, element('p', 'story-summary', story.summary));
+  const themes = element('p', 'story-themes', storyThemesFor(story).join(' · '));
+  if (themes.textContent) card.append(themes);
   const bottom = element('div', 'story-card-bottom');
   bottom.append(element('span', 'story-time', story.readingTime));
   const read = element('button', 'text-button', 'Read the story');
@@ -613,13 +620,32 @@ function createStoryCard(story, index) {
 }
 
 function renderStories() {
-  storyGrid.replaceChildren(...stories.slice(0, visibleStories).map(createStoryCard));
-  const shown = Math.min(visibleStories, stories.length);
-  storyStatus.textContent = `${shown} of ${stories.length} stories`;
-  storyMore.hidden = shown >= stories.length;
+  const matching = filterStories(stories, storySearch.value, storyTradition.value);
+  const filtered = Boolean(storySearch.value.trim()) || storyTradition.value !== 'all';
+  storyGrid.replaceChildren(...matching.slice(0, visibleStories).map(createStoryCard));
+  const shown = Math.min(visibleStories, matching.length);
+  const collectionLabel = filtered ? 'matching stories' : 'stories';
+  storyStatus.textContent = `Showing ${shown} of ${matching.length} ${collectionLabel}`;
+  storyEmpty.hidden = matching.length !== 0;
+  storyReset.hidden = !filtered;
+  storyGrid.hidden = matching.length === 0;
+  storyMore.hidden = shown >= matching.length;
   storyLess.hidden = shown <= storyPageSize;
-  if (!storyMore.hidden) storyMore.textContent = `Show ${Math.min(storyPageSize, stories.length - shown)} more stories`;
+  if (!storyMore.hidden) storyMore.textContent = `Show ${Math.min(storyPageSize, matching.length - shown)} more stories`;
 }
+function updateStoryFilters() {
+  visibleStories = storyPageSize;
+  renderStories();
+}
+storySearch.addEventListener('input', updateStoryFilters);
+storyTradition.addEventListener('change', updateStoryFilters);
+document.querySelector('#story-filters').addEventListener('submit', (event) => event.preventDefault());
+storyReset.addEventListener('click', () => {
+  storySearch.value = '';
+  storyTradition.value = 'all';
+  updateStoryFilters();
+  storySearch.focus();
+});
 storyMore.addEventListener('click', () => {
   const firstNew = visibleStories;
   visibleStories += storyPageSize;

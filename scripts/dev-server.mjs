@@ -25,6 +25,7 @@ const assets = new Map([
   ['/styles.css', ['styles.css', 'text/css; charset=utf-8']],
   ['/app.js', ['app.js', 'text/javascript; charset=utf-8']],
   ['/learn-content.js', ['learn-content.js', 'text/javascript; charset=utf-8']],
+  ['/story-discovery.js', ['story-discovery.js', 'text/javascript; charset=utf-8']],
   ['/quiz.js', ['quiz.js', 'text/javascript; charset=utf-8']],
   ['/quiz.css', ['quiz.css', 'text/css; charset=utf-8']],
   ['/accounts.js', ['accounts.js', 'text/javascript; charset=utf-8']],
