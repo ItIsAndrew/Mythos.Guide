@@ -18,7 +18,7 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 - Search and browse 141 Greek and Roman divine figures, including Aether, Euterpe, and lesser-known figures. Both Thalias have working qualified Muse/Grace aliases. Show more or fewer cards, filter by tradition, or meet a random god.
 - Every figure has source references, a myth-version note, reviewed topic tags, and a useful next-step topic. There are 12 named topics, including war, love, healing, creation, and dreams. Related stories and worlds are labeled as thematic suggestions where appropriate.
 - Coverage includes all 48 figures in [Theoi’s major-pantheon overview](https://www.theoi.com/Pantheon.html) and all 12 Roman [Dei Consentes](https://penelope.uchicago.edu/encyclopaedia_romana/romanforum/deorumconsentium.html), exceeding the requested 75% of this defined major-god reference set. Ancient mythology has no fixed total for all divine figures.
-- Family facts, 12 Greek/Roman name comparisons, and an eight-word glossary support research.
+- Family facts, 12 Greek/Roman name comparisons, and a 16-word glossary support research. Each word has a myth example and a link to a related figure; a four-clue challenge lets beginners practice.
 - Read 12 original educational retellings, six at a time. Explore six worlds and places, including a healing sanctuary and Roman public life. Stories and worlds include sources and version notes.
 - Play five-question Easy, Medium, or Hard quiz rounds drawn from 48 questions. Answers show an explanation and source. Phone questions and feedback stay in view; players can keep playing or end a round to change difficulty.
 - Create an account with an available, approved made-up nickname and a password. Save the private recovery code shown once; it can reset a forgotten password without email. Code replacement and password recovery invalidate old codes and sessions.
@@ -28,12 +28,14 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 
 ## How to try it
 
-1. Open the guide, search **Aether**, and open **Sources & myth versions**. Try a topic, a story, and a world; use **Show more / Show fewer** to control the collection.
+1. Open the guide, search **Aether**, and open **Sources & myth versions**. Try a topic, a story, and a world; use **Show more / Show fewer** to control the collection. In **Names & words**, try a clue and follow an example to its figure.
 2. Choose **Play**, finish a five-question round, and try **Change difficulty**. In **My posts**, create an invented account, save the recovery code privately, then save, edit, and delete a mythology note.
 
 ## Latest checks
 
 On October 21, 2026, all **86 automated tests passed** for implementation save point `65a20b8`. Live database checks passed account isolation, validation, moderation, posting controls, recovery, and session revocation. They used disposable collections inside the already configured database; all test collections were removed afterward. Browser checks confirmed save/edit success when the following refresh fails, all three quiz levels, new stories/worlds, and layouts from 320 to 1280 pixels without sideways scrolling. Another chat started further layout work after these checks; its unfinished edits were preserved. See [TESTING.md](TESTING.md) for details and the resolved audit findings.
+
+After the Names & words expansion on October 21, all **100 current automated tests passed** locally. Browser checks confirmed the word challenge, term filtering, and a glossary link opening the matching figure. The other unfinished local edits were not included in this save point.
 
 ## What is next
 

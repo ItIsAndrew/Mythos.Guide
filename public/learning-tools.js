@@ -66,6 +66,53 @@ function searchableText(value) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase().trim();
 }
 
+function wordPractice() {
+  const words = ['Oracle', 'Nymph', 'Titan', 'Muse'];
+  const panel = element('div', 'glossary-entry');
+  const title = element('h3', 'learning-title', 'Try a word challenge');
+  const clue = element('p', 'learning-note');
+  const choices = element('div', 'comparison-grid');
+  const feedback = element('p', 'glossary-count');
+  feedback.setAttribute('role', 'status');
+  const next = element('button', 'outline-button', 'Next clue');
+  next.type = 'button';
+  next.hidden = true;
+  let round = 0;
+
+  function showClue() {
+    const answer = glossary.find(({ term }) => term === words[round]);
+    const options = [words[(round + 1) % words.length], words[(round + 2) % words.length]];
+    options.splice(round % 3, 0, answer.term);
+    clue.textContent = `Which word means: ${answer.definition}`;
+    choices.replaceChildren();
+    feedback.textContent = `Clue ${round + 1} of ${words.length}`;
+    next.hidden = true;
+    for (const option of options) {
+      const button = element('button', 'outline-button', option);
+      button.type = 'button';
+      button.addEventListener('click', () => {
+        feedback.textContent = option === answer.term
+          ? `Correct! ${answer.example}`
+          : `The word is ${answer.term}. ${answer.example}`;
+        for (const choice of choices.children) choice.disabled = true;
+        next.textContent = round === words.length - 1 ? 'Try again' : 'Next clue';
+        next.hidden = false;
+        next.focus();
+      });
+      choices.append(button);
+    }
+  }
+
+  next.addEventListener('click', () => {
+    round = (round + 1) % words.length;
+    showClue();
+    choices.firstElementChild?.focus();
+  });
+  panel.append(title, clue, choices, feedback, next);
+  showClue();
+  return panel;
+}
+
 function mountGlossary(root) {
   const panel = learningPanel('Mythology word guide', 'Clear meanings for words you meet along the way.');
   const body = element('div', 'learning-body');
@@ -85,18 +132,23 @@ function mountGlossary(root) {
   const empty = element('p', 'glossary-empty', 'No matching words yet. Try another word or clear your search to see every definition.');
   empty.hidden = true;
   field.append(label, input);
-  body.append(field, count, definitions, empty);
+  body.append(wordPractice(), field, count, definitions, empty);
   body.append(sourceLink('Read more: Greek gods and religious practices at The Met', 'https://www.metmuseum.org/essays/greek-gods-and-religious-practices'));
   panel.append(body);
   root.replaceChildren(panel);
 
   function renderDefinitions() {
     const query = searchableText(input.value);
-    const matches = glossary.filter(({ term, definition }) => searchableText(`${term} ${definition}`).includes(query));
+    const matches = glossary.filter(({ term, definition, example, figure }) => searchableText(`${term} ${definition} ${example} ${figure}`).includes(query));
     definitions.replaceChildren();
-    for (const { term, definition } of matches) {
+    for (const { term, definition, example, figure } of matches) {
       const item = element('div', 'glossary-entry');
-      item.append(element('dt', '', term), element('dd', '', definition));
+      const exampleLine = element('dd');
+      const exampleLabel = element('strong', '', 'In the guide: ');
+      const link = nameButton(figure, 'Greek');
+      link.textContent = `Meet ${figure} →`;
+      exampleLine.append(exampleLabel, document.createTextNode(`${example} `), link);
+      item.append(element('dt', '', term), element('dd', '', definition), exampleLine);
       definitions.append(item);
     }
     count.textContent = `${matches.length} of ${glossary.length} words${query ? ' match your search' : ' in the guide'}.`;

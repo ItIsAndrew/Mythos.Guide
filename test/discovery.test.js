@@ -65,8 +65,12 @@ test('comparison names resolve to distinct archive entries in their stated tradi
     assert.ok(pair.domain.length > 2);
   }
   assert.deepEqual(comparisons.find(({ greek }) => greek === 'Apollo'), { greek: 'Apollo', roman: 'Apollo', domain: 'Music, healing, and prophecy' });
-  assert.deepEqual(glossary.map(({ term }) => term), ['Myth', 'Deity', 'Pantheon', 'Olympian', 'Titan', 'Underworld', 'Oracle', 'Nymph']);
-  assert.ok(glossary.every(({ definition }) => definition.length > 15 && definition.length < 180));
+  assert.deepEqual(glossary.map(({ term }) => term), [
+    'Myth', 'Deity', 'Pantheon', 'Olympian', 'Titan', 'Underworld', 'Oracle', 'Nymph',
+    'Hero', 'Muse', 'Fate', 'Prophecy', 'Ritual', 'Shrine', 'Hearth', 'Personification',
+  ]);
+  assert.ok(glossary.every(({ definition, example }) => definition.length > 15 && definition.length < 180 && example.length > 20));
+  assert.ok(glossary.every(({ figure }) => sampleGods.some((god) => god.name === figure && god.tradition === 'Greek')));
 });
 
 test('suggestions prioritize existing exact relationships and counterparts', () => {

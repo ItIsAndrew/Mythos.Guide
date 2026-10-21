@@ -44,15 +44,25 @@ export const comparisons = [
 // https://www.theoi.com/Titan/Titanes.html
 // https://www.theoi.com/Nymphe/Nymphai.html
 // https://delphi.culture.gr/archaelogical-site/site-history/mythological-versions-of-the-foundation-of-the-oracle/
+// https://www.theoi.com/Daimon/Moirai.html
+// https://www.theoi.com/Pontios/Nereides.html
 export const glossary = [
-  { term: 'Myth', definition: 'A traditional story about gods, heroes, or the world. Myths can have many different versions.' },
-  { term: 'Deity', definition: 'Another word for a god or goddess.' },
-  { term: 'Pantheon', definition: 'The gods and goddesses of a particular tradition, considered together.' },
-  { term: 'Olympian', definition: 'A god associated with Mount Olympus, the home of the leading Greek gods in myths.' },
-  { term: 'Titan', definition: 'One of an older family of Greek gods. The Titans include Cronus and Rhea; some of their descendants are also called Titans.' },
-  { term: 'Underworld', definition: 'The realm of the dead in Greek and Roman myths. Hades rules it in Greek tradition.' },
-  { term: 'Oracle', definition: 'A message believed to come from a god, or the person or sacred place through which it was given.' },
-  { term: 'Nymph', definition: 'A female divine spirit connected with nature, such as a spring, tree, mountain, or the sea.' },
+  { term: 'Myth', definition: 'A traditional story about gods, heroes, or the world. Myths can have many different versions.', example: 'Athena appears in a story about a gift to a city.', figure: 'Athena' },
+  { term: 'Deity', definition: 'Another word for a god or goddess.', example: 'Zeus is a Greek deity linked with the sky.', figure: 'Zeus' },
+  { term: 'Pantheon', definition: 'The gods and goddesses of a particular tradition, considered together.', example: 'Hera belongs to the Greek pantheon.', figure: 'Hera' },
+  { term: 'Olympian', definition: 'A god associated with Mount Olympus, the home of the leading Greek gods in myths.', example: 'Hestia is often counted among the Olympians.', figure: 'Hestia' },
+  { term: 'Titan', definition: 'One of an older family of Greek gods. The Titans include Cronus and Rhea; some of their descendants are also called Titans.', example: 'Cronus rules before Zeus in many myths.', figure: 'Cronus' },
+  { term: 'Underworld', definition: 'The realm of the dead in Greek and Roman myths. Hades rules it in Greek tradition.', example: 'Persephone is queen of the Greek underworld.', figure: 'Persephone' },
+  { term: 'Oracle', definition: 'A message believed to come from a god, or the person or sacred place through which it was given.', example: 'People asked Apollo’s oracle at Delphi for guidance.', figure: 'Apollo' },
+  { term: 'Nymph', definition: 'A female divine spirit connected with nature, such as a spring, tree, mountain, or the sea.', example: 'Amphitrite is one of the Nereids, a group of sea nymphs.', figure: 'Amphitrite' },
+  { term: 'Hero', definition: 'A remarkable figure in a myth whose adventures and choices matter to the story.', example: 'Heracles is a Greek hero known for difficult adventures.', figure: 'Heracles' },
+  { term: 'Muse', definition: 'One of the Greek goddesses associated with music, poetry, and other arts.', example: 'Euterpe is a Muse linked with music.', figure: 'Euterpe' },
+  { term: 'Fate', definition: 'A person’s destiny or the course of events; Greek myths sometimes show the Fates as goddesses.', example: 'Clotho, one of the Fates, spins the thread of life.', figure: 'Clotho' },
+  { term: 'Prophecy', definition: 'A message or prediction about what may happen in the future.', example: 'Apollo is connected with prophecy and the oracle at Delphi.', figure: 'Apollo' },
+  { term: 'Ritual', definition: 'A repeated action used in worship, such as making an offering to a god.', example: 'Hestia often received a place of honor in offerings.', figure: 'Hestia' },
+  { term: 'Shrine', definition: 'A place set apart to honor a god or another sacred figure.', example: 'People visited healing sanctuaries associated with Asclepius.', figure: 'Asclepius' },
+  { term: 'Hearth', definition: 'The place for a household fire, also a symbol of home and shared life.', example: 'Hestia is the Greek goddess of the hearth.', figure: 'Hestia' },
+  { term: 'Personification', definition: 'An idea represented as a person or divine figure.', example: 'Ananke personifies necessity in Greek tradition.', figure: 'Ananke' },
 ];
 
 function normalize(value) {
