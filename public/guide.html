@@ -3,51 +3,97 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Choose what to explore next in Mythos.Guide: gods, stories, worlds, quizzes, and your own notes." />
+    <meta name="description" content="Find your next discovery in Mythos.Guide. Explore gods, stories, and ancient worlds, learn the basics, or try a quiz." />
     <meta name="theme-color" content="#f6f2e9" />
-    <title>Choose an activity — Mythos.Guide</title>
+    <title>All activities — Mythos.Guide</title>
     <link rel="stylesheet" href="/guide.css" />
     <script src="/guide-home.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#activities">Skip to activities</a>
     <div class="guide-shell">
-      <header class="guide-header"><a class="brand" href="/">Mythos<span>.</span>Guide</a><a class="back-link" href="/">← Back to welcome</a></header>
+      <header class="guide-header">
+        <a class="brand" href="/" aria-label="Mythos.Guide home"><svg aria-hidden="true" viewBox="0 0 44 44" fill="none"><path d="M5 16 22 6l17 10H5Zm3 5h28M11 22v14m11-14v14m11-14v14M6 40h32M9 36h26" stroke="currentColor" stroke-width="2.2" /></svg><span>Mythos<span class="brand-dot">.</span>Guide</span></a>
+        <a class="back-link" href="/">Back to welcome <span aria-hidden="true">↗</span></a>
+      </header>
       <main>
-        <div class="guide-intro">
-          <p class="kicker">YOUR MYTHOLOGY GUIDE <span aria-hidden="true">✦</span> CHOOSE A PATH</p>
-          <h1>Where will curiosity<br /><em>take you?</em></h1>
-          <p>Pick one activity to begin. You can always return here and choose another.</p>
-        </div>
-        <section class="guide-picks" aria-label="Your next steps">
-          <a id="continue-activity" class="pick-card continue-pick" href="/activity#search">
-            <span class="pick-label">PICK UP WHERE YOU LEFT OFF</span>
-            <strong id="continue-title">Find a god</strong>
-            <span id="continue-copy">Start with a mythological name and see where it leads.</span>
-            <span class="pick-action">Continue <span aria-hidden="true">↗</span></span>
-          </a>
-          <a id="suggested-activity" class="pick-card suggestion-pick" href="/activity#stories">
-            <span class="pick-label">A SUGGESTION FOR YOU</span>
-            <strong id="suggested-title">Read the myths</strong>
-            <span id="suggested-copy">Try a short story and meet the gods in action.</span>
-            <span class="pick-action">Give it a try <span aria-hidden="true">↗</span></span>
-          </a>
-        </section>
-        <p class="pick-privacy">Only the activity you last opened is remembered on this device. Your account and notes are not used for suggestions.</p>
-        <section id="activities" aria-labelledby="activities-title">
-          <h2 id="activities-title">Explore the guide</h2>
-          <div class="activity-grid">
-            <a class="activity-card featured" href="/activity#search"><span class="card-number">01 / DISCOVER</span><span class="card-symbol" aria-hidden="true">✦</span><strong>Find a god</strong><span class="card-copy">Search familiar names and lesser-known divine figures. Follow their stories and family connections.</span><span class="card-action">Start searching <span aria-hidden="true">↗</span></span></a>
-            <a class="activity-card" href="/activity#gods"><span class="card-number">02 / BROWSE</span><span class="card-symbol" aria-hidden="true">☼</span><strong>Meet the gods</strong><span class="card-copy">Browse the collection by tradition or topic, one figure at a time.</span><span class="card-action">Open the collection <span aria-hidden="true">↗</span></span></a>
-            <a class="activity-card" href="/activity#stories"><span class="card-number">03 / READ</span><span class="card-symbol" aria-hidden="true">❧</span><strong>Read the myths</strong><span class="card-copy">Settle in with original short retellings from Greek and Roman traditions.</span><span class="card-action">Choose a story <span aria-hidden="true">↗</span></span></a>
-            <a class="activity-card" href="/activity#worlds"><span class="card-number">04 / WANDER</span><span class="card-symbol" aria-hidden="true">◇</span><strong>Explore their worlds</strong><span class="card-copy">Visit Olympus, the sea, the underworld, and places of Roman life.</span><span class="card-action">Pick a place <span aria-hidden="true">↗</span></span></a>
-            <a class="activity-card" href="/activity#play"><span class="card-number">05 / PLAY</span><span class="card-symbol" aria-hidden="true">?</span><strong>Try a quiz</strong><span class="card-copy">Choose Easy, Medium, or Hard and learn from every answer.</span><span class="card-action">Start a round <span aria-hidden="true">↗</span></span></a>
-            <a class="activity-card" href="/activity#basics"><span class="card-number">06 / LEARN</span><span class="card-symbol" aria-hidden="true">α</span><strong>Names &amp; words</strong><span class="card-copy">Compare Greek and Roman names and look up mythology words.</span><span class="card-action">Learn the basics <span aria-hidden="true">↗</span></span></a>
-            <a class="activity-card notes-card" href="/activity#account"><span class="card-number">07 / YOUR SPACE</span><span class="card-symbol" aria-hidden="true">✎</span><strong>My posts</strong><span class="card-copy">Create a nickname account and keep your own private mythology notes.</span><span class="card-action">Open my space <span aria-hidden="true">↗</span></span></a>
+        <div class="guide-top">
+          <div class="guide-intro">
+            <p class="kicker"><span aria-hidden="true">✦</span> A world to explore</p>
+            <h1>Choose a path.</h1>
+            <p>Explore, learn, or play. Go at your own pace.</p>
           </div>
+          <a class="beginner-pick" href="/activity#start-here">
+            <span class="beginner-label">New to mythology?</span>
+            <strong>Start here <span aria-hidden="true">→</span></strong>
+            <span>A simple three-step introduction.</span>
+          </a>
+        </div>
+
+        <section id="resume-panel" class="resume-panel" aria-label="Continue exploring" hidden>
+          <a id="continue-activity" class="resume-link" href="/activity#search">
+            <span class="resume-label">Last opened</span>
+            <strong id="continue-title">Find a god</strong>
+            <span id="continue-copy" class="resume-copy">Search for a name and follow the discoveries it opens.</span>
+            <span class="resume-arrow" aria-hidden="true">↗</span>
+          </a>
+          <a id="suggested-activity" class="resume-link suggested-link" href="/activity#stories">
+            <span class="resume-label">Try next</span>
+            <strong id="suggested-title">Read the myths</strong>
+            <span id="suggested-copy" class="resume-copy">Choose a short Greek or Roman story.</span>
+            <span class="resume-arrow" aria-hidden="true">↗</span>
+          </a>
+          <p class="resume-privacy">Last activity saved on this device.</p>
+        </section>
+
+        <section id="activities" aria-labelledby="activities-title" tabindex="-1">
+          <div class="activities-heading"><h2 id="activities-title">All activities</h2><span>Seven ways to discover</span></div>
+          <div class="activity-groups">
+            <section class="activity-group explore-group" aria-labelledby="explore-title">
+              <h3 id="explore-title">Explore the myths</h3>
+              <div class="activity-grid">
+                <a class="activity-card" href="/activity#search">
+                  <span class="activity-icon clay" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><circle cx="14" cy="14" r="8" /><path d="m20 20 7 7M11 14h6m-3-3v6" /></svg></span>
+                  <div class="activity-copy"><h4>Find a god</h4><p>Have a name in mind? Discover their story, symbols, and family.</p><span class="activity-meta">Search 141 figures</span></div><span class="card-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a class="activity-card" href="/activity#gods">
+                  <span class="activity-icon olive" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M4 11 16 4l12 7H4Zm2 5h20M8 16v10m8-10v10m8-10v10M5 28h22" /></svg></span>
+                  <div class="activity-copy"><h4>Meet the gods</h4><p>Browse familiar names and unexpected figures by tradition or topic.</p><span class="activity-meta">Greek &amp; Roman collections</span></div><span class="card-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a class="activity-card" href="/activity#stories">
+                  <span class="activity-icon ochre" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 9c-4-3-8-3-12-2v19c4-1 8-1 12 2 4-3 8-3 12-2V7c-4-1-8-1-12 2Zm0 0v19M8 12h4m-4 5h4m8-5h4m-4 5h4" /></svg></span>
+                  <div class="activity-copy"><h4>Read the myths</h4><p>Follow a story about courage, love, curiosity, or a changing world.</p><span class="activity-meta">12 stories · 1–2 min each</span></div><span class="card-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a class="activity-card" href="/activity#worlds">
+                  <span class="activity-icon sea" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="m3 24 10-17 7 12 4-6 5 11M9 14l4 3 4-3M3 28h26" /><circle cx="24" cy="6" r="3" /></svg></span>
+                  <div class="activity-copy"><h4>Explore their worlds</h4><p>Visit Olympus, the underworld, and places of ancient daily life.</p><span class="activity-meta">6 places to explore</span></div><span class="card-arrow" aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </section>
+
+            <section class="activity-group learn-group" aria-labelledby="learn-title">
+              <h3 id="learn-title">Learn &amp; play</h3>
+              <div class="activity-grid">
+                <a class="activity-card learning-card" href="/activity#basics">
+                  <span class="activity-icon olive" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="m5 25 8-19 8 19M8 19h10m5-5h5m-3-3v14" /></svg></span>
+                  <div class="activity-copy"><h4>Names &amp; words</h4><p>Make sense of mythology words and Greek and Roman names.</p><span class="activity-meta">Examples &amp; a word challenge</span></div><span class="card-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a class="activity-card quiz-card" href="/activity#play">
+                  <span class="activity-icon clay" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M11 11a5 5 0 1 1 8 4c-2 1-3 2-3 5M16 25v1" /><circle cx="16" cy="16" r="13" /></svg></span>
+                  <div class="activity-copy"><h4>Try a quiz</h4><p>Choose your level, learn from each answer, and practice what you missed.</p><span class="activity-meta">5 questions · No timer</span></div><span class="card-arrow" aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </section>
+          </div>
+
+          <a class="notebook-link" href="/activity#account">
+            <span class="activity-icon neutral" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M8 5h18v23H8V5ZM5 9h6M5 16h6m-6 7h6m5-12h6m-6 5h6" /></svg></span>
+            <div><h3>My posts</h3><p>Keep your own private notes about the myths.</p></div>
+            <span class="account-label">Nickname account</span><span class="card-arrow" aria-hidden="true">↗</span>
+          </a>
         </section>
       </main>
-      <footer class="guide-footer"><span>Mythos.Guide</span><span>Every path leads to another story.</span></footer>
+      <footer class="guide-footer"><span>Mythos.Guide</span><span>Go at your own pace. There’s always another story.</span></footer>
     </div>
   </body>
 </html>

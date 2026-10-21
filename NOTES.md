@@ -14,7 +14,7 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 
 ## What is done
 
-- A welcoming landing page leads into a compact activity menu. Search, browsing, stories, worlds, basics, quiz, and private notes each open in a focused view. The menu offers a link back to the last opened activity and a different suggested activity. Only the activity name is stored in this browser; nicknames and posts are not used. Old links to guide sections still reach the matching activity.
+- The activity menu groups the seven choices into **Explore the myths**, **Learn & play**, and a private notes row. Compact cards have clear icons, short descriptions, and useful details such as story length. A **Start here** link helps beginners. Returning visitors see their last activity and a different suggestion; new visitors see the activities without an empty resume panel. Only the activity name is stored in this browser. Old links still open the matching activity.
 - The landing page now has direct god search, example names, an Athena introduction, clear beginner links, and a compact collection preview. Text uses a calmer hierarchy and phone controls have tap areas of at least 44 pixels.
 - Search and browse 141 Greek and Roman divine figures, including Aether, Euterpe, and lesser-known figures. Both Thalias have working qualified Muse/Grace aliases. Clear a search without reloading, sort names A–Z or Z–A, show more or fewer cards, filter by tradition, or meet a random god.
 - Every figure has source references, a myth-version note, reviewed topic tags, and a useful next-step topic. There are 12 named topics, including war, love, healing, creation, and dreams. Related stories and worlds are labeled as thematic suggestions where appropriate.
@@ -34,13 +34,7 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 
 ## Latest checks
 
-On October 21, 2026, all **86 automated tests passed** for implementation save point `65a20b8`. Live database checks passed account isolation, validation, moderation, posting controls, recovery, and session revocation. They used disposable collections inside the already configured database; all test collections were removed afterward. Browser checks confirmed save/edit success when the following refresh fails, all three quiz levels, new stories/worlds, and layouts from 320 to 1280 pixels without sideways scrolling. Another chat started further layout work after these checks; its unfinished edits were preserved. See [TESTING.md](TESTING.md) for details and the resolved audit findings.
-
-After the Names & words expansion on October 21, all **100 current automated tests passed** locally. Browser checks confirmed the word challenge, term filtering, and a glossary link opening the matching figure. The other unfinished local edits were not included in this save point.
-
-After the landing, story search, and quiz practice improvements on October 21, the full **100-test suite passed** again. Browser checks confirmed landing search (including multiword names), the Athena link, story search/filter/no-match/reset and paging, missed-answer review/practice/replay, and keyboard skipping to the visible activity. Landing and story layouts fit 320–1280 pixel screens without sideways scrolling. These improvements remain local; no website was deployed.
-
-After the activity improvements on October 21, all **107 current automated tests passed** locally. Browser checks confirmed search reset, reverse name order, world-to-story links, the filtered story chooser, eight word clues, and a complete quiz round with correct-answer review. The writing prompts were checked with made-up account data in a local test harness; they did not save a post. No live database check or deployment was part of this change.
+On October 21, 2026, the full **107-test suite passed** after the activity-menu redesign. Browser checks confirmed all seven destinations, the beginner link, updated resume/suggestion links after returning, and keyboard access. Menu layouts fit 320–1280 pixel screens without sideways scrolling; visible links have tap areas of at least 44 pixels. Earlier checks covered landing search, story filters, quiz practice, and live account protection. Details and historical results are in [TESTING.md](TESTING.md). The app remains local.
 
 ## What is next
 

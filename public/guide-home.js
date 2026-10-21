@@ -17,22 +17,24 @@ const activityNames = {
   account: ['My posts', 'Open your own private mythology notes.'],
 };
 const suggestions = { search: 'stories', gods: 'worlds', stories: 'play', worlds: 'gods', play: 'basics', basics: 'search', account: 'stories' };
-let lastActivity;
-try { lastActivity = window.localStorage.getItem('mythos-guide:last-activity'); } catch { /* Storage may be unavailable. */ }
-if (!Object.hasOwn(activityNames, lastActivity)) lastActivity = null;
+function updateResumePanel() {
+  let lastActivity;
+  try { lastActivity = window.localStorage.getItem('mythos-guide:last-activity'); } catch { /* The activity menu still works when storage is unavailable. */ }
+  const hasActivity = typeof lastActivity === 'string' && Object.hasOwn(activityNames, lastActivity);
+  document.querySelector('#resume-panel').hidden = !hasActivity;
+  if (!hasActivity) return;
 
-if (lastActivity) {
   const [title, copy] = activityNames[lastActivity];
   document.querySelector('#continue-activity').href = `/activity#${lastActivity}`;
   document.querySelector('#continue-title').textContent = title;
   document.querySelector('#continue-copy').textContent = copy;
-} else {
-  document.querySelector('#continue-activity .pick-label').textContent = 'A GOOD PLACE TO START';
-  document.querySelector('#continue-activity .pick-action').firstChild.textContent = 'Start exploring ';
-}
 
-const suggestion = suggestions[lastActivity] || 'stories';
-const [suggestedTitle, suggestedCopy] = activityNames[suggestion];
-document.querySelector('#suggested-activity').href = `/activity#${suggestion}`;
-document.querySelector('#suggested-title').textContent = suggestedTitle;
-document.querySelector('#suggested-copy').textContent = suggestedCopy;
+  const suggestion = suggestions[lastActivity];
+  const [suggestedTitle, suggestedCopy] = activityNames[suggestion];
+  document.querySelector('#suggested-activity').href = `/activity#${suggestion}`;
+  document.querySelector('#suggested-title').textContent = suggestedTitle;
+  document.querySelector('#suggested-copy').textContent = suggestedCopy;
+}
+updateResumePanel();
+// Returning from an activity can restore this page from the browser's cache.
+window.addEventListener('pageshow', updateResumePanel);

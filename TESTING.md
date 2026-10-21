@@ -1,5 +1,13 @@
 # Mythos.Guide test results
 
+## Activity menu — October 21, 2026
+
+All **107 current automated tests pass**, including six new checks against the real menu script for new/returning visitors, all seven saved activities, unavailable/corrupt storage, back navigation, and old bookmarks.
+
+Browser checks confirmed that all seven activity cards open the correct focused section. Returning to the menu updates **Last opened** and suggests a different activity. **Start here** opens the beginner guide; the keyboard skip link focuses the activity list. At widths 320, 390, 430, 768, and 1280 pixels, the menu has no sideways scrolling and visible links have tap areas of at least 44 pixels. Muted text colors were checked for contrast on the tinted cards.
+
+This update changes the menu and its presentation only. The app remains local; database/account settings and server code were unchanged.
+
 ## Landing, story search, and quiz practice — October 21, 2026
 
 The full current suite passes **100 tests**. The improvements preserve the existing account, API, content, and routing checks. New regressions cover delayed landing-search handoff, multiword/Unicode names, invalid/repeated queries, active-section keyboard skip links, combined story filters, and quiz review/practice state.
