@@ -149,7 +149,6 @@
             <button id="browse-more" class="outline-button" type="button" hidden>Show more gods <span aria-hidden="true">↓</span></button>
             <button id="browse-less" class="outline-button browse-less-button" type="button" hidden>Show fewer gods <span aria-hidden="true">↑</span></button>
           </div>
-          <div class="beginner-next"><a href="/guide">All activities</a><a href="#stories">Next: Read a story <span aria-hidden="true">→</span></a></div>
         </section>
 
         <section id="basics" class="content-section" aria-labelledby="basics-title">
@@ -183,7 +182,6 @@
           <div id="story-grid" class="story-grid"></div>
           <div class="show-more-wrap"><button id="stories-more" class="outline-button" type="button" hidden>Show more stories</button><button id="stories-less" class="outline-button browse-less-button" type="button" hidden>Show fewer stories</button></div>
           <p class="collection-note story-note">Original educational sample retellings, inspired by Greek and Roman mythology. Myths vary by source, place, and time; these stories are not quotations from ancient texts.</p>
-          <div class="beginner-next"><a href="/guide">All activities</a><a href="#play">Next: Try an easy quiz <span aria-hidden="true">→</span></a></div>
         </section>
 
         <section id="play" class="play-section content-section" aria-labelledby="play-title">
@@ -197,11 +195,12 @@
         <section id="account" class="account-section content-section" aria-labelledby="account-title">
           <div class="section-intro">
             <div><p class="section-kicker"><span>05</span> YOUR OWN LITTLE ARCHIVE</p><h2 id="account-title">A place for your discoveries.</h2></div>
-            <p>Keep short notes about the myths. Other members cannot see your posts. The owner can read and delete posts to keep this space safe.</p>
+            <p>Keep short notes about the myths. Only you and the owner can read them; the owner can remove unsafe posts.</p>
           </div>
-          <p class="account-rules">Use a made-up nickname. No real names or contact information: no emails, phone numbers, addresses, or social handles in nicknames or posts.</p>
+          <p class="account-rules">Use a made-up nickname. Leave real names, schools, emails, phone numbers, addresses, and social handles out of nicknames and posts.</p>
           <p id="account-status" class="account-status" role="status" aria-live="polite" aria-atomic="true">Checking your account…</p>
           <div id="account-entry" class="account-card" hidden>
+            <p class="account-entry-intro">New here? Choose <strong>Create account</strong> to get a made-up nickname. No invitation code is needed. Already joined? Choose <strong>Log in</strong>.</p>
             <div class="account-tabs" role="group" aria-label="Choose an account action">
               <button id="account-login-tab" type="button" aria-pressed="true">Log in</button>
               <button id="account-register-tab" type="button" aria-pressed="false">Create account</button>
@@ -227,6 +226,17 @@
           </div>
           <noscript><p class="noscript-message">Please enable JavaScript to use your account and posts.</p></noscript>
         </section>
+        <nav class="activity-next" aria-label="Keep exploring">
+          <div>
+            <span class="activity-next-label">KEEP EXPLORING</span>
+            <h2 id="activity-next-title">Read the myths</h2>
+            <p id="activity-next-copy">Choose a short story and see the gods in action.</p>
+          </div>
+          <div class="activity-next-links">
+            <a id="activity-next-link" class="activity-next-primary" href="#stories">Go to stories <span aria-hidden="true">→</span></a>
+            <a class="activity-next-menu" href="/guide">All activities</a>
+          </div>
+        </nav>
       </main>
 
       <footer class="site-footer"><span class="footer-brand">Mythos.Guide</span><span>For the endlessly curious.</span><span class="footer-edition">GREEK &amp; ROMAN MYTHOLOGY <span aria-hidden="true">✦</span></span></footer>

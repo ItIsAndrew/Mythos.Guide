@@ -56,3 +56,7 @@
 #account-recovery-result input { width:100%; min-width:0; min-height:48px; padding:12px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:16px; border:1px solid var(--line); border-radius:3px; background:var(--white); color:var(--ink); }
 #account-recovery-result input:focus-visible { outline:3px solid #c66c45; outline-offset:3px; }
 @media(max-width:900px) { .account-recovery { font-size:16px; } #account-recovery-result { padding:16px; } }
+.account-entry-intro { margin: 0 0 18px; color: var(--ink); font-size: 15px; line-height: 1.6; }
+.account-entry-intro strong { color: var(--rust-dark); }
+.account-tabs #account-register-tab:not([aria-pressed="true"]) { border-color: var(--rust); color: var(--rust-dark); font-weight: 650; }
+@media(max-width:900px) { .account-entry-intro { font-size: 16px; } }

@@ -40,6 +40,9 @@ function fixture(path) {
   }
   const input = { value: '' };
   const skipLink = { href: '#search-input', textContent: 'Skip to search' };
+  const nextLink = { href: '#stories', firstChild: { textContent: 'Go to stories ' } };
+  const nextTitle = { textContent: 'Read the myths' };
+  const nextCopy = { textContent: '' };
   let requested = 0;
   let received = 0;
   const form = {
@@ -56,6 +59,9 @@ function fixture(path) {
       if (selector === '#search-input') return input;
       if (selector === '#search-form') return form;
       if (selector === '.skip-link') return skipLink;
+      if (selector === '#activity-next-link') return nextLink;
+      if (selector === '#activity-next-title') return nextTitle;
+      if (selector === '#activity-next-copy') return nextCopy;
       return null;
     },
     getElementById(id) { return this.querySelector(`#${id}`); },
@@ -70,7 +76,7 @@ function fixture(path) {
   vm.runInNewContext(activitySource, { document, window, URLSearchParams, URL, requestAnimationFrame: (callback) => callback() });
   form.addEventListener('submit', () => { received += 1; });
   return {
-    input, nodes, window, document, skipLink,
+    input, nodes, window, document, skipLink, nextLink, nextTitle, nextCopy,
     get requested() { return requested; },
     get received() { return received; },
     ready() {
@@ -96,6 +102,22 @@ test('a landing search waits for the app listener and submits its trimmed name o
   entry.navigate('#stories');
   assert.equal(entry.requested, 1, 'later navigation must not repeat the landing search');
   assert.equal(entry.nodes.get('stories').hidden, false);
+});
+
+test('every activity offers a working next path and updates it when switching activities', () => {
+  const entry = fixture('/activity#start-here');
+  for (const [current, next, title] of [
+    ['start-here', 'search', 'Find a god'], ['search', 'stories', 'Read the myths'],
+    ['gods', 'worlds', 'Explore their worlds'], ['worlds', 'stories', 'Read the myths'],
+    ['stories', 'play', 'Try a quiz'], ['basics', 'search', 'Find a god'],
+    ['play', 'basics', 'Names & words'], ['account', 'stories', 'Read the myths'],
+  ]) {
+    entry.navigate(`#${current}`);
+    assert.equal(entry.nextLink.href, `#${next}`, current);
+    assert.equal(entry.nextTitle.textContent, title, current);
+    assert.notEqual(current, next);
+    assert.ok(entry.nextCopy.textContent.length > 15, current);
+  }
 });
 
 test('plain and legacy search URLs accept multiword and Unicode names as input text', () => {

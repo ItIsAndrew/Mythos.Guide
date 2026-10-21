@@ -91,7 +91,7 @@ button, a { touch-action: manipulation; }
 }
 
 /* A short first-visit path uses the existing collection, stories, and quiz. */
-.phone-nav, .beginner-next { display: none; }
+.phone-nav { display: none; }
 .beginner-start { padding: 34px 0 38px; border-bottom: 1px solid var(--line); scroll-margin-top: 24px; }
 .beginner-start h2 { font: 400 32px/1.2 var(--serif); letter-spacing: -.7px; margin: 0 0 12px; }
 .beginner-copy { max-width: 700px; margin: 0 0 24px; color: var(--muted); font-size: 16px; line-height: 1.7; }
@@ -122,6 +122,4 @@ button, a { touch-action: manipulation; }
   .beginner-steps { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .beginner-link { min-height: 0; padding: 16px; gap: 10px; }
   .beginner-link strong { font-size: 16px; }
-  .beginner-next { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
-  .beginner-next a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--rust); font-size: 15px; line-height: 1.5; text-underline-offset: 4px; }
 }

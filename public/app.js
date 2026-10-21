@@ -732,4 +732,13 @@ document.querySelectorAll('.phone-nav a').forEach((link) => {
     document.querySelector('.phone-menu').open = false;
   });
 });
-loadBrowse();
+// The archive is large enough to leave on demand: stories, words, and quiz
+// should open without a MongoDB read they do not use.
+let browseStarted = false;
+function loadBrowseWhenOpened() {
+  if (window.location.hash !== '#gods' || browseStarted) return;
+  browseStarted = true;
+  loadBrowse();
+}
+window.addEventListener('hashchange', loadBrowseWhenOpened);
+loadBrowseWhenOpened();

@@ -6,6 +6,16 @@ const activitySections = new Map([
 const activityNodes = new Map([...document.querySelector('main').children]
   .filter((node) => node.tagName === 'SECTION')
   .map((node) => [node.id || (node.classList.contains('discovery') ? 'discovery' : ''), node]));
+const nextActivity = {
+  'start-here': ['search', 'Find a god', 'Pick a name and begin your discovery.', 'Find a god'],
+  search: ['stories', 'Read the myths', 'Choose a short story and see the gods in action.', 'Go to stories'],
+  gods: ['worlds', 'Explore their worlds', 'Visit a place connected to the gods.', 'Explore places'],
+  worlds: ['stories', 'Read the myths', 'Follow a story set in this world.', 'Go to stories'],
+  stories: ['play', 'Try a quiz', 'See what you remember from the myths.', 'Try a quiz'],
+  basics: ['search', 'Find a god', 'Use a name you learned to discover more.', 'Find a god'],
+  play: ['basics', 'Names & words', 'Learn a little more before your next round.', 'Learn the words'],
+  account: ['stories', 'Read the myths', 'Find a story to write about in your private notes.', 'Go to stories'],
+};
 for (const [id, node] of activityNodes) {
   if (id === 'discovery') continue;
   const back = document.createElement('a');
@@ -36,6 +46,14 @@ function showActivity(name, scroll = true) {
   }
   for (const link of document.querySelectorAll('.site-nav a, .phone-menu-links a')) {
     if (link.hash) link.setAttribute('aria-current', link.hash.slice(1) === key ? 'page' : 'false');
+  }
+  const [nextKey, nextTitle, nextCopy, nextLabel] = nextActivity[key];
+  const nextLink = document.querySelector('#activity-next-link');
+  if (nextLink) {
+    nextLink.href = `#${nextKey}`;
+    nextLink.firstChild.textContent = `${nextLabel} `;
+    document.querySelector('#activity-next-title').textContent = nextTitle;
+    document.querySelector('#activity-next-copy').textContent = nextCopy;
   }
   document.title = `${({ 'start-here': 'Start here', search: 'Find a god', gods: 'Meet the gods', basics: 'Names and words', worlds: 'Explore their worlds', stories: 'Read the myths', play: 'Try a quiz', account: 'My posts' })[key] || 'Discover'} — Mythos.Guide`;
   if (scroll) requestAnimationFrame(() => activityNodes.get(activitySections.get(key)[0])?.scrollIntoView({ block: 'start' }));

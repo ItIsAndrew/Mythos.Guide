@@ -3,3 +3,23 @@ main > [hidden]{display:none!important}
 .activity-back{display:inline-flex;align-items:center;min-height:44px;margin:0 0 16px;color:var(--rust);font-size:14px;font-weight:650;text-decoration:none}
 .activity-back:hover{text-decoration:underline;text-underline-offset:4px}
 @media(max-width:900px){.phone-nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+main > section[tabindex="-1"]:focus { outline: none; }
+main > section[tabindex="-1"]:focus-visible .section-intro h2,
+#start-here:focus-visible > h2 { text-decoration: underline; text-decoration-color: var(--rust); text-decoration-thickness: 2px; text-underline-offset: 8px; }
+.activity-next { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 22px; margin: 28px 0 54px; padding: 25px 30px; border: 1px solid var(--line); border-left: 4px solid var(--rust); border-radius: 4px; background: var(--white); }
+.activity-next-label { color: var(--rust-dark); font-size: 11px; font-weight: 700; letter-spacing: 1.4px; }
+.activity-next h2 { margin: 8px 0 5px; font: 400 clamp(24px,3vw,31px)/1.2 var(--serif); letter-spacing: -.6px; }
+.activity-next p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.activity-next-links { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.activity-next-links a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border-radius: 3px; font-size: 14px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.activity-next-primary { gap: 15px; background: var(--rust); color: var(--white); }
+.activity-next-primary:hover { background: var(--rust-dark); }
+.activity-next-menu { border: 1px solid var(--line); color: var(--ink); }
+.activity-next-menu:hover { background: var(--paper); }
+@media(max-width:700px){
+  .activity-next { grid-template-columns: 1fr; padding: 23px 20px; }
+  .activity-next-links { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .activity-next-links a { white-space: normal; text-align: center; }
+}
+@media(max-width:390px){.activity-next-links { grid-template-columns: 1fr; }}

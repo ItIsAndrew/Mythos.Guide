@@ -354,7 +354,7 @@ function verifySession() {
       if (previousNickname) clearPrivateData();
       else entry.hidden = false;
       state.concealed = false;
-      say('Accounts are ready. Create your own account with a made-up nickname.');
+      say('Accounts are ready.');
     }
   });
 }
