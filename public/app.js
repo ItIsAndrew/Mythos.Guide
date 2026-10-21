@@ -169,6 +169,7 @@ form.addEventListener('submit', (event) => {
 document.addEventListener('click', (event) => {
   const example = event.target.closest('[data-search]');
   if (!example) return;
+  window.mythosOpenActivity?.('search');
   if (dialog.open) {
     dialogOpener = input;
     dialog.close();
@@ -248,6 +249,7 @@ function createExploreNext(god) {
         dialog.close();
       }
       selectWorld(index, true);
+      window.mythosOpenActivity?.('worlds');
       document.querySelector('#worlds').scrollIntoView({ block: 'start', behavior: 'auto' });
     });
     actions.append(visit);
@@ -264,6 +266,7 @@ function createExploreNext(god) {
       }
       currentTopic = topic.id;
       topicSelect.value = topic.id;
+      window.mythosOpenActivity?.('gods');
       await loadBrowse('all');
       heading.focus({ preventScroll: true });
       document.querySelector('#gods').scrollIntoView({ block: 'start', behavior: 'auto' });

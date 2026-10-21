@@ -42,6 +42,12 @@ test('the app serves its page and public assets locally', async () => {
   for (const [path, expectedType] of [
     ['/', 'text/html'],
     ['/styles.css', 'text/css'],
+    ['/guide', 'text/html'],
+    ['/activity', 'text/html'],
+    ['/guide.css', 'text/css'],
+    ['/guide-home.js', 'text/javascript'],
+    ['/activity.css', 'text/css'],
+    ['/activity.js', 'text/javascript'],
     ['/app.js', 'text/javascript'],
     ['/learn-content.js', 'text/javascript'],
     ['/quiz.js', 'text/javascript'],
