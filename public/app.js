@@ -12,9 +12,16 @@ const status = document.querySelector('#search-status');
 const button = document.querySelector('#search-button');
 const buttonLabel = document.querySelector('#search-button-label');
 const discovery = document.querySelector('.discovery');
+const searchReset = document.querySelector('#search-reset');
+const initialSearchState = results.firstElementChild.cloneNode(true);
 
 let activeRequest;
 let searchNumber = 0;
+let hasSearched = false;
+
+function updateSearchReset() {
+  searchReset.hidden = !hasSearched && !input.value.trim();
+}
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -124,6 +131,8 @@ async function search() {
     return;
   }
 
+  hasSearched = true;
+  updateSearchReset();
   input.removeAttribute('aria-invalid');
   activeRequest = new AbortController();
   results.setAttribute('aria-busy', 'true');
@@ -176,11 +185,29 @@ document.addEventListener('click', (event) => {
     dialog.close();
   }
   input.value = example.dataset.search;
+  updateSearchReset();
   input.focus({ preventScroll: true });
   search();
 });
 
-input.addEventListener('input', () => input.removeAttribute('aria-invalid'));
+input.addEventListener('input', () => {
+  input.removeAttribute('aria-invalid');
+  updateSearchReset();
+});
+searchReset.addEventListener('click', () => {
+  activeRequest?.abort();
+  searchNumber += 1;
+  hasSearched = false;
+  input.value = '';
+  input.removeAttribute('aria-invalid');
+  results.replaceChildren(initialSearchState.cloneNode(true));
+  results.setAttribute('aria-busy', 'false');
+  button.removeAttribute('aria-busy');
+  buttonLabel.textContent = 'Search';
+  status.textContent = 'Your discovery starts here.';
+  updateSearchReset();
+  input.focus();
+});
 
 // A single native dialog keeps details and story reading accessible by keyboard.
 const dialog = document.querySelector('#detail-dialog');
@@ -387,6 +414,7 @@ const browseStatus = document.querySelector('#browse-status');
 const browseMore = document.querySelector('#browse-more');
 const browseLess = document.querySelector('#browse-less');
 const topicSelect = document.querySelector('#god-topic');
+const sortSelect = document.querySelector('#god-sort');
 topics.forEach((topic) => {
   const option = element('option', '', topic.label);
   option.value = topic.id;
@@ -401,8 +429,14 @@ let currentTradition = 'all';
 let currentTopic = 'all';
 let browseNumber = 0;
 
+function matchingBrowseGods() {
+  return filterGodsByTopic(browseGods, currentTopic).sort((first, second) => (
+    sortSelect.value === 'za' ? second.name.localeCompare(first.name) : first.name.localeCompare(second.name)
+  ));
+}
+
 function renderBrowse() {
-  const matchingGods = filterGodsByTopic(browseGods, currentTopic);
+  const matchingGods = matchingBrowseGods();
   const cards = matchingGods.slice(0, visibleGods).map((god, index) => {
     const card = element('button', 'god-card');
     card.type = 'button';
@@ -492,8 +526,12 @@ topicSelect.addEventListener('change', () => {
   visibleGods = browsePageSize;
   renderBrowse();
 });
+sortSelect.addEventListener('change', () => {
+  visibleGods = browsePageSize;
+  renderBrowse();
+});
 browseMore.addEventListener('click', () => {
-  const firstNewIndex = Math.min(visibleGods, filterGodsByTopic(browseGods, currentTopic).length);
+  const firstNewIndex = Math.min(visibleGods, matchingBrowseGods().length);
   visibleGods += browsePageSize;
   renderBrowse();
   browseResults.children[firstNewIndex]?.focus({ preventScroll: true });

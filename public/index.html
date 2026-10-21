@@ -66,7 +66,7 @@
                   <button id="search-button" type="submit"><span id="search-button-label">Search</span><span aria-hidden="true">↗</span></button>
                 </div>
               </form>
-              <div id="search-hint" class="search-examples"><span>Try a name</span><button type="button" data-search="Zeus">Zeus</button><button type="button" data-search="Athena">Athena</button><button type="button" data-search="Morpheus">Morpheus</button></div>
+              <div id="search-hint" class="search-examples"><span>Try a name</span><button type="button" data-search="Zeus">Zeus</button><button type="button" data-search="Athena">Athena</button><button type="button" data-search="Morpheus">Morpheus</button><button type="button" data-search="Janus">Janus</button><button id="search-reset" type="button" hidden>Clear search</button></div>
               <div class="random-discovery">
                 <button id="random-god" class="random-button" type="button">Meet a random god <span aria-hidden="true">↗</span></button>
                 <p id="random-status" role="status" aria-live="polite">No name in mind? Let curiosity choose.</p>
@@ -143,7 +143,7 @@
             </div>
             <p id="browse-status" class="small-status" role="status" aria-live="polite">Opening the collection…</p>
           </div>
-          <div class="topic-filter"><label for="god-topic">Explore by topic</label><select id="god-topic" class="topic-control" disabled><option value="all">All topics</option></select></div>
+          <div class="topic-filter"><div class="browse-field"><label for="god-topic">Explore by topic</label><select id="god-topic" class="topic-control" disabled><option value="all">All topics</option></select></div><div class="browse-field"><label for="god-sort">Name order</label><select id="god-sort" class="topic-control"><option value="az">A to Z</option><option value="za">Z to A</option></select></div></div>
           <div id="browse-results" class="god-grid" aria-busy="true"></div>
           <div class="show-more-wrap">
             <button id="browse-more" class="outline-button" type="button" hidden>Show more gods <span aria-hidden="true">↓</span></button>
