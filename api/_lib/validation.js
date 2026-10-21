@@ -18,11 +18,12 @@ export function validateNickname(value) {
 
 // New accounts choose from impersonal word pairs. Keep the general validator
 // for existing accounts so this change cannot lock anyone out.
+const signupNicknames = new Map(nicknameStarts.flatMap((start) => nicknameEnds.flatMap((end) => (
+  [`${start}${end}`, `${start}-${end}`].filter((name) => name.length <= 24).map((name) => [name.toLowerCase(), name])
+))));
 export function validateSignupNickname(value) {
   validateNickname(value);
-  const canonical = nicknameStarts.flatMap((start) => nicknameEnds.flatMap((end) => (
-    [`${start}${end}`, `${start}-${end}`]
-  ))).find((name) => name.toLowerCase() === value.toLowerCase());
+  const canonical = signupNicknames.get(value.toLowerCase());
   if (!canonical) {
     throw new HttpError(400, "Choose two made-up nickname words, such as Moon-Quill or CometFox. Use the nickname suggestion on the page.");
   }
@@ -53,21 +54,27 @@ export function containsContactInformation(value) {
   if (/(?:^|\s)(?:\p{N}{1,6}[a-z]?|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:[\p{L}\p{N}.'-]+\s+){0,6}(?:street|st\.?|avenue|ave\.?|road|rd\.?|lane|ln\.?|drive|dr\.?|boulevard|blvd\.?|court|ct\.?|way|place|pl\.?|terrace|ter\.?|circle|close|crescent|parkway|highway|hwy\.?)(?:\b|$)/iu.test(text)) return true;
   if (/(?:^|\s)\p{N}{1,6}[a-z]?\s+(?:rue|rua|calle|strasse|straße|via|piazza)\b|\b(?:rue|rua|calle|strasse|straße|via|piazza)\s+(?:[\p{L}.'-]+\s+){0,5}\p{N}{1,6}|\b(?:apt\.?|apartment|suite|unit)\s*#?\s*\p{N}+/iu.test(text)) return true;
   if (/\b(?:p\.?\s*o\.?\s*box|postal\s+address|home\s+address|my\s+address|i\s+live\s+(?:at|on))\b/iu.test(text)) return true;
-  if (/\b(?:school|academy|college|university|campus|homeroom|classroom|school\s*district)\b/iu.test(text)) return true;
+  // A historical academy is a valid research subject. Block personal school
+  // disclosures and explicitly named locations rather than the topic word alone.
+  if (/\b(?:my|our|your)\s+(?:(?:old|new|local|current|elementary|middle|high|primary|secondary)\s+)?(?:school|academy|college|university|campus|homeroom|classroom|school\s*district)\b/iu.test(text)) return true;
+  if (/\b(?:school|academy|college|university|campus)\s*(?:address|location|[:=])|\b(?:i|we)\s+(?:attend|enrolled|study\s+at)\b|(?:^|[\n.!?]\s*)(?:student|class)\s+at\b/iu.test(text)) return true;
   if (/\b(?:my\s+(?:teacher|principal|class)|i\s+(?:go|attend|study)\s+(?:at|to))\b/iu.test(text)) return true;
   if (/\b(?:my|our|your)\s+(?:(?:best|close|old|new)\s+)?(?:friend|classmate|neighbor|neighbour|teacher|principal|parent|mother|father|mom|mum|dad|brother|sister|cousin|family|child|kid)\b/iu.test(text)) return true;
   if (/\b(?:friend|classmate|neighbor|neighbour|teacher|principal|parent|cousin)\s+(?:named|called|is)\b/iu.test(text)) return true;
   if (/\b(?:is|was)\s+(?:my|our|your)\s+(?:(?:best|close|old|new)\s+)?(?:friend|classmate|neighbor|neighbour|teacher|principal|parent|cousin)\b/iu.test(text)) return true;
   if (/\b(?:i\s+(?:am|was|know|met|live|work)|i['’]m|myself|about\s+me|we\s+(?:are|live|know)|our\s+(?:home|town|city))\b/iu.test(text)) return true;
   // Personal introductions are outside the mythology notebook's purpose.
-  if (/\b(?:my\s+(?:real\s+)?name\s+is|real\s+name\s*[:=]|full\s+name\s*[:=])\b/iu.test(text)) return true;
+  if (/\b(?:my\s+(?:(?:real|full)\s+)?name\s*(?:is\b|[:=])|(?:real|full)\s+name\s*(?:is\b|[:=])|call\s+me\b)|(?:^|[\n.!?]\s*)name\s*[:=]/iu.test(text)) return true;
+  // Common introductions in Spanish, French, Portuguese, German, and Italian.
+  // This is a focused filter, not a guarantee that every language/name is caught.
+  if (/\b(?:me\s+llamo|mi\s+nombre\s+es|je\s+m['’]appelle|mon\s+nom\s+est|meu\s+nome\s+[ée]|eu\s+me\s+chamo|ich\s+hei(?:ß|ss)e|mein\s+name\s+ist|mi\s+chiamo|il\s+mio\s+nome\s+[èe])(?=\s|[:=]|$)/iu.test(text)) return true;
   return false;
 }
 
 export function validatePostText(value) {
   if (typeof value !== "string" || value.length > 500 || !value.trim()
       || containsContactInformation(value)) {
-    throw new HttpError(400, "Write 1 to 500 characters about mythology. No real names, schools, emails, phone numbers, addresses, social handles, or links.");
+    throw new HttpError(400, "Write 1 to 500 characters about mythology. No personal introductions, school locations, emails, phone numbers, addresses, social handles, or links.");
   }
   return value.trim();
 }
@@ -79,13 +86,6 @@ export function safePostText(value) {
 export function validateId(value) {
   if (typeof value !== "string" || !/^[a-f0-9]{32}$/.test(value)) {
     throw new HttpError(400, "Choose a saved post.");
-  }
-  return value;
-}
-
-export function validateInviteCode(value) {
-  if (typeof value !== "string" || !/^[A-Za-z0-9_-]{43}$/.test(value)) {
-    throw new HttpError(400, "Use a valid invitation from the owner.");
   }
   return value;
 }

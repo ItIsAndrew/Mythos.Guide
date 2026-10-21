@@ -48,7 +48,7 @@ export const additionalGods = [
   ["greek-melpomene", "Melpomene", "Greek", "Melpomene is one of the nine Muses. She became associated with tragedy and is often recognized in art by a tragic mask.", "Tragedy", ["Tragic mask"], null, ["Melpomenē", "Melpoménē", "Μελπομένη"]],
   ["greek-polyhymnia", "Polyhymnia", "Greek", "Polyhymnia is one of the nine Muses. Later traditions link her with sacred hymns, and artists often show her in a thoughtful pose.", "Sacred hymns", ["Veil"], null, ["Polymnia", "Polymneia", "Πολύμνια"]],
   ["greek-terpsichore", "Terpsichore", "Greek", "Terpsichore is one of the nine Muses. She is especially linked with dance and choral song, and may be shown holding a stringed instrument.", "Dance and choral song", ["Lyre"], null, ["Terpsikhorē", "Terpsikhore", "Τερψιχόρη"]],
-  ["greek-thalia-muse", "Thalia", "Greek", "Thalia is one of the nine Muses. Later tradition associates her with comedy and often shows her with a comic theater mask.", "Comedy", ["Comic mask"], null, ["Thaleia", "Thalía", "Θάλεια"]],
+  ["greek-thalia-muse", "Thalia", "Greek", "Thalia is one of the nine Muses. Later tradition associates her with comedy and often shows her with a comic theater mask.", "Comedy", ["Comic mask"], null, ["Thaleia", "Thalía", "Θάλεια", "Thalia the Muse", "Thalia Muse"]],
   ["greek-urania", "Urania", "Greek", "Urania is one of the nine Muses. Later tradition connects her with astronomy, and art often gives her a globe or a pointing staff.", "Astronomy", ["Globe", "Pointing staff"], null, ["Ourania", "Ouraníā", "Οὐρανία"]],
 
   // Fate and other familiar Greek divine figures.

@@ -26,6 +26,27 @@ function readable(value) {
   return Array.isArray(value) ? value.join(', ') : String(value || '');
 }
 
+function createReferences(sources, versionNote) {
+  const references = Array.isArray(sources) ? sources.filter((source) => source?.title && /^https:\/\//.test(source.url)) : [];
+  if (!references.length) return null;
+  const panel = element('details', 'reference-panel');
+  panel.append(element('summary', '', 'Sources & myth versions'));
+  if (versionNote) panel.append(element('p', 'reference-note', versionNote));
+  const list = element('ul', 'reference-list');
+  for (const source of references) {
+    const item = element('li');
+    const link = element('a', '', source.title);
+    link.href = source.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.setAttribute('aria-label', `${source.title} (opens in a new tab)`);
+    item.append(link);
+    list.append(item);
+  }
+  panel.append(list, element('p', 'reference-hint', 'Reference links open in a new tab.'));
+  return panel;
+}
+
 function showFeedback(title, message, isError = false) {
   const panel = element('div', `feedback-state${isError ? ' is-error' : ''}`);
   panel.append(element('h3', '', title), element('p', '', message));
@@ -64,6 +85,8 @@ function renderResults(gods) {
       more.addEventListener('click', () => openGod(god, more));
       main.append(more);
     }
+    const references = createReferences(god.sources, god.versionNote);
+    if (references) main.append(references);
     main.append(createExploreNext(god));
     const details = element('dl', 'result-details');
     const otherTradition = god.tradition === 'Greek' ? 'Roman' : 'Greek';
@@ -205,8 +228,8 @@ function createExploreNext(god) {
   const section = element('details', 'explore-next');
   section.append(element('summary', '', 'What can I explore next?'));
   section.append(element('p', '', next.stories.length || next.worlds.length
-    ? 'You might enjoy these stories and places. They connect with this god’s themes or tradition.'
-    : 'Keep learning with a short story from the collection.'));
+    ? 'Choose a related story, place, or theme. A shared theme does not mean this god appears in every story.'
+    : 'Continue with other gods connected with this theme.'));
   const actions = element('div', 'explore-next-actions');
   next.stories.forEach((story) => {
     const read = element('button', 'name-link', `Read ${story.title}`);
@@ -229,6 +252,24 @@ function createExploreNext(god) {
     });
     actions.append(visit);
   });
+  const topic = topics.find((item) => item.id === next.topicId && item.id !== 'all');
+  if (topic) {
+    const explore = element('button', 'name-link', `Explore more: ${topic.label}`);
+    explore.type = 'button';
+    explore.addEventListener('click', async () => {
+      const heading = document.querySelector('#gods-title');
+      if (dialog.open) {
+        dialogOpener = heading;
+        dialog.close();
+      }
+      currentTopic = topic.id;
+      topicSelect.value = topic.id;
+      await loadBrowse('all');
+      heading.focus({ preventScroll: true });
+      document.querySelector('#gods').scrollIntoView({ block: 'start', behavior: 'auto' });
+    });
+    actions.append(explore);
+  }
   if (!actions.childElementCount) {
     const browseStories = element('a', 'name-link', 'Browse the stories');
     browseStories.href = '#stories';
@@ -284,6 +325,8 @@ function openGod(god, opener) {
     section.append(sourceLink);
     content.append(section);
   }
+  const references = createReferences(god.sources, god.versionNote);
+  if (references) content.append(references);
   content.append(createExploreNext(god));
   const another = element('button', 'random-button', 'Meet another random god');
   another.type = 'button';
@@ -459,7 +502,7 @@ browseLess.addEventListener('click', () => {
 
 const worldTabs = document.querySelector('#world-tabs');
 const worldPanel = document.querySelector('#world-panel');
-const realmSymbols = ['☼', '≋', '☾', '⌂'];
+const realmSymbols = ['☼', '≋', '☾', '⌂', '⚕', '◇'];
 
 function selectWorld(index, moveFocus = false) {
   const world = worlds[index];
@@ -480,6 +523,8 @@ function selectWorld(index, moveFocus = false) {
     detailGrid.append(item);
   });
   worldPanel.replaceChildren(introduction, detailGrid, relatedNames(world.gods, 'Meet a few of the gods connected with this world'));
+  const references = createReferences(world.sources, world.versionNote);
+  if (references) worldPanel.append(references);
   if (moveFocus) worldTabs.children[index].focus();
 }
 
@@ -518,7 +563,7 @@ function openStory(story, opener) {
   const prose = element('div', 'story-prose');
   story.paragraphs.forEach((paragraph) => prose.append(element('p', '', paragraph)));
   reader.append(prose);
-  if (story.note) reader.append(element('p', 'story-source-note', story.note));
+  if (story.note || story.versionNote) reader.append(element('p', 'story-source-note', story.versionNote || story.note));
   if (story.source?.url) {
     const sourceNote = element('p', 'story-source-note', 'Read more: ');
     const sourceLink = element('a', '', story.source.title);
@@ -528,13 +573,21 @@ function openStory(story, opener) {
     sourceNote.append(sourceLink, document.createTextNode(' (opens in a new tab)'));
     reader.append(sourceNote);
   }
+  const furtherReferences = createReferences((story.sources || []).filter((source) => source.url !== story.source?.url));
+  if (furtherReferences) reader.append(furtherReferences);
   reader.append(relatedNames(story.relatedGods));
   reader.append(element('p', 'collection-note', 'An original educational sample retelling. Ancient accounts and interpretations vary.'));
   openDialog(reader, opener);
 }
 
 const storyGrid = document.querySelector('#story-grid');
-stories.forEach((story, index) => {
+const storyMore = document.querySelector('#stories-more');
+const storyLess = document.querySelector('#stories-less');
+const storyStatus = document.querySelector('#stories-status');
+const storyPageSize = 6;
+let visibleStories = storyPageSize;
+
+function createStoryCard(story, index) {
   const card = element('article', 'story-card');
   const top = element('div', 'story-card-top');
   const number = element('span', 'story-number', String(index + 1).padStart(2, '0'));
@@ -553,8 +606,31 @@ stories.forEach((story, index) => {
   read.addEventListener('click', () => openStory(story, read));
   bottom.append(read);
   card.append(bottom);
-  storyGrid.append(card);
+  return card;
+}
+
+function renderStories() {
+  storyGrid.replaceChildren(...stories.slice(0, visibleStories).map(createStoryCard));
+  const shown = Math.min(visibleStories, stories.length);
+  storyStatus.textContent = `${shown} of ${stories.length} stories`;
+  storyMore.hidden = shown >= stories.length;
+  storyLess.hidden = shown <= storyPageSize;
+  if (!storyMore.hidden) storyMore.textContent = `Show ${Math.min(storyPageSize, stories.length - shown)} more stories`;
+}
+storyMore.addEventListener('click', () => {
+  const firstNew = visibleStories;
+  visibleStories += storyPageSize;
+  renderStories();
+  const card = storyGrid.children[firstNew];
+  card?.scrollIntoView({ block: 'start', behavior: 'auto' });
+  card?.querySelector('button')?.focus({ preventScroll: true });
 });
+storyLess.addEventListener('click', () => {
+  visibleStories = storyPageSize;
+  renderStories();
+  storyMore.focus();
+});
+renderStories();
 
 mountQuiz(document.querySelector('#quiz-root'));
 mountLearningTools({ comparisonRoot: document.querySelector('#name-comparison'), glossaryRoot: document.querySelector('#myth-glossary') });

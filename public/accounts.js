@@ -1,5 +1,3 @@
-import { nicknameEnds, nicknameStarts } from './nickname-words.js';
-
 const root = document.querySelector('#account');
 const entry = document.querySelector('#account-entry');
 const member = document.querySelector('#account-member');
@@ -8,7 +6,6 @@ const accountForm = document.querySelector('#account-form');
 const nickname = document.querySelector('#account-nickname');
 const nicknameSuggest = document.querySelector('#nickname-suggest');
 const password = document.querySelector('#account-password');
-const invite = document.querySelector('#account-invite');
 const loginTab = document.querySelector('#account-login-tab');
 const registerTab = document.querySelector('#account-register-tab');
 const postForm = document.querySelector('#post-form');
@@ -16,7 +13,14 @@ const postText = document.querySelector('#post-text');
 const postList = document.querySelector('#post-list');
 const postingStatus = document.querySelector('#posting-status');
 const deletePassword = document.querySelector('#account-delete-password');
-const state = { user: null, posts: [], postingEnabled: true, mode: 'login', busy: false, editId: null, editDraft: null, deleteId: null, sessionRevision: 0, recheckPending: false, concealed: false };
+const recoveryResult = document.querySelector('#account-recovery-result');
+const recoveryValue = document.querySelector('#account-recovery-value');
+const recoveryPassword = document.querySelector('#account-recovery-password');
+const recoverForm = document.querySelector('#account-recover-form');
+const recoverNickname = document.querySelector('#account-recover-nickname');
+const recoverCode = document.querySelector('#account-recover-code');
+const recoverPassword = document.querySelector('#account-recover-password');
+const state = { user: null, posts: [], postingEnabled: true, mode: 'login', busy: false, editId: null, editDraft: null, deleteId: null, sessionRevision: 0, recheckPending: false, concealed: false, focusAfterBusy: null };
 const authChannel = typeof BroadcastChannel === 'function' ? new BroadcastChannel('mythos-member-session') : null;
 
 function node(tag, className, text) {
@@ -59,19 +63,22 @@ async function request(path, method = 'GET', body) {
 }
 
 function safeMessage(error, kind) {
+  if (kind === 'post' && !error.status) return 'We could not confirm whether this note was saved. Your draft is still here. Press Refresh posts before saving again.';
   if (error.status === 429) return 'Please wait a moment before trying again. Requests made too quickly are ignored.';
   if (error.status === 401) {
+    if (kind === 'recover') return 'That nickname and recovery code were not recognized. Check the private code you saved.';
+    if (kind === 'recovery-code') return 'The password was not recognized. Your recovery code has not changed.';
     if (kind === 'login') return 'That nickname and password were not recognized. Please try again.';
     if (kind === 'delete-account') return 'The password was not recognized. Your account has not been deleted.';
     return 'Please log in again to see your posts.';
   }
   if (error.status === 403 && kind === 'post') return 'Posting is currently off. You can still read or delete your posts.';
   if (error.status === 400 || error.status === 422) {
-    if (kind === 'register') return 'Check the suggested nickname, password, and invitation. Use no real names or contact information.';
-    if (kind === 'post') return 'Use 1–500 characters about mythology. Remove real names, schools, emails, phone numbers, addresses, and social handles.';
+    if (kind === 'register') return 'Check the suggested nickname and password. Use no real names or contact information.';
+    if (kind === 'post') return 'Use 1–500 characters about mythology. Remove personal introductions, school locations, emails, phone numbers, addresses, and social handles.';
     return 'Please check the fields and try again.';
   }
-  if (error.status === 409 && kind === 'register') return 'Please choose another made-up nickname or check your invitation.';
+  if (error.status === 409 && kind === 'register') return 'That nickname was just taken. Press Suggest another nickname, then try again. Your password is still here.';
   return 'We could not complete that action. Please try again in a moment.';
 }
 
@@ -79,27 +86,34 @@ function setBusy(value) {
   state.busy = value;
   root.setAttribute('aria-busy', String(value));
   root.querySelectorAll('button, input, textarea').forEach((item) => { item.disabled = value; });
-  invite.disabled = value || state.mode !== 'register';
+  document.querySelector('#account-submit').disabled = value || (state.mode === 'register' && !nickname.value);
   postText.disabled = value || !state.postingEnabled;
   document.querySelector('#post-submit').disabled = value || !state.postingEnabled;
   postList.querySelectorAll('[data-post-edit]').forEach((item) => { item.disabled = value || !state.postingEnabled; });
 }
 
-function clearPrivateData() {
+function clearPrivateData({ preserveEntry = false } = {}) {
   state.concealed = false;
   state.user = null;
   state.posts = [];
   state.editId = null;
   state.editDraft = null;
   state.deleteId = null;
+  state.focusAfterBusy = null;
   member.hidden = true;
   entry.hidden = false;
   postList.replaceChildren();
   document.querySelector('#account-welcome').textContent = '';
   postText.value = '';
-  password.value = '';
-  invite.value = '';
+  if (!preserveEntry) {
+    password.value = '';
+    recoverForm.reset();
+  }
   deletePassword.value = '';
+  recoveryPassword.value = '';
+  recoveryValue.value = '';
+  recoveryResult.hidden = true;
+  document.querySelector('#account-recovery-details').open = false;
   document.querySelector('#account-delete-details').open = false;
   updateCount();
 }
@@ -180,11 +194,13 @@ function renderPosts() {
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         run('post', 'Saving your changes…', async () => {
-          await request('/api/posts', 'PATCH', { id: post.id, text: text.value });
+          const savedText = text.value;
+          await request('/api/posts', 'PATCH', { id: post.id, text: savedText });
+          state.posts = state.posts.map((item) => item.id === post.id ? { ...item, text: savedText } : item);
           state.editId = null;
           state.editDraft = null;
-          await loadPosts();
-          say('Your changes have been saved.');
+          renderPosts();
+          await refreshAfterSuccess('Your changes have been saved.');
         });
       });
       card.append(form);
@@ -197,8 +213,9 @@ function renderPosts() {
           actionButton('Delete this post', 'account-danger', () => run('posts', 'Deleting your post…', async () => {
             await request('/api/posts', 'DELETE', { id: post.id });
             state.deleteId = null;
-            await loadPosts();
-            say('Your post has been deleted.');
+            state.posts = state.posts.filter((item) => item.id !== post.id);
+            renderPosts();
+            await refreshAfterSuccess('Your post has been deleted.');
           })),
           actionButton('Cancel', 'account-secondary', () => { state.deleteId = null; renderPosts(); }),
         );
@@ -243,6 +260,23 @@ async function loadPosts() {
   }
 }
 
+async function refreshAfterSuccess(message) {
+  try {
+    await loadPosts();
+    say(message);
+  } catch (error) {
+    if (error.stale) return;
+    if (error.status === 401) say(`${message} Log in again to view your saved posts.`);
+    else say(`${message} The list could not refresh. Press Refresh posts to update it; do not save again.`);
+  }
+}
+
+function showRecoveryCode(value) {
+  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(value)) return;
+  recoveryValue.value = value;
+  recoveryResult.hidden = false;
+}
+
 async function run(kind, loading, work) {
   if (state.busy) return;
   setBusy(true);
@@ -258,7 +292,7 @@ async function run(kind, loading, work) {
         entry.hidden = false;
       }
     }
-    if (error.status === 401 && !['login', 'register', 'delete-account'].includes(kind)) clearPrivateData();
+    if (error.status === 401 && !['login', 'register', 'recover', 'recovery-code', 'delete-account'].includes(kind)) clearPrivateData();
     if (error.status === 403 && kind === 'post') {
       applyPosting(false);
       renderPosts();
@@ -267,6 +301,10 @@ async function run(kind, loading, work) {
   } finally {
     setBusy(false);
     if (state.recheckPending) verifySession();
+    else if (state.focusAfterBusy && !state.concealed && !state.focusAfterBusy.disabled) {
+      state.focusAfterBusy.focus({ preventScroll: true });
+      state.focusAfterBusy = null;
+    }
   }
 }
 
@@ -281,7 +319,9 @@ function concealAccount() {
 }
 
 function queueSessionCheck(clear = false) {
-  state.sessionRevision += 1;
+  // Routine focus checks wait for in-flight work. Only an explicit session
+  // change makes its response stale; otherwise a successful save could be lost.
+  if (clear) state.sessionRevision += 1;
   state.recheckPending = true;
   if (clear) clearPrivateData();
   concealAccount();
@@ -299,16 +339,20 @@ function verifySession() {
     if (data.user?.nickname) {
       if (previousNickname !== data.user.nickname) clearPrivateData();
       showMember(data.user);
-      await loadPosts();
+      let refreshed = true;
+      try { await loadPosts(); } catch (error) {
+        if (error.stale || error.status === 401) throw error;
+        refreshed = false;
+      }
       state.concealed = document.visibilityState === 'hidden';
       member.hidden = state.concealed;
-      say('Your own archive is open.');
+      say(refreshed ? 'Your own archive is open.' : 'Your account is open, but the list could not refresh. Your drafts are still here. Press Refresh posts to try again.', !refreshed);
     } else {
-      // A routine focus check must not erase an unfinished invitation signup.
+      // A routine focus check must not erase an unfinished signup.
       if (previousNickname) clearPrivateData();
       else entry.hidden = false;
       state.concealed = false;
-      say('Accounts are ready. To join, ask the owner for a one-use invitation.');
+      say('Accounts are ready. Create your own account with a made-up nickname.');
     }
   });
 }
@@ -330,26 +374,25 @@ function chooseMode(mode) {
   registerTab.setAttribute('aria-pressed', String(mode === 'register'));
   nicknameSuggest.hidden = mode !== 'register';
   nickname.readOnly = mode === 'register';
-  if (mode === 'register') suggestNickname(false);
-  document.querySelector('#account-invite-field').hidden = mode !== 'register';
-  invite.disabled = mode !== 'register';
-  invite.required = mode === 'register';
+  if (mode === 'register') nickname.value = '';
   password.autocomplete = mode === 'register' ? 'new-password' : 'current-password';
   password.value = '';
   document.querySelector('#account-submit').textContent = mode === 'register' ? 'Create my account' : 'Log in';
-  say(mode === 'register' ? 'Choose a made-up nickname and use the invitation the owner gave you.' : 'Log in to open your own archive.');
+  say(mode === 'register' ? 'Choose a made-up nickname and a password to create your account.' : 'Log in to open your own archive.');
   nickname.focus({ preventScroll: true });
+  if (mode === 'register') suggestNickname(false);
 }
 
-function suggestNickname(announce = true) {
-  const start = nicknameStarts[Math.floor(Math.random() * nicknameStarts.length)];
-  let end = nicknameEnds[Math.floor(Math.random() * nicknameEnds.length)];
-  if (`${start}-${end}` === nickname.value) {
-    end = nicknameEnds[(nicknameEnds.indexOf(end) + 1) % nicknameEnds.length];
-  }
-  nickname.value = `${start}-${end}`;
-  nickname.focus({ preventScroll: true });
-  if (announce) say('You can use this made-up nickname, or choose another suggestion.');
+async function suggestNickname(announce = true) {
+  if (state.busy) return;
+  await run('nickname', 'Finding an available made-up nickname…', async () => {
+    const data = await request('/api/account?mode=nickname');
+    if (typeof data.nickname !== 'string' || !/^[A-Za-z-]{3,24}$/.test(data.nickname)) throw new Error('response');
+    nickname.value = data.nickname;
+    state.focusAfterBusy = nickname;
+    if (announce) say('This made-up nickname is available now. You can use it, or ask for another suggestion.');
+    else say('Choose a made-up nickname and a password to create your account.');
+  });
 }
 
 function validPassword(value, field) {
@@ -374,32 +417,29 @@ accountForm.addEventListener('submit', (event) => {
   if (!validPassword(password.value, password)) return;
   const mode = state.mode;
   const credentials = { action: mode, nickname: nickname.value.trim(), password: password.value };
-  if (mode === 'register') credentials.inviteCode = invite.value.trim();
   run(mode, mode === 'register' ? 'Creating your account…' : 'Opening your archive…', async () => {
     const data = await request('/api/account', 'POST', credentials);
     if (!data.user?.nickname) throw new Error('response');
     notifySessionChange();
     showMember(data.user);
-    await loadPosts();
-    say(mode === 'register' ? 'Your account is ready. You can save your first post.' : 'Your own archive is open.');
-    postText.focus({ preventScroll: true });
+    showRecoveryCode(data.recoveryCode);
+    await refreshAfterSuccess(mode === 'register' ? 'Your account is ready. Save your private recovery code below.' : 'Your own archive is open.');
+    state.focusAfterBusy = mode === 'register' ? recoveryValue : postText;
   });
 });
 postForm.addEventListener('submit', (event) => {
   event.preventDefault();
   if (!state.postingEnabled) return;
   run('post', 'Saving your post…', async () => {
-    await request('/api/posts', 'POST', { text: postText.value });
+    const data = await request('/api/posts', 'POST', { text: postText.value });
+    if (data.post?.id) state.posts = [data.post, ...state.posts];
     postText.value = '';
     updateCount();
-    await loadPosts();
-    say('Your post has been saved to your account.');
+    renderPosts();
+    await refreshAfterSuccess('Your post has been saved to your account.');
   });
 });
 document.querySelector('#account-refresh').addEventListener('click', () => run('posts', 'Refreshing your posts…', async () => {
-  state.editId = null;
-  state.editDraft = null;
-  state.deleteId = null;
   await loadPosts();
   say('Your posts are up to date.');
 }));
@@ -418,6 +458,40 @@ document.querySelector('#account-delete-form').addEventListener('submit', (event
     notifySessionChange();
     clearPrivateData();
     say('Your account and all your posts have been deleted.');
+  });
+});
+
+document.querySelector('#account-recovery-dismiss').addEventListener('click', () => {
+  recoveryValue.value = '';
+  recoveryResult.hidden = true;
+  postText.focus({ preventScroll: true });
+});
+document.querySelector('#account-recovery-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  if (!validPassword(recoveryPassword.value, recoveryPassword)) return;
+  run('recovery-code', 'Replacing your recovery code…', async () => {
+    const data = await request('/api/account', 'POST', { action: 'recovery-code', password: recoveryPassword.value });
+    recoveryPassword.value = '';
+    document.querySelector('#account-recovery-details').open = false;
+    showRecoveryCode(data.recoveryCode);
+    notifySessionChange();
+    say('Save your new private recovery code. Any older code and other logins have been replaced.');
+    state.focusAfterBusy = recoveryValue;
+  });
+});
+recoverForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  if (!validPassword(recoverPassword.value, recoverPassword)) return;
+  run('recover', 'Recovering your account…', async () => {
+    const data = await request('/api/account', 'POST', { action: 'recover', nickname: recoverNickname.value.trim(), recoveryCode: recoverCode.value.trim(), password: recoverPassword.value });
+    if (!data.user?.nickname) throw new Error('response');
+    clearPrivateData();
+    showMember(data.user);
+    document.querySelector('#account-recover-details').open = false;
+    showRecoveryCode(data.recoveryCode);
+    notifySessionChange();
+    await refreshAfterSuccess('Your password has been reset. Save your replacement recovery code below.');
+    state.focusAfterBusy = recoveryValue;
   });
 });
 

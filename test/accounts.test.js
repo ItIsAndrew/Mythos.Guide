@@ -74,22 +74,10 @@ async function owner(f) {
   return cookieOf(response);
 }
 
-async function invitation(f, ownerCookie) {
-  clearCooldowns(f);
-  const response = await invoke(f.admin, {
-    method: 'POST', cookie: ownerCookie, body: { action: 'invite' },
-  });
-  assert.equal(response.status, 201, JSON.stringify(response.body));
-  assert.match(response.body.inviteCode, /^[A-Za-z0-9_-]{43}$/);
-  assert.ok(new Date(response.body.expiresAt) > new Date());
-  return response.body.inviteCode;
-}
-
-async function member(f, ownerCookie, nickname = 'CometFox') {
-  const inviteCode = await invitation(f, ownerCookie);
+async function member(f, nickname = 'CometFox') {
   clearCooldowns(f);
   const response = await invoke(f.account, {
-    method: 'POST', body: { action: 'register', nickname, password: PASSWORD, inviteCode },
+    method: 'POST', body: { action: 'register', nickname, password: PASSWORD },
   });
   assert.equal(response.status, 201, JSON.stringify(response.body));
   assert.deepEqual(response.body.user, { nickname });
@@ -138,17 +126,12 @@ test('posts reject contact details, obfuscation, controls, and oversized content
   ]) assert.throws(() => validatePostText(text), { status: 400 }, text);
 });
 
-test('accounts require an owner invitation and store bcrypt hashes without exposing credentials', async () => {
+test('anyone can create a nickname-only account with a bcrypt password and no invitation', async () => {
   const f = fixture();
   const unauthenticated = await invoke(f.account);
   assert.equal(unauthenticated.status, 200);
   assert.equal(unauthenticated.body.user, null);
-  const denied = await invoke(f.account, {
-    method: 'POST', body: { action: 'register', nickname: 'CometFox', password: PASSWORD, inviteCode: 'x'.repeat(43) },
-  });
-  assert.ok([400, 403].includes(denied.status));
-  const ownerCookie = await owner(f);
-  const memberCookie = await member(f, ownerCookie);
+  const memberCookie = await member(f);
   const current = await invoke(f.account, { cookie: memberCookie });
   assert.deepEqual(current.body.user, { nickname: 'CometFox' });
   assert.doesNotMatch(JSON.stringify(current), /password|hash|userId|token|@/i);
@@ -158,36 +141,28 @@ test('accounts require an owner invitation and store bcrypt hashes without expos
   assert.match(users[0].passwordHash, /^\$2[ab]\$1[2-9]\$/);
   assert.ok(await bcrypt.compare(PASSWORD, users[0].passwordHash));
   assert.ok(!JSON.stringify(users[0]).includes(PASSWORD));
+  const oldInviteField = await invoke(f.account, {
+    method: 'POST', body: { action: 'register', nickname: 'MoonOtter', password: PASSWORD, inviteCode: 'x'.repeat(43) },
+  });
+  assert.equal(oldInviteField.status, 400, 'unexpected fields must be rejected');
 });
 
-test('an invitation expires and is consumed only once even by simultaneous registrations', async () => {
+test('public registration limits rapid account creation by source IP', async () => {
   const f = fixture();
-  const ownerCookie = await owner(f);
-  const inviteCode = await invitation(f, ownerCookie);
-  clearCooldowns(f);
-  const responses = await Promise.all(['CometFox', 'MoonOtter'].map((nickname) => invoke(f.account, {
-    method: 'POST', body: { action: 'register', nickname, password: PASSWORD, inviteCode },
-  })));
-  assert.equal(responses.filter(({ status }) => status === 201).length, 1);
-  assert.equal(responses.filter(({ status }) => [400, 403].includes(status)).length, 1);
-  const expiredCode = await invitation(f, ownerCookie);
-  for (const [name, collection] of f.database.collections) {
-    if (/invite/.test(name)) {
-      for (const document of collection.documents) if (document.expiresAt) document.expiresAt = new Date(0);
-    }
+  const responses = [];
+  for (const nickname of ['CometFox', 'MoonOtter', 'StarBadger', 'RiverOwl', 'CloudFinch', 'SilverMoth']) {
+    responses.push(await invoke(f.account, { method: 'POST', address: '192.0.2.10', body: { action: 'register', nickname, password: PASSWORD } }));
   }
-  clearCooldowns(f);
-  const expired = await invoke(f.account, {
-    method: 'POST', body: { action: 'register', nickname: 'StarBadger', password: PASSWORD, inviteCode: expiredCode },
-  });
-  assert.ok([400, 403].includes(expired.status));
+  assert.deepEqual(responses.map(({ status }) => status), [201, 201, 201, 201, 201, 429]);
+  assert.ok(Number(responses.at(-1).headers['retry-after']) > 0);
+  assert.equal(await f.database.collection(COLLECTIONS.users).countDocuments({}), 5);
 });
 
 test('two users can read and manage only their own posts, including forged owner fields', async () => {
   const f = fixture();
   const ownerCookie = await owner(f);
-  const alice = await member(f, ownerCookie, 'CometFox');
-  const bob = await member(f, ownerCookie, 'MoonOtter');
+  const alice = await member(f, 'CometFox');
+  const bob = await member(f, 'MoonOtter');
   const alicePost = await writePost(f, alice, 'Athena has an owl symbol.');
   const bobPost = await writePost(f, bob, 'Hermes carries messages in mythology.');
   assert.deepEqual((await invoke(f.posts, { cookie: alice })).body.posts.map(({ id }) => id), [alicePost.id]);
@@ -215,7 +190,7 @@ test('owner access is separate, can delete any post, and stops both new posts an
   const f = fixture();
   assert.equal((await invoke(f.admin)).status, 401);
   const ownerCookie = await owner(f);
-  const memberCookie = await member(f, ownerCookie);
+  const memberCookie = await member(f);
   const post = await writePost(f, memberCookie);
   assert.equal((await invoke(f.admin, { cookie: memberCookie })).status, 401);
   assert.equal((await invoke(f.posts, { cookie: ownerCookie })).status, 401);
@@ -246,7 +221,7 @@ test('owner access is separate, can delete any post, and stops both new posts an
 test('session cookies are private, logout revokes a copied cookie, and password errors are generic', async () => {
   const f = fixture();
   const ownerCookie = await owner(f);
-  const cookie = await member(f, ownerCookie);
+  const cookie = await member(f);
   clearCooldowns(f);
   const login = await invoke(f.account, {
     method: 'POST', body: { action: 'login', nickname: 'CometFox', password: PASSWORD },
@@ -276,7 +251,7 @@ test('session cookies are private, logout revokes a copied cookie, and password 
 test('account deletion verifies the password and removes the member, private posts, and sessions', async () => {
   const f = fixture();
   const ownerCookie = await owner(f);
-  const cookie = await member(f, ownerCookie);
+  const cookie = await member(f);
   await writePost(f, cookie);
   clearCooldowns(f);
   const denied = await invoke(f.account, { method: 'DELETE', cookie, body: { password: 'IncorrectMadeUpPassword' } });
@@ -312,33 +287,27 @@ test('mutations reject foreign or missing origins, non-JSON, oversized JSON, and
   }
 });
 
-test('duplicate nicknames roll back invite consumption and registration commits all records together', async () => {
+test('duplicate nicknames fail and registration commits account and session together', async () => {
   const f = fixture();
-  const ownerCookie = await owner(f);
-  await member(f, ownerCookie);
-  const inviteCode = await invitation(f, ownerCookie);
+  await member(f);
   clearCooldowns(f);
   const duplicate = await invoke(f.account, {
-    method: 'POST', body: { action: 'register', nickname: 'CometFOX', password: PASSWORD, inviteCode },
+    method: 'POST', body: { action: 'register', nickname: 'CometFOX', password: PASSWORD },
   });
   assert.equal(duplicate.status, 409);
-  const retained = await f.database.collection(COLLECTIONS.invites).findOne({ _id: hashToken(inviteCode) });
-  assert.ok(retained, 'a rejected nickname does not consume a valid invitation');
-  assert.ok(!JSON.stringify(retained).includes(inviteCode), 'invitation tokens are hashed in storage');
   clearCooldowns(f);
   const sessionsBefore = await f.database.collection(COLLECTIONS.sessions).countDocuments({});
   f.database.failNextCommit(new Error('PRIVATE_TRANSACTION_COMMIT_DETAILS'));
   const failed = await invoke(f.account, {
-    method: 'POST', body: { action: 'register', nickname: 'MoonOtter', password: PASSWORD, inviteCode },
+    method: 'POST', body: { action: 'register', nickname: 'MoonOtter', password: PASSWORD },
   });
   assert.equal(failed.status, 503);
   assert.ok(!JSON.stringify(failed.body).includes('PRIVATE_TRANSACTION_COMMIT_DETAILS'));
   assert.equal(await f.database.collection(COLLECTIONS.users).countDocuments({ nicknameKey: 'moonotter' }), 0);
   assert.equal(await f.database.collection(COLLECTIONS.sessions).countDocuments({}), sessionsBefore);
-  assert.ok(await f.database.collection(COLLECTIONS.invites).findOne({ _id: hashToken(inviteCode) }));
   clearCooldowns(f);
   const retry = await invoke(f.account, {
-    method: 'POST', body: { action: 'register', nickname: 'MoonOtter', password: PASSWORD, inviteCode },
+    method: 'POST', body: { action: 'register', nickname: 'MoonOtter', password: PASSWORD },
   });
   assert.equal(retry.status, 201);
 });
@@ -346,7 +315,7 @@ test('duplicate nicknames roll back invite consumption and registration commits 
 test('post validation runs on the server and never persists rejected contact details', async () => {
   const f = fixture();
   const ownerCookie = await owner(f);
-  const memberCookie = await member(f, ownerCookie);
+  const memberCookie = await member(f);
   for (const text of ['x'.repeat(501), 'sample@example.com', '555-123-4567', '@fictionalfox', '123 Sample Street']) {
     clearCooldowns(f);
     const result = await invoke(f.posts, { method: 'POST', cookie: memberCookie, body: { text } });
@@ -366,7 +335,7 @@ test('post validation runs on the server and never persists rejected contact det
 test('legacy unsafe posts are redacted on output while retaining owner deletion access', async () => {
   const f = fixture();
   const ownerCookie = await owner(f);
-  const memberCookie = await member(f, ownerCookie);
+  const memberCookie = await member(f);
   const user = await f.database.collection(COLLECTIONS.users).findOne({ nicknameKey: 'cometfox' });
   const id = 'e'.repeat(32);
   await f.database.collection(COLLECTIONS.posts).insertOne({
@@ -387,7 +356,7 @@ test('legacy unsafe posts are redacted on output while retaining owner deletion 
 test('expired, forged, and duplicate cookies cannot authenticate; rotating the owner secret revokes owner sessions', async () => {
   const f = fixture();
   const ownerCookie = await owner(f);
-  const memberCookie = await member(f, ownerCookie);
+  const memberCookie = await member(f);
   const sessionToken = memberCookie.split('=')[1];
   const session = await f.database.collection(COLLECTIONS.sessions).findOne({ _id: hashToken(sessionToken) });
   assert.ok(session);
@@ -455,7 +424,7 @@ test('owner pagination reaches every post exactly once and validates cursor inpu
 test('concurrent fast requests are limited across independent handler instances', async () => {
   const f = fixture();
   const ownerCookie = await owner(f);
-  const memberCookie = await member(f, ownerCookie);
+  const memberCookie = await member(f);
   clearCooldowns(f);
   const independent = createPostsHandler(async () => f.database, { promise: null });
   const responses = await Promise.all(Array.from({ length: 12 }, (_, index) => invoke(index % 2 ? f.posts : independent, {
@@ -477,4 +446,114 @@ test('database failures give fixed errors and never leak driver details', async 
     assert.equal(response.headers['cache-control'], 'no-store');
     assert.equal(response.headers['x-content-type-options'], 'nosniff');
   }
+});
+
+test('privacy filtering catches colon declarations and common introductions while allowing historical school research', async () => {
+  const f = fixture(); const ownerCookie = await owner(f); const cookie = await member(f);
+  for (const text of [
+    'Full name: Astra Fictional', 'Real name=Astra Fictional', 'My name: Astra Fictional',
+    'My full name is Astra Fictional', 'Name: Astra Fictional', 'Call me Astra Fictional',
+    'Me llamo Astra Fictional', 'Mi nombre es Astra Fictional', "Je m’appelle Astra Fictional", 'Mon nom est Astra Fictional',
+    'Meu nome é Astra Fictional', 'Eu me chamo Astra Fictional', 'Ich heiße Astra Fictional', 'Mein Name ist Astra Fictional',
+    'Mi chiamo Astra Fictional', 'Il mio nome è Astra Fictional',
+    'My school is at the edge of town.', 'Our academy is Cedar Valley Academy.', 'University address: Sample Road',
+  ]) {
+    assert.throws(() => validatePostText(text), { status: 400 }, text);
+    const result = await invoke(f.posts, { method: 'POST', cookie, body: { text } });
+    assert.equal(result.status, 400, text);
+  }
+  assert.equal(await f.database.collection(COLLECTIONS.posts).countDocuments({}), 0);
+  for (const text of [
+    'The Academy of Athens has a statue of Athena.', 'The university library has books about Roman myths.',
+    'Ancient schools discussed philosophy and mythology.', 'Her Roman name is Minerva.',
+    'Ancient students attend the Academy in this imagined scene.', 'The Academy is in Athens.',
+  ]) {
+    assert.equal(validatePostText(text), text);
+    const post = await writePost(f, cookie, text);
+    assert.equal(post.text, text);
+  }
+});
+
+test('nickname suggestions use a large curated space and exclude unavailable account names', async () => {
+  const { nicknameStarts, nicknameEnds } = await import('../public/nickname-words.js');
+  const candidates = nicknameStarts.flatMap((start) => nicknameEnds.map((end) => `${start}-${end}`)).filter((name) => name.length <= 24);
+  assert.ok(new Set(candidates.map((name) => name.toLowerCase())).size >= 6000);
+  const f = fixture();
+  // Only one suggestion remains, so this also exercises every randomized batch.
+  const remaining = candidates.at(-1);
+  f.database.collection(COLLECTIONS.users).documents = candidates.slice(0, -1).map((nickname, index) => ({ _id: `fixture-${index}`, nicknameKey: nickname.toLowerCase() }));
+  const response = await invoke(f.account, { url: '/api/account?mode=nickname' });
+  assert.equal(response.status, 200);
+  assert.deepEqual(response.body, { nickname: remaining });
+  assert.equal(validateSignupNickname(remaining), remaining);
+  f.database.collection(COLLECTIONS.users).documents.push({ _id: 'fixture-last', nicknameKey: remaining.toLowerCase() });
+  assert.equal((await invoke(f.account, { url: '/api/account?mode=nickname' })).status, 503);
+});
+
+test('recovery codes are private, one-use, replace passwords, and revoke previous sessions', async () => {
+  const f = fixture();
+  const joined = await invoke(f.account, { method: 'POST', body: { action: 'register', nickname: 'CometFox', password: PASSWORD } });
+  assert.equal(joined.status, 201);
+  const code = joined.body.recoveryCode; const oldCookie = cookieOf(joined);
+  assert.match(code, /^[A-Za-z0-9_-]{43}$/);
+  const stored = await f.database.collection(COLLECTIONS.users).findOne({ nicknameKey: 'cometfox' });
+  assert.equal(stored.recoveryHash, hashToken(code));
+  assert.ok(!JSON.stringify(stored).includes(code));
+  for (const response of [await invoke(f.account, { cookie: oldCookie }), await invoke(f.account, { method: 'POST', body: { action: 'login', nickname: 'CometFox', password: PASSWORD } })]) {
+    assert.ok(!JSON.stringify(response.body).includes(code)); assert.equal(response.body.recoveryCode, undefined);
+  }
+  await writePost(f, oldCookie);
+  clearCooldowns(f);
+  const wrong = await invoke(f.account, { method: 'POST', body: { action: 'recover', nickname: 'CometFox', recoveryCode: 'x'.repeat(43), password: 'DifferentFictionalPassword' } });
+  const missing = await invoke(f.account, { method: 'POST', body: { action: 'recover', nickname: 'UnknownFox', recoveryCode: 'x'.repeat(43), password: 'DifferentFictionalPassword' } });
+  assert.equal(wrong.status, 401); assert.deepEqual(wrong.body, missing.body);
+  clearCooldowns(f);
+  const recovered = await invoke(f.account, { method: 'POST', body: { action: 'recover', nickname: 'CometFox', recoveryCode: code, password: 'DifferentFictionalPassword' } });
+  assert.equal(recovered.status, 200); assert.notEqual(recovered.body.recoveryCode, code);
+  assert.equal((await invoke(f.account, { cookie: oldCookie })).body.user, null);
+  assert.equal((await invoke(f.posts, { cookie: cookieOf(recovered) })).body.posts.length, 1);
+  clearCooldowns(f);
+  assert.equal((await invoke(f.account, { method: 'POST', body: { action: 'recover', nickname: 'CometFox', recoveryCode: code, password: PASSWORD } })).status, 401);
+  assert.equal((await invoke(f.account, { method: 'POST', body: { action: 'login', nickname: 'CometFox', password: PASSWORD } })).status, 401);
+  assert.equal((await invoke(f.account, { method: 'POST', body: { action: 'login', nickname: 'CometFox', password: 'DifferentFictionalPassword' } })).status, 200);
+  assert.equal((await invoke(f.admin, { cookie: cookieOf(recovered) })).status, 401);
+});
+
+test('password-protected code rotation supports older accounts and invalidates former codes and sessions', async () => {
+  const f = fixture(); const ownerCookie = await owner(f); const oldCookie = await member(f);
+  const users = f.database.collection(COLLECTIONS.users);
+  const user = await users.findOne({ nicknameKey: 'cometfox' });
+  const formerCode = 'p'.repeat(43);
+  await users.updateOne({ _id: user._id }, { $set: { recoveryHash: hashToken(formerCode) } });
+  const denied = await invoke(f.account, { method: 'POST', cookie: oldCookie, body: { action: 'recovery-code', password: 'WrongFictionalPassword' } });
+  assert.equal(denied.status, 401);
+  assert.equal((await users.findOne({ _id: user._id })).recoveryHash, hashToken(formerCode));
+  const updated = await invoke(f.account, { method: 'POST', cookie: oldCookie, body: { action: 'recovery-code', password: PASSWORD } });
+  assert.equal(updated.status, 200); assert.match(updated.body.recoveryCode, /^[A-Za-z0-9_-]{43}$/);
+  assert.equal((await invoke(f.account, { cookie: oldCookie })).body.user, null);
+  assert.equal((await invoke(f.account, { cookie: cookieOf(updated) })).body.user.nickname, 'CometFox');
+  assert.equal((await invoke(f.account, { method: 'POST', body: { action: 'recover', nickname: 'CometFox', recoveryCode: formerCode, password: PASSWORD } })).status, 401);
+  await users.updateOne({ _id: user._id }, { $unset: { recoveryHash: '' } });
+  const legacy = await invoke(f.account, { method: 'POST', cookie: cookieOf(updated), body: { action: 'recovery-code', password: PASSWORD } });
+  assert.equal(legacy.status, 200);
+});
+
+test('recovery code consumption is atomic, rolls back on failure, and recovery attempts are limited', async () => {
+  const f = fixture(); const ownerCookie = await owner(f); const cookie = await member(f);
+  const issued = await invoke(f.account, { method: 'POST', cookie, body: { action: 'recovery-code', password: PASSWORD } });
+  const code = issued.body.recoveryCode;
+  f.database.failNextCommit(new Error('PRIVATE_COMMIT_FAILURE'));
+  const failed = await invoke(f.account, { method: 'POST', body: { action: 'recover', nickname: 'CometFox', recoveryCode: code, password: 'ReplacementFictionalPassword' } });
+  assert.equal(failed.status, 503);
+  assert.equal(failed.headers['set-cookie'], undefined, 'a rolled-back recovery must not replace the browser session');
+  assert.equal((await invoke(f.account, { cookie: cookieOf(issued) })).body.user.nickname, 'CometFox');
+  clearCooldowns(f);
+  const responses = await Promise.all(Array.from({ length: 2 }, () => invoke(f.account, { method: 'POST', body: { action: 'recover', nickname: 'CometFox', recoveryCode: code, password: 'ReplacementFictionalPassword' } })));
+  assert.equal(responses.filter((response) => response.status === 200).length, 1);
+  assert.equal(responses.filter((response) => response.status === 401).length, 1);
+  clearCooldowns(f);
+  const attempts = [];
+  for (let index = 0; index < 6; index += 1) attempts.push(await invoke(f.account, { method: 'POST', body: { action: 'recover', nickname: 'CometFox', recoveryCode: 'x'.repeat(43), password: PASSWORD } }));
+  assert.equal(attempts.at(-1).status, 429);
+  assert.ok(attempts.at(-1).headers['retry-after']);
 });

@@ -1,5 +1,6 @@
 import { getDatabase } from "./_lib/mongodb.js";
 import { normalizeSearch, sampleGods } from "./_lib/sample-gods.js";
+import { guideFor } from "../public/god-guide.js";
 
 const COLLECTION = "mythos_guide_sample_gods";
 const SAMPLE_IDS = sampleGods.map(({ id }) => id);
@@ -82,14 +83,19 @@ function matchRank(record, query) {
 }
 
 function publicRecord(record) {
+  const guide = guideFor(record.id);
   return {
     id: record.id,
     name: record.name,
     tradition: record.tradition,
     description: record.description,
     domain: record.domain,
-    symbols: record.symbols,
+    // Older sample rows are insert-only. Omit one unverified attribute in the
+    // public view without rewriting the owner's stored document.
+    symbols: record.id === 'greek-eunomia'
+      ? record.symbols.filter((symbol) => !/^scroll$/i.test(symbol.trim())) : record.symbols,
     equivalent: record.equivalent,
+    ...guide,
   };
 }
 
@@ -161,10 +167,17 @@ export function createGodsHandler(databaseProvider = getDatabase, archiveState =
       }
 
       const { query } = request;
-      const normalized = normalizeSearch(query);
+      const requestedName = normalizeSearch(query);
+      // Apply qualified aliases at read time as well as in new seed fixtures,
+      // so existing insert-only archives do not need a migration.
+      const qualifiedThalia = new Map([
+        ['thaliathemuse', 'greek-thalia-muse'], ['thaliamuse', 'greek-thalia-muse'],
+        ['thaliathegrace', 'greek-thalia-grace'], ['thaliagrace', 'greek-thalia-grace'],
+      ]).get(requestedName);
+      const normalized = qualifiedThalia ? 'thalia' : requestedName;
       const records = await collection.find({
         sampleArchive: "mythos-guide-v1",
-        id: { $in: SAMPLE_IDS },
+        id: { $in: qualifiedThalia ? [qualifiedThalia] : SAMPLE_IDS },
         searchNames: { $regex: escapeRegex(normalized) },
       }, {
         projection: {

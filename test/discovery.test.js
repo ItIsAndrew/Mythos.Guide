@@ -8,7 +8,7 @@ const byId = (id) => sampleGods.find((god) => god.id === id);
 const ids = (gods) => gods.map(({ id }) => id);
 
 test('topics combine with either tradition and preserve archive ordering', () => {
-  assert.deepEqual(topics.map(({ id }) => id), ['all', 'sea', 'sky', 'arts', 'nature', 'underworld']);
+  assert.deepEqual(topics.map(({ id }) => id), ['all', 'sea', 'sky', 'arts', 'nature', 'underworld', 'war', 'love', 'healing', 'fate', 'home', 'origins', 'dreams']);
   const greekSea = filterGodsByTopic(sampleGods.filter((god) => god.tradition === 'Greek'), 'sea');
   const romanSea = filterGodsByTopic(sampleGods.filter((god) => god.tradition === 'Roman'), 'sea');
   assert.ok(ids(greekSea).includes('greek-poseidon'));
@@ -71,7 +71,7 @@ test('comparison names resolve to distinct archive entries in their stated tradi
 
 test('suggestions prioritize existing exact relationships and counterparts', () => {
   const athena = suggestionsFor(byId('greek-athena'), worlds, stories);
-  assert.deepEqual(ids(athena.stories), ['athenas-gift']);
+  assert.deepEqual(ids(athena.stories), ['athenas-gift', 'mars-anna-perenna']);
   assert.deepEqual(ids(athena.worlds), ['olympus']);
   const ceres = suggestionsFor(byId('roman-ceres'), worlds, stories);
   assert.deepEqual(ids(ceres.stories), ['persephones-return']);
@@ -104,9 +104,9 @@ test('unqualified Thalia names do not establish a false Muse or Grace relationsh
 test('thematic suggestions use real content and never invent a missing story or world', () => {
   assert.deepEqual(ids(suggestionsFor(byId('greek-euterpe'), worlds, stories).stories), ['hermes-and-the-lyre']);
   assert.deepEqual(ids(suggestionsFor(byId('greek-nereus'), worlds, stories).worlds), ['sea']);
-  assert.deepEqual(suggestionsFor(byId('greek-euterpe'), [], []), { stories: [], worlds: [] });
-  assert.deepEqual(suggestionsFor(null, worlds, stories), { stories: [], worlds: [] });
-  assert.deepEqual(suggestionsFor({ name: 'Unknown', domain: 'Unknown' }, worlds, stories), { stories: [], worlds: [] });
+  assert.deepEqual(suggestionsFor(byId('greek-euterpe'), [], []), { stories: [], worlds: [], topicId: 'arts' });
+  assert.deepEqual(suggestionsFor(null, worlds, stories), { stories: [], worlds: [], topicId: null });
+  assert.deepEqual(suggestionsFor({ name: 'Unknown', domain: 'Unknown' }, worlds, stories), { stories: [], worlds: [], topicId: null });
   for (const god of sampleGods) {
     const result = suggestionsFor(god, worlds, stories);
     assert.ok(result.stories.length <= 2 && result.worlds.length <= 1);

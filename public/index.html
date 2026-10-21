@@ -130,7 +130,7 @@
 
         <section id="gods" class="collection-section content-section" aria-labelledby="gods-title">
           <div class="section-intro">
-            <div><p class="section-kicker"><span>01</span> Gods &amp; goddesses</p><h2 id="gods-title">Meet the gods</h2></div>
+            <div><p class="section-kicker"><span>01</span> Gods &amp; goddesses</p><h2 id="gods-title" tabindex="-1">Meet the gods</h2></div>
             <p>Browse Greek and Roman gods, goddesses, and lesser-known divine figures.</p>
           </div>
           <div class="collection-toolbar">
@@ -159,7 +159,7 @@
         <section id="worlds" class="world-section content-section" aria-labelledby="worlds-title">
           <div class="section-intro">
             <div><p class="section-kicker"><span>02</span> Places &amp; rituals</p><h2 id="worlds-title">Explore their worlds</h2></div>
-            <p>Visit Olympus, the sea, the underworld, and a Roman home.</p>
+            <p>Visit divine homes, the sea, the underworld, places of healing, and Roman community life.</p>
           </div>
           <div id="world-tabs" class="world-tabs" role="tablist" aria-label="Explore a mythological world"></div>
           <div id="world-panel" class="world-panel" role="tabpanel" tabindex="0"></div>
@@ -171,6 +171,8 @@
             <p>Short retellings about wisdom, courage, choices, and changing seasons.</p>
           </div>
           <div id="story-grid" class="story-grid"></div>
+          <p id="stories-status" class="small-status" role="status" aria-live="polite"></p>
+          <div class="show-more-wrap"><button id="stories-more" class="outline-button" type="button" hidden>Show more stories</button><button id="stories-less" class="outline-button browse-less-button" type="button" hidden>Show fewer stories</button></div>
           <p class="collection-note story-note">Original educational sample retellings, inspired by Greek and Roman mythology. Myths vary by source, place, and time; these stories are not quotations from ancient texts.</p>
           <div class="beginner-next"><a href="#start-here">Start here</a><a href="#play">Next: Try an easy quiz <span aria-hidden="true">→</span></a></div>
         </section>
@@ -193,23 +195,25 @@
           <div id="account-entry" class="account-card" hidden>
             <div class="account-tabs" role="group" aria-label="Choose an account action">
               <button id="account-login-tab" type="button" aria-pressed="true">Log in</button>
-              <button id="account-register-tab" type="button" aria-pressed="false">Join with an invitation</button>
+              <button id="account-register-tab" type="button" aria-pressed="false">Create account</button>
             </div>
             <form id="account-form" class="account-form">
               <div class="account-field"><label for="account-nickname">Made-up nickname</label><input id="account-nickname" name="nickname" type="text" minlength="3" maxlength="24" pattern="[A-Za-z][A-Za-z-]{2,23}" autocomplete="username" autocapitalize="none" spellcheck="false" aria-describedby="nickname-hint" required /><button id="nickname-suggest" class="account-secondary" type="button" hidden>Suggest another nickname</button><p id="nickname-hint" class="account-hint">For a new account, use the suggested made-up nickname. Choose “Suggest another nickname” if you want a different one. No personal names.</p></div>
-              <div class="account-field"><label for="account-password">Password</label><input id="account-password" name="password" type="password" minlength="10" maxlength="72" autocomplete="current-password" aria-describedby="password-hint" required /><p id="password-hint" class="account-hint">10 characters or more, up to 72 bytes. Keep it somewhere safe; there is no email recovery.</p></div>
-              <div id="account-invite-field" class="account-field" hidden><label for="account-invite">Invitation code</label><input id="account-invite" name="inviteCode" type="text" maxlength="128" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="invite-hint" disabled /><p id="invite-hint" class="account-hint">The owner creates a private, one-use invitation in Owner Controls. You need a code before you can create an account.</p></div>
+              <div class="account-field"><label for="account-password">Password</label><input id="account-password" name="password" type="password" minlength="10" maxlength="72" autocomplete="current-password" aria-describedby="password-hint" required /><p id="password-hint" class="account-hint">10 characters or more, up to 72 bytes. Save your password and private recovery code somewhere safe.</p></div>
               <button id="account-submit" class="account-primary" type="submit">Log in</button>
             </form>
+            <details id="account-recover-details" class="account-recovery"><summary>Forgot your password?</summary><form id="account-recover-form" class="account-form"><div class="account-field"><label for="account-recover-nickname">Your nickname</label><input id="account-recover-nickname" autocomplete="username" autocapitalize="none" required maxlength="24" /></div><div class="account-field"><label for="account-recover-code">Private recovery code</label><input id="account-recover-code" autocomplete="off" required maxlength="43" spellcheck="false" /></div><div class="account-field"><label for="account-recover-password">New password</label><input id="account-recover-password" type="password" autocomplete="new-password" minlength="10" maxlength="72" required /></div><button class="account-primary" type="submit">Reset password</button><p class="account-hint">Use the code you saved when joining. Without your password or recovery code, this private account cannot be recovered.</p></form></details>
           </div>
           <div id="account-member" hidden>
             <div class="account-toolbar"><h3 id="account-welcome"></h3><div class="account-actions"><button id="account-refresh" class="account-secondary" type="button">Refresh posts</button><button id="account-logout" class="account-secondary" type="button">Log out</button></div></div>
+            <section id="account-recovery-result" class="account-card account-recovery-result" hidden><h4>Save your private recovery code</h4><p>Keep this outside Mythos.Guide. It is shown once. Anyone with it can reset your password. A new code replaces the old one.</p><div class="account-field"><label for="account-recovery-value">Recovery code</label><input id="account-recovery-value" readonly autocomplete="off" spellcheck="false" /></div><button id="account-recovery-dismiss" type="button" class="account-secondary">I saved my code</button></section>
             <p id="posting-status" class="posting-status" role="status"></p>
             <form id="post-form" class="account-card account-form">
-              <div class="account-field"><label for="post-text">A note about mythology</label><textarea id="post-text" name="text" rows="4" maxlength="500" aria-describedby="post-hint post-count" required></textarea><div class="account-field-footer"><p id="post-hint" class="account-hint">Up to 500 characters. Keep real names, schools, and all contact information out of your post.</p><span id="post-count" class="account-count">0 / 500</span></div></div>
+              <div class="account-field"><label for="post-text">A note about mythology</label><textarea id="post-text" name="text" rows="4" maxlength="500" aria-describedby="post-hint post-count" required></textarea><div class="account-field-footer"><p id="post-hint" class="account-hint">Up to 500 characters. Keep personal names, your school details, and contact information out of your post.</p><span id="post-count" class="account-count">0 / 500</span></div></div>
               <button id="post-submit" class="account-primary" type="submit">Save my post</button>
             </form>
             <div id="post-list" class="post-list" aria-busy="false"></div>
+            <details id="account-recovery-details" class="account-recovery"><summary>Replace my recovery code</summary><form id="account-recovery-form" class="account-form"><div class="account-field"><label for="account-recovery-password">Current password</label><input id="account-recovery-password" type="password" autocomplete="current-password" minlength="10" maxlength="72" required /></div><button class="account-secondary" type="submit">Make a new recovery code</button><p class="account-hint">This replaces any old code. Older accounts can create their first code here.</p></form></details>
             <details id="account-delete-details" class="account-delete"><summary>Delete my account</summary><p>This permanently deletes your account and all your posts. You cannot undo it.</p><form id="account-delete-form" class="account-form"><div class="account-field"><label for="account-delete-password">Confirm with your password</label><input id="account-delete-password" type="password" minlength="10" maxlength="72" autocomplete="current-password" required /></div><button class="account-danger" type="submit">Delete account and all my posts</button></form></details>
           </div>
           <noscript><p class="noscript-message">Please enable JavaScript to use your account and posts.</p></noscript>

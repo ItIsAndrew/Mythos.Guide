@@ -1,8 +1,8 @@
 import { getDatabase } from "./_lib/mongodb.js";
 import {
-  COLLECTIONS, SETTINGS_ID, apiHandler, createSession, endSession, hashToken,
+  COLLECTIONS, SETTINGS_ID, apiHandler, createSession, endSession,
   ownerSecret, postingEnabled, publicPost, rateIdentity, rateLimit,
-  requireAdmin, respond, sameSecret, token,
+  requireAdmin, respond, sameSecret,
 } from "./_lib/accounts.js";
 import { HttpError, schema, validateId } from "./_lib/validation.js";
 
@@ -59,15 +59,6 @@ export function createAdminHandler(databaseProvider = getDatabase, state) {
       const result = await db.collection(COLLECTIONS.posts).deleteOne({ _id: validateId(body.id) });
       if (!result.deletedCount) throw new HttpError(404, "That post was not found.");
       respond(res, 200, { deleted: true });
-      return;
-    }
-    if (body.action === "invite") {
-      schema(body, ["action"]);
-      await rateLimit(db, "owner-invite", identity, 10, 60 * 60_000);
-      const inviteCode = token();
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60_000);
-      await db.collection(COLLECTIONS.invites).insertOne({ _id: hashToken(inviteCode), expiresAt });
-      respond(res, 201, { inviteCode, expiresAt: expiresAt.toISOString() });
       return;
     }
     if (body.action === "posting") {

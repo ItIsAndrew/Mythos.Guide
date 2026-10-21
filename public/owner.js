@@ -5,10 +5,8 @@ const passcode = document.querySelector('#owner-passcode');
 const status = document.querySelector('#owner-status');
 const list = document.querySelector('#owner-post-list');
 const posting = document.querySelector('#owner-posting');
-const inviteResult = document.querySelector('#owner-invite-result');
-const inviteCode = document.querySelector('#owner-invite-code');
 const older = document.querySelector('#owner-older');
-const state = { busy: false, authenticated: false, postingEnabled: true, posts: [], nextCursor: null, deleteId: null, inviteCode: '', sessionRevision: 0, recheckPending: false, concealed: false };
+const state = { busy: false, authenticated: false, postingEnabled: true, posts: [], nextCursor: null, deleteId: null, sessionRevision: 0, recheckPending: false, concealed: false };
 const authChannel = typeof BroadcastChannel === 'function' ? new BroadcastChannel('mythos-owner-session') : null;
 
 function node(tag, className, text) {
@@ -62,15 +60,11 @@ function clearPrivateData() {
   state.posts = [];
   state.nextCursor = null;
   state.deleteId = null;
-  state.inviteCode = '';
   content.hidden = true;
   login.hidden = false;
   list.replaceChildren();
   older.hidden = true;
   passcode.value = '';
-  inviteResult.hidden = true;
-  inviteCode.textContent = '';
-  document.querySelector('#owner-invite-expiry').textContent = '';
 }
 
 function safeMessage(error, kind) {
@@ -235,30 +229,6 @@ posting.addEventListener('change', () => {
     applyPosting(enabled);
     say(enabled ? 'Posting is on. Members can save and edit their posts.' : 'Posting is off. Members can still read and delete their saved posts.');
   });
-});
-document.querySelector('#owner-invite').addEventListener('click', () => run('invite', 'Creating a private invitation…', async () => {
-  const data = await request('POST', { action: 'invite' });
-  if (typeof data.inviteCode !== 'string' || !data.inviteCode) throw new Error('response');
-  state.inviteCode = data.inviteCode;
-  inviteCode.textContent = data.inviteCode;
-  document.querySelector('#owner-invite-expiry').textContent = `Expires ${readableDate(data.expiresAt)}. One account only.`;
-  inviteResult.hidden = false;
-  say('Your invitation is ready. Give this code privately to one friend.');
-}));
-document.querySelector('#owner-copy-invite').addEventListener('click', async () => {
-  if (state.busy || !state.inviteCode) return;
-  try {
-    await navigator.clipboard.writeText(state.inviteCode);
-    say('Invitation code copied. Give it privately to your friend.');
-  } catch {
-    const selection = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(inviteCode);
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-    inviteCode.focus();
-    say('Select the invitation code above and copy it. Your browser did not allow automatic copying.');
-  }
 });
 document.querySelector('#owner-refresh').addEventListener('click', () => run('refresh', 'Refreshing member posts…', async () => {
   state.deleteId = null;

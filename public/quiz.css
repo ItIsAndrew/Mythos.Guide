@@ -32,3 +32,12 @@
   .quiz-difficulty-hint { font-size: 14px; line-height: 1.6; }
   .quiz-change-button { margin: 12px 0 0; }
 }
+
+.quiz-heading, .quiz-feedback, .quiz-difficulty-option, .quiz-quit-title { scroll-margin-top: 100px; }
+.quiz-source { display: inline-flex; align-items: center; min-height: 44px; margin-top: 6px; color: var(--rust,#a4402d); font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+.quiz-version-note { margin: 6px 0 0; color: var(--muted,#686d60); font-size: 13px; line-height: 1.6; }
+.quiz-quit-confirmation { margin-top: 20px; padding: 18px; border: 1px solid var(--line,#dbd5c8); border-radius: 4px; background: var(--paper,#f5f1e8); }
+.quiz-quit-title { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.5; }
+.quiz-quit-confirmation .quiz-small-note { margin-bottom: 16px; }
+.quiz-quit-title:focus { outline: 2px solid var(--rust,#a4402d); outline-offset: 5px; }
+@media (max-width: 900px) { .quiz-source, .quiz-version-note { font-size: 16px; } }

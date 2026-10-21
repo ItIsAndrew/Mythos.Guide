@@ -1,36 +1,12 @@
-// These topic groups help readers explore; they are not ancient categories or
-// a complete account of any god's roles. A figure can belong to several topics.
-export const topics = [
-  { id: 'all', label: 'All topics' },
-  { id: 'sea', label: 'Sea & water' },
-  { id: 'sky', label: 'Sky & stars' },
-  { id: 'arts', label: 'Arts & wisdom' },
-  { id: 'nature', label: 'Nature & growth' },
-  { id: 'underworld', label: 'The underworld' },
-];
+import { guideFor, guideTopics } from './god-guide.js';
 
-const topicRules = {
-  sea: /\b(sea|water|waters|waves|ocean|oceans|river|rivers|harbors|harbours)\b/i,
-  sky: /\b(sky|sun|moon|stars|starry|dawn|daylight|night|wind|winds|thunder|rainbows|astronomy|upper air)\b/i,
-  arts: /\b(arts|wisdom|crafts|metalworking|invention|music|poetry|dance|song|hymns|tragedy|comedy|theater|theatre|history|learning|memory|astronomy)\b/i,
-  nature: /\b(nature|earth|agriculture|harvest|grain|growth|growing|flowers|flourishing|spring|fruit|orchards|woods|fields|wilderness|wild places|shepherds|flocks|hunting|forests|plants|trees)\b/i,
-  underworld: /\b(underworld|death|dead|underground|afterlife)\b/i,
-};
-
-// These links are established roles that the brief domain field may omit.
-// https://www.metmuseum.org/essays/greek-gods-and-religious-practices
-// https://www.theoi.com/Pantheon.html
-const topicIds = {
-  underworld: new Set(['greek-hermes', 'roman-mercury', 'greek-hecate', 'roman-trivia']),
-};
+// Reviewed role tags replace guesses from a short domain phrase.
+export const topics = [{ id: 'all', label: 'All topics' }, ...guideTopics];
 
 export function filterGodsByTopic(gods, topicId) {
   const records = Array.isArray(gods) ? gods : [];
-  const rule = Object.hasOwn(topicRules, topicId) ? topicRules[topicId] : null;
-  if (!rule) return records.slice();
-  return records.filter((god) => (
-    god && (rule.test(String(god.domain || '')) || topicIds[topicId]?.has(god.id))
-  ));
+  if (!guideTopics.some(({ id }) => id === topicId)) return records.slice();
+  return records.filter((god) => guideFor(god?.id)?.topics.includes(topicId));
 }
 
 export function chooseRandomGod(gods, previousId, random = Math.random) {
@@ -121,7 +97,7 @@ function existingById(records, ids) {
 // priority. The fallback offers a related topic, not a claim that this god
 // appears in that story or lives in that place.
 export function suggestionsFor(god, worlds, stories) {
-  if (!god) return { stories: [], worlds: [] };
+  if (!god) return { stories: [], worlds: [], topicId: null };
   const worldRecords = Array.isArray(worlds) ? worlds : [];
   const storyRecords = Array.isArray(stories) ? stories : [];
   const names = godNames(god);
@@ -129,15 +105,24 @@ export function suggestionsFor(god, worlds, stories) {
     ? [normalize(String(god.equivalent).replace(/\s*\([^)]*\)\s*$/, ''))] : []);
   const directStories = relatedMatches(storyRecords, 'relatedGods', names, counterpart);
   const directWorlds = relatedMatches(worldRecords, 'gods', names, counterpart);
-  const topic = topics.find(({ id }) => id !== 'all' && filterGodsByTopic([god], id).length)?.id;
+  const topic = guideFor(god.id)?.topics[0] || null;
   const fallbackStoryIds = {
     sea: ['athenas-gift'],
+    sky: ['morpheus-message'],
     arts: ['hermes-and-the-lyre'],
     nature: ['persephones-return'],
     underworld: ['persephones-return', 'orpheus-looks-back'],
+    war: [god.tradition === 'Roman' ? 'mars-anna-perenna' : 'ares-bronze-jar', 'heracles-alcestis'],
+    love: ['venus-shield'],
+    healing: ['asclepius-healing', 'heracles-alcestis'],
+    fate: ['morpheus-message'],
+    home: ['an-open-door'],
+    origins: [],
+    dreams: ['morpheus-message'],
   };
-  const fallbackWorldIds = { sea: ['sea'], sky: ['olympus'], underworld: ['underworld'] };
+  const fallbackWorldIds = { sea: ['sea'], sky: ['olympus'], underworld: ['underworld'], healing: ['healing-sanctuary'], home: ['roman-forum'], nature: ['roman-hearth'], fate: ['roman-forum'], origins: ['olympus'] };
   return {
+    topicId: topic,
     stories: (directStories.length ? directStories
       : existingById(storyRecords, fallbackStoryIds[topic] || [])).slice(0, 2),
     worlds: (directWorlds.length ? directWorlds

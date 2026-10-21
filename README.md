@@ -2,7 +2,7 @@
 
 A beginner-friendly guide to Greek and Roman mythology. Search 141 divine figures, discover their families, read six original story retellings, explore four mythological worlds, and play trivia with 48 questions across three difficulty levels.
 
-The guide also includes topic filters, random god discovery, Greek/Roman name comparisons, a short glossary, and invite-only accounts for private mythology notes.
+The guide also includes topic filters, random god discovery, Greek/Roman name comparisons, a short glossary, and self-service nickname accounts for private mythology notes.
 
 ## Run locally
 
@@ -14,12 +14,12 @@ Use Node.js 22 or newer.
 
 The existing Mac shortcuts can start the app and open owner controls. Keep the Terminal window open while using the app.
 
-MongoDB must support transactions for invitations and account deletion. The app uses the database already named in the connection URL. Only server code in `/api` accesses MongoDB, using the official driver and a reused client.
+MongoDB must support transactions for account deletion and post changes. The app uses the database already named in the connection URL. Only server code in `/api` accesses MongoDB, using the official driver and a reused client.
 
 ## Checks
 
 - `npm test` runs the automated suite without a real database.
-- With the app running and private settings configured, `npm run check:safety` checks accounts, private posts, invitations, and owner controls using disposable sample data. Run it only against your local test app.
+- With the app running and private settings configured, `npm run check:safety` checks accounts, private posts, rate limits, and owner controls using disposable sample data. Run it only against your local test app.
 
 See [TESTING.md](TESTING.md) for recorded results and [NOTES.md](NOTES.md) for completed features and next steps.
 

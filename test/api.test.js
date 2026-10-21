@@ -3,12 +3,12 @@ import { test } from 'node:test';
 import { createGodsHandler } from '../api/gods.js';
 import { normalizeSearch, sampleGods } from '../api/_lib/sample-gods.js';
 
-const publicKeys = ['description', 'domain', 'equivalent', 'id', 'name', 'symbols', 'tradition'];
+const publicKeys = ['description', 'domain', 'equivalent', 'id', 'name', 'sources', 'symbols', 'topics', 'tradition', 'versionNote'];
 const unavailable = {
   error: 'The mythology archive is taking a break. Please try your search again in a moment.',
 };
 
-function mockDatabase() {
+function mockDatabase(archive = sampleGods) {
   const calls = { indexes: [], writes: [], finds: [], collections: [] };
   const collection = {
     async createIndex(...args) { calls.indexes.push(args); },
@@ -18,7 +18,7 @@ function mockDatabase() {
       calls.finds.push(call);
       // Returning extra fields intentionally verifies the HTTP response strips
       // database metadata even if a driver/mock ignores the projection.
-      let records = sampleGods.toReversed().map((record) => ({ ...record, _id: 'sample-private-id' }));
+      let records = archive.toReversed().map((record) => ({ ...record, _id: 'sample-private-id' }));
       records = records.filter((record) => (
         record.sampleArchive === filter.sampleArchive
         && (!filter.id || filter.id.$in.includes(record.id))
@@ -85,6 +85,59 @@ test('all, Greek, and Roman filters return only the requested tradition', async 
     assert.equal(calls.finds.at(-1).filter.tradition, tradition === 'all' ? undefined : tradition);
   }
   assert.equal(calls.writes.length, 1, 'one handler seeds only once across requests');
+});
+
+test('every canonical name returns its figure with public references and reviewed topics', async () => {
+  const { database } = mockDatabase();
+  const handler = createGodsHandler(async () => database);
+  for (const god of sampleGods) {
+    const { status, body } = await invoke(handler, `/api/gods?q=${encodeURIComponent(god.name)}`);
+    assert.equal(status, 200, god.name);
+    const record = body.results.find(({ id }) => id === god.id);
+    assert.ok(record, god.id);
+    assert.ok(record.sources.length && record.topics.length, god.id);
+    assert.ok(record.versionNote.length > 40, god.id);
+    assert.ok(!Object.hasOwn(record, 'searchNames'));
+  }
+});
+
+test('qualified Thalia aliases work against old rows without changing stored names', async () => {
+  const oldRows = sampleGods.map((record) => record.id.startsWith('greek-thalia-')
+    ? { ...record, searchNames: ['thalia', 'thaleia'] } : record);
+  const { database, calls } = mockDatabase(oldRows);
+  const handler = createGodsHandler(async () => database);
+  for (const [query, expected] of [
+    ['Thalia the Muse', 'greek-thalia-muse'], ['Thalia Muse', 'greek-thalia-muse'],
+    ['THÁLIA MUSE', 'greek-thalia-muse'], ['Thalia the Grace', 'greek-thalia-grace'],
+    ['Thalia Grace', 'greek-thalia-grace'],
+  ]) {
+    const { body } = await invoke(handler, `/api/gods?q=${encodeURIComponent(query)}`);
+    assert.deepEqual(body.results.map(({ id }) => id), [expected], query);
+    assert.equal(calls.finds.at(-1).filter.searchNames.$regex, 'thalia');
+  }
+  assert.deepEqual((await invoke(handler, '/api/gods?q=Thalia')).body.results.map(({ id }) => id),
+    ['greek-thalia-grace', 'greek-thalia-muse']);
+  assert.deepEqual((await invoke(handler, '/api/gods?q=constructor')).body.results, []);
+  assert.ok(oldRows.filter(({ id }) => id.startsWith('greek-thalia-'))
+    .every(({ searchNames }) => searchNames.length === 2));
+  assert.equal(calls.writes.length, 1);
+  assert.ok(calls.writes[0][0].every(({ updateOne }) => Object.keys(updateOne.update).join() === '$setOnInsert'));
+});
+
+test('public metadata enriches preserved old rows and omits only the unverified Eunomia scroll', async () => {
+  const oldRows = sampleGods.map((record) => record.id === 'greek-eunomia' ? {
+    ...record, symbols: ['Flowers', 'Scroll'], description: 'Preserved local sample description.',
+    sources: [{ title: 'Stored extra field', url: 'https://invalid.example/' }], topics: ['fake'],
+  } : record.id === 'greek-dike' ? { ...record, symbols: ['Scales'] } : record);
+  const { database } = mockDatabase(oldRows);
+  const handler = createGodsHandler(async () => database);
+  const { body } = await invoke(handler, '/api/gods?q=Eunomia');
+  assert.equal(body.results[0].description, 'Preserved local sample description.');
+  assert.deepEqual(body.results[0].symbols, ['Flowers']);
+  assert.deepEqual(body.results[0].topics, ['home', 'fate']);
+  assert.match(body.results[0].sources[0].url, /HoraEunomia/);
+  assert.deepEqual((await invoke(handler, '/api/gods?q=Dike')).body.results[0].symbols, ['Scales']);
+  assert.deepEqual(oldRows.find(({ id }) => id === 'greek-eunomia').symbols, ['Flowers', 'Scroll']);
 });
 
 test('seeding uses insert-only upserts and preserves existing sample records', async () => {
@@ -155,9 +208,9 @@ test('search retains aliases, accents, exact-name ranking, ambiguity, limits, an
     assert.equal(status, 200);
     assert.equal(body.query, query.trim());
     assert.equal(body.results[0].id, expectedId);
-    assert.equal(calls.finds.at(-1).filter.searchNames.$regex, normalizeSearch(query));
+    assert.equal(calls.finds.at(-1).filter.searchNames.$regex, query === 'Thalia the Grace' ? 'thalia' : normalizeSearch(query));
     assert.equal(calls.finds.at(-1).limit, sampleGods.length);
-    assert.deepEqual(calls.finds.at(-1).filter.id.$in, sampleGods.map(({ id }) => id));
+    assert.deepEqual(calls.finds.at(-1).filter.id.$in, query === 'Thalia the Grace' ? ['greek-thalia-grace'] : sampleGods.map(({ id }) => id));
   }
   const apollo = await invoke(handler, '/api/gods?q=Apollo');
   assert.deepEqual(apollo.body.results.map(({ id }) => id), ['greek-apollo', 'roman-apollo']);

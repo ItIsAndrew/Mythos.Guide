@@ -16,6 +16,15 @@
 .explore-next > summary:focus-visible { outline: 3px solid #c66c45; outline-offset: 4px; }
 .explore-next[open] > summary { margin-bottom: 12px; }
 .god-detail > .random-button { margin-top: 20px; }
+.reference-panel { min-width: 0; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line); }
+.reference-panel > summary { min-height: 44px; padding: 10px 0; color: var(--rust); font-size: 16px; line-height: 1.5; cursor: pointer; }
+.reference-panel > summary:focus-visible { outline: 3px solid #c66c45; outline-offset: 4px; }
+.reference-note { max-width: 760px; margin: 12px 0; color: var(--muted); font-size: 15px; line-height: 1.75; overflow-wrap: anywhere; }
+.reference-list { display: grid; gap: 8px; margin: 12px 0; padding-left: 20px; }
+.reference-list a { display: inline-flex; align-items: center; min-height: 44px; color: var(--rust); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; text-underline-offset: 4px; }
+.reference-hint { margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+#gods-title:focus { outline: 2px solid var(--rust); outline-offset: 6px; }
+#stories-status { margin-top: 20px; }
 .explore-next h3 { margin: 0 0 8px; font: 400 24px/1.3 var(--serif); letter-spacing: -.4px; }
 .explore-next p { margin: 0 0 14px; color: var(--muted); font-size: 15px; line-height: 1.7; }
 .explore-next-actions { display: flex; flex-wrap: wrap; gap: 10px; min-width: 0; }
@@ -74,6 +83,8 @@
   .learning-summary { padding: 20px 21px; }
   .learning-description { line-height: 1.7; }
   .comparison-label, .glossary-count { font-size: 14px; }
+  .reference-note, .reference-list a, #stories-status { font-size: 16px; }
+  .reference-hint { font-size: 14px; }
   .glossary-list { column-gap: 22px; }
 }
 

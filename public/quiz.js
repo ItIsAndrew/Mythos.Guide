@@ -1,5 +1,62 @@
+// Each answer links to an ancient text, classical passages, or a museum object.
+// Theoi pages reproduce the named ancient authors; modern summaries are not
+// used as a substitute for those passages. Myths vary by author and place.
+const reference = (title, path, versionNote = 'This is a familiar ancient association. Stories and divine roles vary across authors and places.') => Object.freeze({
+  source: Object.freeze({ title, url: path.startsWith('https://') ? path : `https://www.theoi.com/${path}` }), versionNote,
+});
+const questionReferences = Object.freeze({
+  zeus: reference('Ancient passages about Zeus', 'Olympios/Zeus.html'),
+  athena: reference('Ancient evidence and art: Athena', 'Olympios/Athena.html'),
+  poseidon: reference('Ancient passages and art: Poseidon', 'Olympios/Poseidon.html'),
+  demeter: reference('Homeric hymns and other passages: Demeter', 'Olympios/Demeter.html'),
+  hermes: reference('Homeric hymns and other passages: Hermes', 'Olympios/Hermes.html'),
+  hades: reference('Ancient passages: Hades', 'Khthonios/Haides.html', 'Hades rules the underworld; Thanatos personifies death. They are distinct figures.'),
+  artemis: reference('Homeric hymns and other passages: Artemis', 'Olympios/Artemis.html'),
+  apollo: reference('Homeric hymns and other passages: Apollo', 'Olympios/Apollon.html'),
+  jupiter: reference('Classical passages about Zeus and Roman Jupiter', 'Olympios/Zeus.html', 'Romans identified Jupiter with Zeus, while maintaining distinct local rites and stories.'),
+  minerva: reference('Classical passages about Athena and Roman Minerva', 'Olympios/Athena.html', 'Minerva and Athena were identified with each other; their traditions are not identical.'),
+  neptune: reference('Classical passages about Poseidon and Roman Neptune', 'Olympios/Poseidon.html', 'Roman Neptune shares Poseidon’s sea associations, with a distinct history of worship.'),
+  vesta: reference('Ovid, Fasti 6: Vesta and the hearth', 'Text/OvidFasti6.html'),
+  janus: reference('Ovid, Fasti 1: Janus explains his roles', 'Text/OvidFasti1.html', 'Ovid presents one poetic explanation of Janus’s faces and role at beginnings.'),
+  venus: reference('Ovid, Fasti 4: Venus and love', 'Text/OvidFasti4.html'),
+  vulcan: reference('Classical passages about Hephaestus and Vulcan', 'Olympios/Hephaistos.html'),
+  mercury: reference('Classical passages about Hermes and Mercury', 'Olympios/Hermes.html'),
+  hebe: reference('Homer, Iliad 4.1 and other passages: Hebe', 'Ouranios/Hebe.html', 'Hebe serves as cupbearer in Homer; other stories give that role to Ganymede.'),
+  eileithyia: reference('Ancient passages: Eileithyia', 'Ouranios/Eileithyia.html', 'Some texts describe one Eileithyia; others speak of several childbirth goddesses.'),
+  eris: reference('Hesiod and Homer: Eris', 'Daimon/Eris.html'),
+  morpheus: reference('Ovid’s account of the dream spirits', 'Daimon/Oneiroi.html', 'The human-shaped dream spirit here follows Ovid’s Roman poem, not every ancient account of dreams.'),
+  harmonia: reference('Hesiod and other passages: Harmonia', 'Ouranios/Harmonia.html'),
+  plutus: reference('Hesiod, Theogony 969 and other passages: Plutus', 'Georgikos/Ploutos.html', 'Plutus, who personifies wealth, is distinct from Pluto, a name for the underworld ruler.'),
+  nereus: reference('Hesiod and other passages: Nereus', 'Pontios/Nereus.html', 'Nereus is called an Old Man of the Sea; the title can also describe other sea figures.'),
+  mnemosyne: reference('Hesiod, Theogony: Mnemosyne and the Muses', 'Titan/TitanisMnemosyne.html'),
+  hera: reference('Homeric hymns and other passages: Hera', 'Olympios/Hera.html'),
+  aphrodite: reference('Homeric hymns and other passages: Aphrodite', 'Olympios/Aphrodite.html'),
+  ares: reference('Homeric hymns and other passages: Ares', 'Olympios/Ares.html', 'Ares is strongly associated with battle; Athena also has important roles in war.'),
+  hestia: reference('Homeric hymns: Hestia', 'Ouranios/Hestia.html'),
+  diana: reference('The Met: Diana and her hunting attributes', 'https://www.metmuseum.org/art/collection/search/436499'),
+  mars: reference('Ovid, Fasti 3: Mars and the Roman calendar', 'Text/OvidFasti3.html', 'Mars has Roman civic and ancestral roles as well as his association with war.'),
+  juno: reference('The Met: Juno with her peacock', 'https://www.metmuseum.org/art/collection/search/207645', 'This familiar attribute appears in ancient and later art; it is not Juno’s only symbol.'),
+  bacchus: reference('Ovid, Fasti 3: Bacchus and his festival', 'Text/OvidFasti3.html'),
+  dionysus: reference('Ancient passages: Dionysus and drama', 'Olympios/Dionysos.html'),
+  hephaestus: reference('Homer and other passages: Hephaestus', 'Olympios/Hephaistos.html'),
+  persephone: reference('Homeric Hymn to Demeter and other passages', 'Khthonios/Persephone.html', 'The number of seeds and the division of Persephone’s year vary among ancient tellings.'),
+  iris: reference('Ancient passages: Iris and the rainbow', 'Pontios/Iris.html'),
+  ceres: reference('Ovid, Fasti 4: Ceres and agriculture', 'Text/OvidFasti4.html'),
+  aurora: reference('Classical passages: Eos and Roman Aurora', 'Titan/Eos.html'),
+  luna: reference('Classical passages: Selene and Roman Luna', 'Titan/Selene.html'),
+  cupid: reference('Ovid, Metamorphoses 1: Cupid’s arrows', 'Text/OvidMetamorphoses1.html', 'In this episode Cupid has arrows with different effects; love is not always welcome or mutual.'),
+  euterpe: reference('Ancient art: Euterpe with double pipes', 'Ouranios/MousaEuterpe.html', 'The instrument is the aulos, often translated as flute; it is a reed instrument, unlike a modern flute.'),
+  calliope: reference('Ancient passages: Calliope and poetry', 'Ouranios/MousaKalliope.html', 'Specific Muse-to-art pairings became more standardized over time.'),
+  clotho: reference('Ancient passages: the Fates and spinning', 'Daimon/Moirai.html'),
+  atlas: reference('Hesiod, Theogony 517–520: Atlas', 'Titan/TitanAtlas.html', 'Hesiod describes Atlas supporting the sky, not holding the planet Earth.'),
+  pomona: reference('Ovid, Metamorphoses 14: Pomona’s orchard', 'Text/OvidMetamorphoses14.html'),
+  portunus: reference('Cicero, On the Nature of the Gods 2.26: Portunus', 'Pontios/Palaimon.html', 'The linked collection includes Cicero’s Roman explanation of Portunus and his harbor association.'),
+  terminus: reference('Ovid, Fasti 2: the Terminalia', 'Text/OvidFasti2.html'),
+  concordia: reference('Ovid, Fasti 6: Concordia settles a dispute', 'Text/OvidFasti6.html'),
+});
+
 const question = (id, prompt, choices, answer, explanation, difficulty = 'easy') => Object.freeze({
-  id, prompt, choices: Object.freeze(choices), answer, explanation, difficulty,
+  id, prompt, choices: Object.freeze(choices), answer, explanation, difficulty, ...questionReferences[id],
 });
 
 export const quizDifficulties = Object.freeze(['easy', 'medium', 'hard']);
@@ -151,6 +208,15 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
     return getState();
   }
 
+  function quitRound() {
+    status = 'ready';
+    round = [];
+    index = 0;
+    score = 0;
+    selectedIndex = null;
+    return getState();
+  }
+
   function answer(choiceIndex) {
     const current = round[index];
     if (status !== 'question' || selectedIndex !== null || !Number.isInteger(choiceIndex)
@@ -171,7 +237,7 @@ export function createQuizSession({ questions = questionBank, roundSize = 5, ran
     return getState();
   }
 
-  return { getState, start, answer, next, restart: start, selectDifficulty };
+  return { getState, start, answer, next, restart: start, selectDifficulty, quitRound };
 }
 
 let mountNumber = 0;
@@ -181,6 +247,7 @@ export function mountQuiz(root) {
   const session = createQuizSession();
   const doc = root.ownerDocument;
   const headingId = `quiz-heading-${++mountNumber}`;
+  let confirmQuit = false;
 
   function element(tag, className, text) {
     const node = doc.createElement(tag);
@@ -224,7 +291,7 @@ export function mountQuiz(root) {
         difficultyChoices.append(option);
       }
       panel.append(difficultyChoices);
-      panel.append(button('Start quiz', () => { session.start(); render('heading'); }));
+      panel.append(button('Start quiz', () => { confirmQuit = false; session.start(); render('heading'); }));
       panel.append(element('p', 'quiz-small-note', 'Play just for fun. Your answers stay in this page.'));
     } else if (state.status === 'complete') {
       panel.append(element('p', 'quiz-eyebrow', `${state.difficulty} round complete`));
@@ -235,7 +302,7 @@ export function mountQuiz(root) {
         ? 'A brilliant round! Try another mix of Greek and Roman questions.'
         : 'Every answer is a chance to learn. Explore the gods, then try a new round whenever you like.';
       panel.append(title, element('p', 'quiz-description', message));
-      panel.append(button('Play again', () => { session.restart(); render('heading'); }));
+      panel.append(button('Play again', () => { confirmQuit = false; session.restart(); render('heading'); }));
       panel.append(button('Change difficulty', () => { session.selectDifficulty(state.difficulty); render('difficulty'); }, 'quiz-change-button'));
     } else {
       const current = state.currentQuestion;
@@ -257,7 +324,7 @@ export function mountQuiz(root) {
       choices.setAttribute('role', 'group');
       choices.setAttribute('aria-labelledby', headingId);
       current.choices.forEach((choice, choiceIndex) => {
-        const option = button('', () => { session.answer(choiceIndex); render('feedback'); }, 'quiz-choice');
+        const option = button('', () => { confirmQuit = false; session.answer(choiceIndex); render('feedback'); }, 'quiz-choice');
         option.append(element('span', 'quiz-choice-letter', String.fromCharCode(65 + choiceIndex)));
         option.append(element('span', 'quiz-choice-name', choice));
         if (answered) {
@@ -282,21 +349,49 @@ export function mountQuiz(root) {
         feedback.tabIndex = -1;
         feedback.append(element('p', 'quiz-feedback-title', correct ? 'Correct!' : `The correct answer is ${current.answer}.`));
         feedback.append(element('p', 'quiz-explanation', current.explanation));
+        const source = element('a', 'quiz-source', `Read the source: ${current.source.title}`);
+        source.href = current.source.url;
+        source.target = '_blank';
+        source.rel = 'noopener noreferrer';
+        feedback.append(source, element('p', 'quiz-version-note', current.versionNote));
       }
       panel.append(feedback);
       if (answered) {
         panel.append(button(state.index + 1 === state.total ? 'See my score' : 'Next question', () => {
-          session.next(); render('heading');
+          confirmQuit = false; session.next(); render('heading');
         }));
       } else {
         panel.append(element('p', 'quiz-small-note', 'Choose one answer. You can use Tab and Enter to play.'));
       }
+      const change = button('Change difficulty', () => { confirmQuit = true; render('quit'); }, 'quiz-change-button');
+      change.setAttribute('aria-expanded', String(confirmQuit));
+      panel.append(change);
+      if (confirmQuit) {
+        const confirmation = element('div', 'quiz-quit-confirmation');
+        confirmation.setAttribute('role', 'group');
+        confirmation.setAttribute('aria-label', 'End this round?');
+        const title = element('p', 'quiz-quit-title', 'End this round to choose a difficulty?');
+        title.tabIndex = -1;
+        confirmation.append(title, element('p', 'quiz-small-note', 'Your current score will reset. You can also keep playing.'));
+        confirmation.append(button('Keep playing', () => { confirmQuit = false; render(answered ? 'feedback' : 'heading'); }));
+        confirmation.append(button('End round', () => { confirmQuit = false; session.quitRound(); render('difficulty'); }, 'quiz-change-button'));
+        panel.append(confirmation);
+      }
     }
 
     root.replaceChildren(panel);
-    if (focusTarget === 'heading') panel.querySelector('.quiz-heading')?.focus({ preventScroll: true });
-    if (focusTarget === 'feedback') panel.querySelector('.quiz-feedback')?.focus({ preventScroll: true });
-    if (focusTarget === 'difficulty') panel.querySelector('.quiz-difficulty input:checked')?.focus({ preventScroll: true });
+    const target = {
+      heading: '.quiz-heading', feedback: '.quiz-feedback',
+      difficulty: '.quiz-difficulty input:checked', quit: '.quiz-quit-title',
+    }[focusTarget];
+    const focusNode = target ? panel.querySelector(target) : null;
+    if (focusNode) {
+      focusNode.focus({ preventScroll: true });
+      // Replacing a tall question leaves a phone at the old scroll position.
+      // Focus alone deliberately avoids scrolling, so make the new content
+      // visible explicitly. The header offset is provided by scroll-margin.
+      focusNode.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
   }
 
   render();

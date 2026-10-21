@@ -1,15 +1,16 @@
 import { randomBytes } from 'node:crypto';
 import { setTimeout as pause } from 'node:timers/promises';
-import { nicknameEnds, nicknameStarts } from '../public/nickname-words.js';
 
 // Exercise the local HTTP API only. MongoDB access remains inside /api.
-const base = 'http://localhost:3000';
+const portOption = process.argv.slice(2);
+if (portOption.length > 1 || (portOption.length && !/^--port=\d{4,5}$/.test(portOption[0]))) throw new Error('Choose a local test port with --port=3139.');
+const testPort = portOption.length ? Number(portOption[0].slice(7)) : 3000;
+if (testPort < 1024 || testPort > 65535) throw new Error('Choose a local test port from 1024 to 65535.');
+const base = portOption.length ? `http://127.0.0.1:${testPort}` : 'http://localhost:3000';
 const owner = { cookie: '' };
 const first = { cookie: '' };
 const second = { cookie: '' };
 const visitor = { cookie: '' };
-const aliases = nicknameStarts.flatMap((start) => nicknameEnds.map((end) => `${start}-${end}`));
-const firstAlias = randomBytes(2).readUInt16BE() % aliases.length;
 let nicknameA;
 let nicknameB;
 const password = randomBytes(24).toString('base64url');
@@ -57,15 +58,21 @@ async function expect(jar, path, method, body, status) {
   return result;
 }
 
-async function registerMadeUp(jar, inviteCode, exclude = '') {
-  for (let index = 0; index < aliases.length; index += 1) {
-    const nickname = aliases[(firstAlias + index) % aliases.length];
+async function registerMadeUp(jar, exclude = '') {
+  for (let index = 0; index < 5; index += 1) {
+    const suggested = await expect(visitor, '/api/account?mode=nickname', 'GET', undefined, 200);
+    const nickname = suggested.data.nickname;
     if (nickname === exclude) continue;
-    const result = await call(jar, '/api/account', 'POST', { action: 'register', nickname, password, inviteCode });
-    if (result.status === 201) return nickname;
+    const result = await call(jar, '/api/account', 'POST', { action: 'register', nickname, password });
+    if (result.status === 201) {
+      check(/^[A-Za-z0-9_-]{43}$/.test(result.data.recoveryCode), 'A private recovery code was not created.');
+      jar.recoveryCode = result.data.recoveryCode;
+      jar.password = password;
+      return nickname;
+    }
     check(result.status === 409, 'A made-up test account could not be registered.');
   }
-  throw new Error('No unused made-up nickname remains for the safety check.');
+  throw new Error('An unused made-up nickname could not be selected.');
 }
 
 try {
@@ -81,16 +88,14 @@ try {
   originalPosting = initial.data.postingEnabled;
   if (!originalPosting) await expect(owner, '/api/admin', 'POST', { action: 'posting', enabled: true }, 200);
 
-  const invitationA = await expect(owner, '/api/admin', 'POST', { action: 'invite' }, 201);
-  const invitationB = await expect(owner, '/api/admin', 'POST', { action: 'invite' }, 201);
-  nicknameA = await registerMadeUp(first, invitationA.data.inviteCode);
+  nicknameA = await registerMadeUp(first);
   created.add(first);
-  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'Sarah', password, inviteCode: invitationB.data.inviteCode }, 400);
-  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'SarahJones', password, inviteCode: invitationB.data.inviteCode }, 400);
-  nicknameB = await registerMadeUp(second, invitationB.data.inviteCode, nicknameA);
+  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'Sarah', password }, 400);
+  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'SarahJones', password }, 400);
+  nicknameB = await registerMadeUp(second, nicknameA);
   created.add(second);
-  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'Star-Fox', password, inviteCode: invitationA.data.inviteCode }, 400);
-  console.log('PASS: invite-only nickname accounts and one-use invitations.');
+  await expect(visitor, '/api/account', 'POST', { action: 'register', nickname: 'Star-Fox', password, inviteCode: 'unused' }, 400);
+  console.log('PASS: self-service nickname accounts without invitations; extra fields are rejected.');
 
   await expect(first, '/api/posts', 'POST', { text: 'Athena carries a shield in the sample story.' }, 201);
   const postsA = await expect(first, '/api/posts', 'GET', undefined, 200);
@@ -115,6 +120,8 @@ try {
     'Call 202-555-0199', 'Find me at 123 Fictional Street', 'Follow @fictional_owl',
     'https://example.invalid/fictional', 'I go to Cedar Valley Middle School.',
     'My friend Sarah likes Athena.', 'Sarah is my friend and likes Athena.',
+    'Full name: Astra Fictional', 'Real name=Astra Fictional',
+    'Me llamo Astra Fictional', 'Je m’appelle Astra Fictional', 'Mi chiamo Astra Fictional',
   ]) await expect(first, '/api/posts', 'POST', { text }, 400);
   const before = await expect(first, '/api/posts', 'GET', undefined, 200);
   check(before.data.posts.length === 1, 'Blocked contact information was saved.');
@@ -142,13 +149,33 @@ try {
   await expect(first, '/api/account', 'POST', { action: 'login', nickname: nicknameA, password }, 200);
   await expect(first, '/api/account', 'DELETE', { password: 'fictional-wrong-password' }, 401);
   console.log('PASS: logout revokes sessions, password login works, and deletion requires the password.');
+
+  const priorCode = first.recoveryCode;
+  const priorCookie = first.cookie;
+  const replacement = await expect(first, '/api/account', 'POST', { action: 'recovery-code', password }, 200);
+  first.recoveryCode = replacement.data.recoveryCode;
+  check(first.recoveryCode !== priorCode, 'Replacing a recovery code kept the previous code.');
+  await expect({ cookie: priorCookie }, '/api/posts', 'GET', undefined, 401);
+  await expect(visitor, '/api/account', 'POST', { action: 'recover', nickname: nicknameA, recoveryCode: priorCode, password }, 401);
+  const beforeResetCookie = first.cookie;
+  const newPassword = randomBytes(24).toString('base64url');
+  const recovered = await expect(first, '/api/account', 'POST', { action: 'recover', nickname: nicknameA, recoveryCode: first.recoveryCode, password: newPassword }, 200);
+  first.password = newPassword;
+  check(recovered.data.recoveryCode !== first.recoveryCode, 'Password recovery did not rotate its code.');
+  first.recoveryCode = recovered.data.recoveryCode;
+  await expect({ cookie: beforeResetCookie }, '/api/posts', 'GET', undefined, 401);
+  await expect(first, '/api/account', 'POST', { action: 'login', nickname: nicknameA, password }, 401);
+  const recoveredLogin = await expect(first, '/api/account', 'POST', { action: 'login', nickname: nicknameA, password: newPassword }, 200);
+  check(!Object.hasOwn(recoveredLogin.data, 'recoveryCode'), 'Login exposed a recovery code.');
+  await expect(first, '/api/admin', 'GET', undefined, 401);
+  console.log('PASS: private one-use account recovery, password change, code replacement, and old-session revocation.');
 } catch (error) {
   console.error(error.message?.startsWith('Safety check') || error.message?.startsWith('Rate limit') ? error.message : 'A local safety check failed. Ask Codex to review it; private values are hidden.');
   process.exitCode = 1;
 } finally {
   for (const jar of created) {
     try {
-      const result = await call(jar, '/api/account', 'DELETE', { password });
+      const result = await call(jar, '/api/account', 'DELETE', { password: jar.password || password });
       check(result.status === 200, 'Could not remove a made-up test account.');
     } catch {
       console.error('A made-up test account needs cleanup.');

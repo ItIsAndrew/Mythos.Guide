@@ -146,6 +146,9 @@ test('the quiz rejects invalid round sizes and every answer exists exactly once'
     assert.equal(new Set(item.choices).size, 4);
     assert.equal(item.choices.filter((choice) => choice === item.answer).length, 1);
     assert.ok(item.explanation.length > 40);
+    assert.ok(item.source?.title.length > 10, `${item.id}: visible source title`);
+    assert.match(item.source?.url ?? '', /^https:\/\/(www\.theoi\.com|www\.metmuseum\.org)\//, `${item.id}: relevant research source`);
+    assert.ok(item.versionNote.length > 40, `${item.id}: myth-version note`);
   }
 });
 
@@ -178,19 +181,23 @@ test('every question in the expanded bank scores correct and incorrect answers c
 });
 
 test('learning content has unique stories, both traditions, and complete realm details', () => {
-  assert.equal(worlds.length, 4);
-  assert.equal(stories.length, 6);
-  assert.equal(new Set([...worlds, ...stories].map((item) => item.id)).size, 10);
+  assert.equal(worlds.length, 6);
+  assert.equal(stories.length, 12);
+  assert.equal(new Set([...worlds, ...stories].map((item) => item.id)).size, worlds.length + stories.length);
   assert.deepEqual(new Set(stories.map((item) => item.tradition)), new Set(['Greek', 'Roman']));
   for (const world of worlds) {
     assert.equal(world.details.length, 3);
     assert.ok(world.gods.length >= 3);
     assert.ok(world.details.every((detail) => detail.title && detail.text));
+    assert.ok(world.sources?.length >= 1, world.id);
+    assert.ok(world.sources.every((source) => source.title && source.url.startsWith('https://')), world.id);
+    assert.ok(world.versionNote.length > 40, world.id);
   }
   for (const story of stories) {
     assert.equal(story.paragraphs.length, 3);
     assert.ok(story.relatedGods.length >= 2);
     assert.ok(story.source.url.startsWith('https://'));
+    assert.ok(story.versionNote.length > 40, story.id);
   }
 });
 
@@ -201,4 +208,38 @@ test('every god linked from a realm or story can be found in the sample archive'
       assert.ok(searchableNames.has(normalizeSearch(name)), `${item.id}: ${name}`);
     }
   }
+});
+
+
+test('ending a round resets progress while preserving the chosen difficulty', () => {
+  const session = createQuizSession({ difficulty: 'hard' });
+  session.start();
+  chooseAnswer(session, true);
+  session.next();
+  chooseAnswer(session, false);
+  const state = session.quitRound();
+  assert.equal(state.status, 'ready');
+  assert.equal(state.currentQuestion, null);
+  assert.equal(state.score, 0);
+  assert.equal(state.index, 0);
+  assert.equal(state.selectedIndex, null);
+  assert.equal(state.difficulty, 'hard');
+  session.selectDifficulty('medium');
+  assert.equal(session.start().currentQuestion.difficulty, 'medium');
+});
+
+test('new retellings add sustained reading and distinct paths beyond the Olympians', () => {
+  const newIds = ['ares-bronze-jar', 'mars-anna-perenna', 'asclepius-healing', 'heracles-alcestis', 'morpheus-message', 'venus-shield'];
+  for (const id of newIds) {
+    const story = stories.find((item) => item.id === id);
+    assert.ok(story, id);
+    const words = story.paragraphs.join(' ').split(/\s+/).length;
+    assert.ok(words >= 200 && words <= 300, `${id}: ${words} words`);
+    assert.equal(story.readingTime, '2 min');
+  }
+  for (const name of ['Ares', 'Mars', 'Heracles', 'Morpheus', 'Asclepius', 'Venus']) {
+    assert.ok(stories.filter((item) => newIds.includes(item.id)).some((story) => story.relatedGods.includes(name)), name);
+  }
+  assert.ok(worlds.find((item) => item.id === 'healing-sanctuary').gods.includes('Hygieia'));
+  assert.deepEqual(worlds.find((item) => item.id === 'roman-forum').gods, ['Janus', 'Concordia', 'Terminus']);
 });

@@ -5,7 +5,6 @@ import { HttpError, safePostText, validateNickname } from "./validation.js";
 export const COLLECTIONS = Object.freeze({
   users: "mythos_guide_users",
   sessions: "mythos_guide_sessions",
-  invites: "mythos_guide_invites",
   posts: "mythos_guide_posts",
   settings: "mythos_guide_settings",
   limits: "mythos_guide_rate_limits",
@@ -136,7 +135,6 @@ export async function ensureIndexes(db, state = defaultState) {
         db.collection(COLLECTIONS.users).createIndex({ nicknameKey: 1 }, { unique: true, name: "unique_nickname" }),
         db.collection(COLLECTIONS.sessions).createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0, name: "session_expiry" }),
         db.collection(COLLECTIONS.sessions).createIndex({ userId: 1 }, { name: "user_sessions" }),
-        db.collection(COLLECTIONS.invites).createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0, name: "invitation_expiry" }),
         db.collection(COLLECTIONS.posts).createIndex({ userId: 1, createdAt: -1 }, { name: "private_posts" }),
         db.collection(COLLECTIONS.posts).createIndex({ createdAt: -1, _id: -1 }, { name: "owner_posts_cursor" }),
         db.collection(COLLECTIONS.limits).createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0, name: "rate_limit_expiry" }),
@@ -212,14 +210,17 @@ function setCookie(req, res, name, value, maxAge) {
   res.setHeader("Set-Cookie", `${name}=${value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${secureCookie(req) ? "; Secure" : ""}`);
 }
 
-export async function createSession(db, req, res, kind, userId, session) {
+export async function createSession(db, req, res, kind, userId, session, deferCookie = false) {
   const raw = token();
   const duration = kind === "admin" ? ADMIN_SESSION_MS : SESSION_MS;
   const record = { _id: hashToken(raw), kind, expiresAt: new Date(Date.now() + duration) };
   if (kind === "user") record.userId = userId;
   else record.secretVersion = hashToken(ownerSecret());
   await db.collection(COLLECTIONS.sessions).insertOne(record, session ? { session } : {});
-  setCookie(req, res, kind === "admin" ? ADMIN_COOKIE : USER_COOKIE, raw, duration / 1000);
+  const commitCookie = () => setCookie(req, res, kind === "admin" ? ADMIN_COOKIE : USER_COOKIE, raw, duration / 1000);
+  // A failed/retried transaction must not replace a working browser cookie.
+  if (deferCookie) return commitCookie;
+  commitCookie();
 }
 
 export async function endSession(db, req, res, kind) {
