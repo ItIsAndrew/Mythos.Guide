@@ -16,6 +16,18 @@ const nextActivity = {
   play: ['basics', 'Names & words', 'Learn a little more before your next round.', 'Learn the words'],
   account: ['stories', 'Read the myths', 'Find a story to write about in your private notes.', 'Go to stories'],
 };
+let accountModuleRequested = false;
+function loadAccountWhenOpened() {
+  if (accountModuleRequested) return;
+  accountModuleRequested = true;
+  const script = document.createElement('script');
+  script.type = 'module';
+  script.src = '/accounts.js';
+  script.addEventListener('error', () => {
+    document.querySelector('#account-status').textContent = 'Account tools could not load. Reload the page to try again.';
+  }, { once: true });
+  document.head.append(script);
+}
 for (const [id, node] of activityNodes) {
   if (id === 'discovery') continue;
   const back = document.createElement('a');
@@ -32,6 +44,7 @@ function showActivity(name, scroll = true) {
   }
   const visible = new Set(activitySections.get(key));
   for (const [id, node] of activityNodes) node.hidden = !visible.has(id);
+  if (key === 'account') loadAccountWhenOpened();
   const skipLink = document.querySelector('.skip-link');
   const activeSection = activityNodes.get(activitySections.get(key)[0]);
   if (skipLink && activeSection) {

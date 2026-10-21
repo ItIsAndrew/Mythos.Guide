@@ -2,9 +2,9 @@
 
 ## Overall navigation and startup — October 21, 2026
 
-All **108 automated tests pass**. A new regression test follows the next link from each of the eight focused views, including Start here. In a fresh local browser page, Find a god led to Stories, Stories led to Quiz, direct Gods browsing loaded all 141 figures, and Create account offered a made-up nickname without creating an account. The old extra phone-only next links were removed to avoid duplicate directions.
+All **109 automated tests pass**. New regression tests follow the next link from each of the eight focused views, including Start here, and confirm account code loads only for My posts. In a fresh local browser page, Find a god led to Stories, Stories led to Quiz, direct Gods browsing loaded all 141 figures, and Create account offered a made-up nickname without creating an account. A Stories visit contained no account script; opening My posts inserted one and showed the account controls. Reloading the direct account link also inserted one. The old extra phone-only next links were removed to avoid duplicate directions.
 
-The gods archive is requested when browsing opens instead of on every activity visit. This is a client-side loading change; the local two-user, rate-limit, owner-delete, and posting-off safety workflow passed immediately before it, and the server code was unchanged. The public app still awaits hosting setup.
+The gods archive and account code are requested when their activities open instead of on every activity visit. These are client-side loading changes; the local two-user, rate-limit, owner-delete, and posting-off safety workflow passed immediately before them, and the server code was unchanged. The public app still awaits hosting setup.
 
 ## Activity menu — October 21, 2026
 

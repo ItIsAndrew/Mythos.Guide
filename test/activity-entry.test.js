@@ -43,6 +43,8 @@ function fixture(path) {
   const nextLink = { href: '#stories', firstChild: { textContent: 'Go to stories ' } };
   const nextTitle = { textContent: 'Read the myths' };
   const nextCopy = { textContent: '' };
+  const scripts = [];
+  const accountStatus = { textContent: 'Checking your account…' };
   let requested = 0;
   let received = 0;
   const form = {
@@ -53,7 +55,8 @@ function fixture(path) {
     ...eventTarget('document'),
     readyState: 'loading',
     title: '',
-    createElement: () => ({}),
+    createElement: () => ({ addEventListener() {} }),
+    head: { append(script) { scripts.push(script); } },
     querySelector(selector) {
       if (selector === 'main') return { children: [...nodes.values()] };
       if (selector === '#search-input') return input;
@@ -62,6 +65,7 @@ function fixture(path) {
       if (selector === '#activity-next-link') return nextLink;
       if (selector === '#activity-next-title') return nextTitle;
       if (selector === '#activity-next-copy') return nextCopy;
+      if (selector === '#account-status') return accountStatus;
       return null;
     },
     getElementById(id) { return this.querySelector(`#${id}`); },
@@ -76,7 +80,7 @@ function fixture(path) {
   vm.runInNewContext(activitySource, { document, window, URLSearchParams, URL, requestAnimationFrame: (callback) => callback() });
   form.addEventListener('submit', () => { received += 1; });
   return {
-    input, nodes, window, document, skipLink, nextLink, nextTitle, nextCopy,
+    input, nodes, window, document, skipLink, nextLink, nextTitle, nextCopy, scripts,
     get requested() { return requested; },
     get received() { return received; },
     ready() {
@@ -118,6 +122,22 @@ test('every activity offers a working next path and updates it when switching ac
     assert.notEqual(current, next);
     assert.ok(entry.nextCopy.textContent.length > 15, current);
   }
+});
+
+test('account code loads only on My posts, including a direct link, and only once', () => {
+  const entry = fixture('/activity#stories');
+  assert.equal(entry.scripts.length, 0, 'reading a story should not load account code');
+  entry.navigate('#play');
+  entry.navigate('#gods');
+  assert.equal(entry.scripts.length, 0, 'other activities should not load account code');
+  entry.navigate('#account');
+  assert.equal(entry.scripts.length, 1);
+  assert.equal(entry.scripts[0].src, '/accounts.js');
+  assert.equal(entry.scripts[0].type, 'module');
+  entry.navigate('#stories');
+  entry.navigate('#account');
+  assert.equal(entry.scripts.length, 1, 'returning must reuse the account module');
+  assert.equal(fixture('/activity#account').scripts.length, 1, 'a direct account link must load the module');
 });
 
 test('plain and legacy search URLs accept multiword and Unicode names as input text', () => {
