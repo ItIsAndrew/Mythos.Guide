@@ -10,7 +10,7 @@ For owner controls, double-click **Open Owner Controls.command** while the app r
 
 ## Where it is published
 
-Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/Mythos.Guide). Source upload was authorized October 19, 2026. The website still runs on this computer; it has not been deployed to Vercel or Sites. Private files and database contents are excluded from Git.
+Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/Mythos.Guide). The latest tested changes were pushed October 21, 2026. Public deployment was authorized that day and is being set up; the GitHub Pages address still shows the repository README because Pages cannot run the `/api` server functions. Until a server host is connected and verified, use the local app. Private files and database contents are excluded from Git.
 
 ## What is done
 
@@ -34,8 +34,8 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 
 ## Latest checks
 
-On October 21, 2026, the full **107-test suite passed** after the activity-menu redesign. Browser checks confirmed all seven destinations, the beginner link, updated resume/suggestion links after returning, and keyboard access. Menu layouts fit 320–1280 pixel screens without sideways scrolling; visible links have tap areas of at least 44 pixels. Earlier checks covered landing search, story filters, quiz practice, and live account protection. Details and historical results are in [TESTING.md](TESTING.md). The app remains local.
+On October 21, 2026, the full **107-test suite passed** after the activity-menu redesign. The live local safety check also passed with disposable sample accounts: two-user isolation, length and contact filters, rate limits, owner deletion, posting pause, recovery, and cleanup. A scan of all reachable Git objects found no saved database URL or owner passcode. Browser checks confirmed all seven destinations, the beginner link, updated resume/suggestion links after returning, and keyboard access. Menu layouts fit 320–1280 pixel screens without sideways scrolling; visible links have tap areas of at least 44 pixels. Details and historical results are in [TESTING.md](TESTING.md). The public app is not yet deployed.
 
 ## What is next
 
-Keep reviewing the educational content and learning paths with beginners. Use invented local test data. No website deployment is authorized: before any future publication, repeat the automated suite, live two-user/owner checks, privacy checks, and browser checks; set secrets privately in the hosting environment and verify HTTPS/Secure cookies. Keep `.env*` first in `.gitignore` and private files outside the public asset list.
+Finish the authorized Vercel setup, store `MONGODB_URI` and `ADMIN_PASSCODE` only in its private environment variables, and verify HTTPS/Secure cookies and a disposable live save before sharing a public app link. The signed-in Vercel account currently shows a 2FA setup dialog for the owner to resolve. Keep reviewing the educational content and learning paths with beginners. Keep `.env*` first in `.gitignore` and private files outside the public asset list.
