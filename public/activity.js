@@ -17,6 +17,9 @@ for (const [id, node] of activityNodes) {
 
 function showActivity(name, scroll = true) {
   const key = name === 'search-input' ? 'search' : activitySections.has(name) ? name : 'search';
+  if (key !== 'start-here') {
+    try { window.localStorage.setItem('mythos-guide:last-activity', key); } catch { /* Browsing still works without storage. */ }
+  }
   const visible = new Set(activitySections.get(key));
   for (const [id, node] of activityNodes) node.hidden = !visible.has(id);
   for (const link of document.querySelectorAll('.site-nav a, .phone-menu-links a')) {

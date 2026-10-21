@@ -3,3 +3,17 @@
 @media(max-width:900px){.guide-shell{padding:0 32px}.activity-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.notes-card{grid-column:span 2}}
 @media(max-width:600px){.guide-shell{padding:0 20px}.guide-header{min-height:82px}.brand{font-size:22px}.back-link{font-size:12px}.guide-intro{padding:46px 0 34px}.guide-intro h1{font-size:clamp(48px,11vw,64px);letter-spacing:-2.5px}.guide-intro>p:last-child{font-size:16px}.activity-grid{grid-template-columns:minmax(0,1fr);gap:12px}.activity-card,.notes-card{grid-column:auto;min-height:0;padding:22px}.activity-card strong{font-size:27px}.card-copy{font-size:16px}.card-action{font-size:15px}.guide-footer{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.activity-card{transition:none}}
+
+/* Two small choices sit above the full activity menu. */
+.guide-picks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.pick-card{display:flex;flex-direction:column;min-width:0;min-height:184px;padding:23px 26px;background:#ede4d5;border:1px solid #d4c4ae;text-decoration:none;border-radius:3px;transition:transform .2s,border-color .2s}
+.pick-card:hover{transform:translateY(-2px);border-color:var(--rust)}
+.suggestion-pick{background:#eef0e8;border-color:#cbd0c1}
+.pick-label{font-size:10px;letter-spacing:1.5px;font-weight:700;color:var(--rust)}
+.pick-card strong{font:400 30px/1.2 var(--serif);letter-spacing:-.5px;margin:16px 0 7px}
+.pick-card>span:nth-child(3){font-size:14px;line-height:1.6;color:var(--muted)}
+.pick-action{margin-top:auto;padding-top:15px;color:var(--rust);font-size:13px;font-weight:700}
+.pick-action span{padding-left:7px}
+.pick-privacy{margin:13px 0 38px;color:var(--muted);font-size:12px;line-height:1.6}
+@media(max-width:600px){.guide-picks{grid-template-columns:minmax(0,1fr);gap:12px}.pick-card{min-height:0;padding:20px}.pick-card strong{font-size:27px}.pick-card>span:nth-child(3){font-size:16px}.pick-action{font-size:15px}.pick-privacy{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.pick-card{transition:none}}

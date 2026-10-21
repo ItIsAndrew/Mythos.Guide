@@ -2,7 +2,7 @@
 
 ## How to run
 
-Double-click **Start Mythos.Guide.command** in this folder. Open **http://localhost:3000** and choose **Enter the guide**. The full tested guide is at **http://localhost:3000/guide**. Keep the Terminal window open; Control+C stops the app. The Mac shortcut uses the Node runtime bundled with Codex and needs no admin password. With Node.js 22+ and dependencies installed, `npm run dev` also works.
+Double-click **Start Mythos.Guide.command** in this folder. Open **http://localhost:3000** and choose **Enter the guide**. The activity menu is at **http://localhost:3000/guide**; each choice opens one focused part of the guide at **http://localhost:3000/activity**. Keep the Terminal window open; Control+C stops the app. The Mac shortcut uses the Node runtime bundled with Codex and needs no admin password. With Node.js 22+ and dependencies installed, `npm run dev` also works.
 
 Internet is needed for MongoDB. Keep the saved private settings in `.env.local`; never share or commit that file. Only `/api` accesses MongoDB, using the official driver, one reused client, and `client.db()` with no database name.
 
@@ -14,7 +14,7 @@ Source code: [ItIsAndrew/Mythos.Guide on GitHub](https://github.com/ItIsAndrew/M
 
 ## What is done
 
-- A welcoming landing page leads into the full guide. A three-step beginner path and simple phone navigation help new visitors choose where to start. Old links to guide sections still open the matching section.
+- A welcoming landing page leads into a compact activity menu. Search, browsing, stories, worlds, basics, quiz, and private notes each open in a focused view. The menu offers a link back to the last opened activity and a different suggested activity. Only the activity name is stored in this browser; nicknames and posts are not used. Old links to guide sections still reach the matching activity.
 - Search and browse 141 Greek and Roman divine figures, including Aether, Euterpe, and lesser-known figures. Both Thalias have working qualified Muse/Grace aliases. Show more or fewer cards, filter by tradition, or meet a random god.
 - Every figure has source references, a myth-version note, reviewed topic tags, and a useful next-step topic. There are 12 named topics, including war, love, healing, creation, and dreams. Related stories and worlds are labeled as thematic suggestions where appropriate.
 - Coverage includes all 48 figures in [Theoi’s major-pantheon overview](https://www.theoi.com/Pantheon.html) and all 12 Roman [Dei Consentes](https://penelope.uchicago.edu/encyclopaedia_romana/romanforum/deorumconsentium.html), exceeding the requested 75% of this defined major-god reference set. Ancient mythology has no fixed total for all divine figures.
