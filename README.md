@@ -1,8 +1,8 @@
 # Mythos.Guide
 
-A beginner-friendly guide to Greek and Roman mythology. Search 141 divine figures, discover their families, read six original story retellings, explore four mythological worlds, and play trivia with 48 questions across three difficulty levels.
+A beginner-friendly guide to Greek and Roman mythology. Search 141 divine figures, discover their families, read 12 original story retellings, explore six worlds and places, and play trivia with 48 questions across three difficulty levels.
 
-The guide also includes topic filters, random god discovery, Greek/Roman name comparisons, a short glossary, and self-service nickname accounts for private mythology notes.
+The guide also includes 12 topic filters, random god discovery, Greek/Roman name comparisons, a short glossary, and self-service nickname accounts for private mythology notes. Each god and quiz answer has a source and a note about differing myth versions. Accounts can be recovered using a private, one-use recovery code.
 
 ## Run locally
 
@@ -10,7 +10,7 @@ Use Node.js 22 or newer.
 
 1. Install dependencies with `npm install`.
 2. Copy `database.env.example` to `.env.local`. Enter your MongoDB connection URL privately as `MONGODB_URI`. For account and owner features, also add `ADMIN_PASSCODE` with a long, random private value. Never commit this file or share its contents.
-3. Run `npm run dev` and open **http://localhost:3000**. The new landing page leads to the full guide at **http://localhost:3000/guide**.
+3. Run `npm run dev` and open **http://localhost:3000**. Choose **Enter the guide** for the activity menu at **http://localhost:3000/guide**. Each choice opens a focused activity.
 
 The existing Mac shortcuts can start the app and open owner controls. Keep the Terminal window open while using the app.
 
@@ -27,4 +27,4 @@ See [TESTING.md](TESTING.md) for recorded results and [NOTES.md](NOTES.md) for c
 
 This repository shares the source code. The website currently runs locally; it has not been deployed to a public web host. Database contents, passwords, owner credentials, and local environment files are not included.
 
-Use invented nicknames and sample notes. Mythology descriptions and retellings are educational starting points; ancient traditions vary, and source links are provided where available.
+Use invented nicknames and sample notes. Mythology descriptions and retellings are educational starting points; ancient traditions vary, and source links accompany the learning content.
