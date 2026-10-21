@@ -105,6 +105,8 @@ function clearPrivateData({ preserveEntry = false } = {}) {
   postList.replaceChildren();
   document.querySelector('#account-welcome').textContent = '';
   postText.value = '';
+  postText.placeholder = '';
+  document.querySelector('#post-prompt-status').textContent = 'Choose an idea for a writing prompt. Nothing is saved until you press Save my post.';
   if (!preserveEntry) {
     password.value = '';
     recoverForm.reset();
@@ -412,6 +414,12 @@ loginTab.addEventListener('click', () => chooseMode('login'));
 registerTab.addEventListener('click', () => chooseMode('register'));
 nicknameSuggest.addEventListener('click', () => suggestNickname());
 postText.addEventListener('input', updateCount);
+['post-prompt-symbol', 'post-prompt-choice', 'post-prompt-place'].forEach((id) => document.querySelector(`#${id}`).addEventListener('click', (event) => {
+  const prompt = event.target.getAttribute('data-post-prompt');
+  postText.placeholder = prompt;
+  document.querySelector('#post-prompt-status').textContent = `Writing idea: ${prompt} Your draft stays as it is.`;
+  postText.focus();
+}));
 accountForm.addEventListener('submit', (event) => {
   event.preventDefault();
   if (!validPassword(password.value, password)) return;

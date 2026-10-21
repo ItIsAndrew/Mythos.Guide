@@ -340,6 +340,9 @@ export function mountQuiz(root) {
       }
       actions.append(button('Play again', () => { confirmQuit = false; session.restart(); render('heading'); }, missed.length ? 'quiz-change-button' : 'quiz-button'));
       actions.append(button('Change difficulty', () => { session.selectDifficulty(state.difficulty); render('difficulty'); }, 'quiz-change-button'));
+      const wordGuide = element('a', 'quiz-change-button', 'Practice mythology words');
+      wordGuide.href = '#basics';
+      actions.append(wordGuide);
       panel.append(actions);
       if (missed.length) {
         const review = element('section', 'quiz-review');
@@ -352,6 +355,20 @@ export function mountQuiz(root) {
           card.append(element('h5', 'quiz-review-question', item.question.prompt));
           card.append(element('p', 'quiz-review-choice', `Your answer: ${item.selectedAnswer}`));
           card.append(element('p', 'quiz-review-correct', `Correct answer: ${item.question.answer}`));
+          card.append(element('p', 'quiz-explanation', item.question.explanation));
+          card.append(sourceFor(item.question), element('p', 'quiz-version-note', item.question.versionNote));
+          review.append(card);
+        }
+        panel.append(review);
+      }
+      const correctAnswers = state.answers.filter((item) => item.correct);
+      if (correctAnswers.length) {
+        const review = element('details', 'quiz-correct-review');
+        review.append(element('summary', '', `Review ${correctAnswers.length} correct ${correctAnswers.length === 1 ? 'answer' : 'answers'}`));
+        for (const item of correctAnswers) {
+          const card = element('article', 'quiz-correct-card');
+          card.append(element('h5', 'quiz-review-question', item.question.prompt));
+          card.append(element('p', 'quiz-review-correct', `Your answer: ${item.question.answer}`));
           card.append(element('p', 'quiz-explanation', item.question.explanation));
           card.append(sourceFor(item.question), element('p', 'quiz-version-note', item.question.versionNote));
           review.append(card);

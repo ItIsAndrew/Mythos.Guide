@@ -46,6 +46,10 @@
 .account-recovery summary { display:list-item; min-height:44px; padding:10px 0; cursor:pointer; color:var(--rust-dark); }
 .account-recovery summary:focus-visible { outline:3px solid #c66c45; outline-offset:4px; }
 .account-recovery .account-form { margin-top:16px; }
+.post-prompts { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.post-prompts > span { color:var(--muted); font-size:14px; margin-right:4px; }
+.post-prompts .account-secondary { min-height:44px; padding:8px 12px; }
+#post-prompt-status { margin-top:9px; }
 #account-recovery-result { display:grid; gap:12px; margin:20px 0 26px; padding:20px; border:1px solid #c7bead; background:var(--paper); max-width:650px; min-width:0; }
 #account-recovery-result h4,#account-recovery-result p { margin:0; line-height:1.7; }
 #account-recovery-result h4 { font-size:18px; }

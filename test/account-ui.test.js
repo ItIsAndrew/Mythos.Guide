@@ -83,6 +83,17 @@ test('login moves focus to the enabled post box and a refresh failure does not m
   assert.match(ui.get('account-status').textContent, /archive is open.*Refresh posts/i);
 });
 
+test('writing ideas guide a private note without overwriting or saving its draft', async () => {
+  const ui = await accountUi({ user: { nickname: 'CometFox' } });
+  const draft = ui.get('post-text');
+  draft.value = 'Athena carries an owl in many images.';
+  ui.get('post-prompt-choice').fire('click');
+  assert.equal(draft.value, 'Athena carries an owl in many images.');
+  assert.equal(draft.placeholder, 'Which choice in a myth surprised you?');
+  assert.match(ui.get('post-prompt-status').textContent, /Your draft stays as it is/);
+  assert.equal(ui.server.writes, 0);
+});
+
 test('registration shows a recovery code once, preserves it on recheck, and dismiss/logout erase it', async () => {
   const ui = await accountUi();
   ui.get('account-register-tab').fire('click'); await ui.settled();

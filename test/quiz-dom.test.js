@@ -118,6 +118,9 @@ test('end-of-round review shows only missed answers and starts a focused practic
     button(index === 4 ? 'See my score' : 'Next question').click();
   }
   assert.equal(root.querySelector('.quiz-heading').textContent, 'You scored 3 out of 5');
+  assert.equal(root.all().filter((node) => node.className === 'quiz-correct-card').length, 3);
+  assert.ok(root.all().some((node) => node.tagName === 'summary' && node.textContent === 'Review 3 correct answers'));
+  assert.equal(root.all().find((node) => node.tagName === 'a' && node.textContent === 'Practice mythology words').href, '#basics');
   const cards = root.all().filter((node) => node.className === 'quiz-review-card');
   assert.equal(cards.length, 2);
   for (const [index, card] of cards.entries()) {

@@ -67,7 +67,7 @@ function searchableText(value) {
 }
 
 function wordPractice() {
-  const words = ['Oracle', 'Nymph', 'Titan', 'Muse'];
+  const words = ['Oracle', 'Nymph', 'Titan', 'Muse', 'Hero', 'Prophecy', 'Hearth', 'Personification'];
   const panel = element('div', 'glossary-entry');
   const title = element('h3', 'learning-title', 'Try a word challenge');
   const clue = element('p', 'learning-note');
