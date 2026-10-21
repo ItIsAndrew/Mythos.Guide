@@ -192,6 +192,12 @@ test('learning content has unique stories, both traditions, and complete realm d
     assert.ok(world.sources?.length >= 1, world.id);
     assert.ok(world.sources.every((source) => source.title && source.url.startsWith('https://')), world.id);
     assert.ok(world.versionNote.length > 40, world.id);
+    assert.ok(world.storyIds?.length >= 1, world.id);
+    for (const storyId of world.storyIds) {
+      const story = stories.find((item) => item.id === storyId);
+      assert.ok(story, `${world.id}: ${storyId}`);
+      assert.ok(story.relatedGods.some((name) => world.gods.includes(name)), `${world.id}: ${storyId} has a linked figure`);
+    }
   }
   for (const story of stories) {
     assert.equal(story.paragraphs.length, 3);
@@ -241,7 +247,7 @@ test('new retellings add sustained reading and distinct paths beyond the Olympia
     assert.ok(stories.filter((item) => newIds.includes(item.id)).some((story) => story.relatedGods.includes(name)), name);
   }
   assert.ok(worlds.find((item) => item.id === 'healing-sanctuary').gods.includes('Hygieia'));
-  assert.deepEqual(worlds.find((item) => item.id === 'roman-forum').gods, ['Janus', 'Concordia', 'Terminus']);
+  assert.deepEqual(worlds.find((item) => item.id === 'roman-forum').gods, ['Janus', 'Concordia', 'Terminus', 'Mars']);
 });
 
 test('completed rounds retain the chosen answers, explanations, and sources for review', () => {

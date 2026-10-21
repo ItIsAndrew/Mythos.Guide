@@ -565,6 +565,19 @@ function selectWorld(index, moveFocus = false) {
     detailGrid.append(item);
   });
   worldPanel.replaceChildren(introduction, detailGrid, relatedNames(world.gods, 'Meet a few of the gods connected with this world'));
+  const storyLinks = element('div', 'world-story-path');
+  storyLinks.append(element('h4', '', 'Read a connected story'));
+  const storyActions = element('div', 'explore-next-actions');
+  for (const storyId of world.storyIds || []) {
+    const story = stories.find((item) => item.id === storyId);
+    if (!story) continue;
+    const read = element('button', 'name-link', `${story.title} · ${story.readingTime}`);
+    read.type = 'button';
+    read.addEventListener('click', () => openStory(story, read));
+    storyActions.append(read);
+  }
+  storyLinks.append(storyActions);
+  worldPanel.append(storyLinks);
   const references = createReferences(world.sources, world.versionNote);
   if (references) worldPanel.append(references);
   if (moveFocus) worldTabs.children[index].focus();
@@ -629,9 +642,11 @@ const storyStatus = document.querySelector('#stories-status');
 const storySearch = document.querySelector('#story-search');
 const storyTradition = document.querySelector('#story-tradition');
 const storyReset = document.querySelector('#stories-reset');
+const storySurprise = document.querySelector('#stories-surprise');
 const storyEmpty = document.querySelector('#stories-empty');
 const storyPageSize = 6;
 let visibleStories = storyPageSize;
+let previousStoryId = null;
 
 function createStoryCard(story, index) {
   const card = element('article', 'story-card');
@@ -669,6 +684,7 @@ function renderStories() {
   storyGrid.hidden = matching.length === 0;
   storyMore.hidden = shown >= matching.length;
   storyLess.hidden = shown <= storyPageSize;
+  storySurprise.disabled = matching.length === 0;
   if (!storyMore.hidden) storyMore.textContent = `Show ${Math.min(storyPageSize, matching.length - shown)} more stories`;
 }
 function updateStoryFilters() {
@@ -683,6 +699,15 @@ storyReset.addEventListener('click', () => {
   storyTradition.value = 'all';
   updateStoryFilters();
   storySearch.focus();
+});
+storySurprise.addEventListener('click', () => {
+  const matching = filterStories(stories, storySearch.value, storyTradition.value);
+  const options = matching.filter((story) => story.id !== previousStoryId);
+  const choices = options.length ? options : matching;
+  if (!choices.length) return;
+  const chosen = choices[Math.floor(Math.random() * choices.length)];
+  previousStoryId = chosen.id;
+  openStory(chosen, storySurprise);
 });
 storyMore.addEventListener('click', () => {
   const firstNew = visibleStories;
